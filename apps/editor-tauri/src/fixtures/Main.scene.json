@@ -1,0 +1,114 @@
+{
+  "version": 1,
+  "name": "Main",
+  "entities": [
+    {
+      "id": "camera",
+      "name": "Main Camera",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [4, 3, 6],
+          "rotation": [-0.4, 0.5, 0],
+          "scale": [1, 1, 1]
+        },
+        "render.camera": {
+          "fov": 60,
+          "near": 0.1,
+          "far": 1000,
+          "primary": true
+        }
+      }
+    },
+    {
+      "id": "sun",
+      "name": "Sun",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [2, 6, 2],
+          "rotation": [0, 0, 0],
+          "scale": [1, 1, 1]
+        },
+        "render.light": {
+          "type": "directional",
+          "color": "#ffffff",
+          "intensity": 1.2,
+          "castShadow": true,
+          "direction": [-0.4, -1, -0.3]
+        }
+      }
+    },
+    {
+      "id": "ambient",
+      "name": "Ambient",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [0, 0, 0],
+          "rotation": [0, 0, 0],
+          "scale": [1, 1, 1]
+        },
+        "render.light": {
+          "type": "ambient",
+          "color": "#405060",
+          "intensity": 0.45
+        }
+      }
+    },
+    {
+      "id": "ground",
+      "name": "Ground",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [0, 0, 0],
+          "rotation": [-1.57079632679, 0, 0],
+          "scale": [12, 12, 1]
+        },
+        "render.mesh": {
+          "primitive": "plane",
+          "color": "#3a5a40",
+          "castShadow": false,
+          "receiveShadow": true
+        }
+      }
+    },
+    {
+      "id": "player",
+      "name": "Player",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [0, 0.5, 0],
+          "rotation": [0, 0, 0],
+          "scale": [1, 1, 1]
+        },
+        "render.mesh": {
+          "primitive": "box",
+          "color": "#4ea8de",
+          "castShadow": true,
+          "receiveShadow": true
+        }
+      }
+    },
+    {
+      "id": "coin",
+      "name": "Coin",
+      "parent": null,
+      "components": {
+        "core.transform": {
+          "position": [2, 0.5, -1],
+          "rotation": [0, 0, 0],
+          "scale": [0.4, 0.4, 0.4]
+        },
+        "render.mesh": {
+          "primitive": "sphere",
+          "color": "#f4d35e",
+          "castShadow": true,
+          "receiveShadow": true
+        }
+      }
+    }
+  ]
+}

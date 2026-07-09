@@ -7,6 +7,14 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@threeforge/engine": path.resolve(
+        __dirname,
+        "../../packages/engine/src/index.ts"
+      ),
+      "@threeforge/schemas": path.resolve(
+        __dirname,
+        "../../packages/schemas/src/index.ts"
+      ),
     },
   },
   clearScreen: false,

@@ -1,29 +1,52 @@
-import { z } from "zod";
+export type {
+  Vec3,
+  InspectorFieldType,
+  InspectorField,
+  ComponentDocs,
+  ComponentDefinition,
+} from "./types.js";
 
-// Entity schema
-export const EntitySchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  parent: z.string().nullable(),
-  components: z.record(z.unknown()),
-});
+export { defineComponent } from "./defineComponent.js";
+export { vec3 } from "./vec3.js";
 
-export type Entity = z.infer<typeof EntitySchema>;
+export {
+  EntitySchema,
+  SceneSchema,
+  parseScene,
+  safeParseScene,
+  type Entity,
+  type Scene,
+} from "./scene.schema.js";
 
-// Scene schema
-export const SceneSchema = z.object({
-  version: z.number(),
-  name: z.string(),
-  entities: z.array(EntitySchema),
-});
+export {
+  PrefabSchema,
+  PrefabNodeSchema,
+  parsePrefab,
+  type Prefab,
+  type PrefabNode,
+} from "./prefab.schema.js";
 
-export type Scene = z.infer<typeof SceneSchema>;
+export {
+  ProjectManifestSchema,
+  parseProjectManifest,
+  type ProjectManifest,
+} from "./project.schema.js";
 
-// Transform component
-export const TransformSchema = z.object({
-  position: z.tuple([z.number(), z.number(), z.number()]).default([0, 0, 0]),
-  rotation: z.tuple([z.number(), z.number(), z.number()]).default([0, 0, 0]),
-  scale: z.tuple([z.number(), z.number(), z.number()]).default([1, 1, 1]),
-});
-
-export type Transform = z.infer<typeof TransformSchema>;
+export {
+  TransformComponent,
+  TransformSchema,
+  type Transform,
+  MeshComponent,
+  MeshSchema,
+  MeshPrimitiveSchema,
+  type Mesh,
+  CameraComponent,
+  CameraSchema,
+  type Camera,
+  LightComponent,
+  LightSchema,
+  LightTypeSchema,
+  type Light,
+  CORE_COMPONENTS,
+  CORE_COMPONENT_MAP,
+} from "./components/index.js";

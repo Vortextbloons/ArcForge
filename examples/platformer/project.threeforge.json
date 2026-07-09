@@ -1,0 +1,23 @@
+{
+  "name": "Platformer Demo",
+  "engineVersion": "0.1.0",
+  "defaultScene": "scenes/Main.scene.json",
+  "render": {
+    "backend": "webgl",
+    "antialias": true,
+    "shadows": true,
+    "toneMapping": "aces"
+  },
+  "physics": {
+    "enabled": false,
+    "backend": "none"
+  },
+  "scripting": {
+    "language": "typescript",
+    "strict": true
+  },
+  "export": {
+    "web": true,
+    "editableThreeProject": true
+  }
+}

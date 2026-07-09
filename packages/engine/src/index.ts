@@ -1,29 +1,29 @@
-// Core engine types
-export type EntityId = string;
+// ECS
+export type { EntityId, EntityRecord } from "./ecs/index.js";
+export { World, ComponentRegistry } from "./ecs/index.js";
 
-export interface EntityData {
-  id: EntityId;
-  name: string;
-  parent: EntityId | null;
-  components: Record<string, unknown>;
-}
+// Render
+export {
+  RenderBridge,
+  type RendererOptions,
+  syncTransforms,
+  syncMeshes,
+  syncCameras,
+  syncLights,
+} from "./render/index.js";
 
-export interface GameContext {
-  time: {
-    delta: number;
-    elapsed: number;
-  };
-  entity: EntityData;
-  scene: SceneData;
-}
+// Runtime
+export {
+  loadScene,
+  worldToScene,
+  type LoadedScene,
+  GameLoop,
+  type TimeState,
+  type FrameCallback,
+  type GameLoopOptions,
+  Runtime,
+  type RuntimeOptions,
+} from "./runtime/index.js";
 
-export interface SceneData {
-  version: number;
-  name: string;
-  entities: EntityData[];
-}
-
-export class Behaviour {
-  update(_ctx: GameContext): void {}
-  fixedUpdate(_ctx: GameContext): void {}
-}
+// Scripting API (minimal Phase 1 stub)
+export { Behaviour, type GameContext } from "./scripting/Behaviour.js";
