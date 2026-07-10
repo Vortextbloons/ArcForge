@@ -5,16 +5,14 @@ import { withPermission, recordWriteSuccess } from "../toolGate.js";
 import { errorResult, jsonResult } from "../toolResult.js";
 import {
   createPlugin,
+  createPluginSystem,
   listPlugins,
   readPlugin,
   setPluginEnabled,
   validatePlugin,
 } from "../mutations/pluginMutations.js";
 
-export function registerPluginTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerPluginTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "plugin.list",
     {
@@ -119,6 +117,34 @@ export function registerPluginTools(
         try {
           const result = await setPluginEnabled(ctx.projectRoot, plugin, true);
           await recordWriteSuccess(ctx, "plugin.enable", `Enabled ${plugin}`, result.paths);
+          return jsonResult(result.data);
+        } catch (err) {
+          return errorResult(err instanceof Error ? err.message : String(err));
+        }
+      })
+  );
+
+  server.registerTool(
+    "plugin.create_system",
+    {
+      title: "Create runtime system",
+      description: "Creates a game-owned RuntimeSystem module and adds it to the plugin manifest.",
+      inputSchema: {
+        plugin: z.string().describe("Plugin id or folder"),
+        name: z.string().min(1),
+        content: z.string().optional(),
+      },
+    },
+    async (args) =>
+      withPermission(ctx, "plugin.create_system", async () => {
+        try {
+          const result = await createPluginSystem(ctx.projectRoot, args);
+          await recordWriteSuccess(
+            ctx,
+            "plugin.create_system",
+            `Created runtime system ${result.data.systemId}`,
+            result.paths
+          );
           return jsonResult(result.data);
         } catch (err) {
           return errorResult(err instanceof Error ? err.message : String(err));

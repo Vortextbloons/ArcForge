@@ -171,7 +171,14 @@ export async function loadProjectBundle(
   }
 
   const scripts: CollectedScript[] = [];
+  const allScriptFiles = await listFiles(
+    root,
+    (rel) =>
+      (rel.startsWith("scripts/") && (rel.endsWith(".ts") || rel.endsWith(".tsx"))) ||
+      /^plugins\/[^/]+\/systems\/.+\.system\.ts$/.test(rel)
+  );
   for (const rel of [...scriptPaths].sort()) {
+    if (allScriptFiles.includes(rel)) continue;
     const abs = resolveUnderRoot(root, rel);
     if (!abs) {
       issues.push(issue("error", "unsafe-script-path", `Unsafe script path: ${rel}`, rel));
@@ -181,25 +188,22 @@ export async function loadProjectBundle(
       issues.push(issue("error", "missing-script", `Script not found: ${rel}`, rel));
       continue;
     }
-    const source = await fs.readFile(abs, "utf8");
-    scripts.push({ path: rel, absolutePath: abs, source });
   }
 
-  // Also collect any scripts on disk that weren't referenced (warn only).
-  const allScriptFiles = await listFiles(
-    root,
-    (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts")
-  );
-  for (const rel of allScriptFiles) {
-    if (scriptPaths.has(rel)) continue;
-    issues.push(
-      issue(
-        "warning",
-        "unreferenced-script",
-        `Script exists but is not referenced by any scene/prefab: ${rel}`,
-        rel
-      )
-    );
+  for (const rel of allScriptFiles.sort()) {
+    const abs = resolveUnderRoot(root, rel);
+    if (!abs) {
+      issues.push(issue("error", "unsafe-script-path", `Unsafe script path: ${rel}`, rel));
+      continue;
+    }
+    const source = await fs.readFile(abs, "utf8");
+    scripts.push({
+      path: rel,
+      absolutePath: abs,
+      source,
+      entry: scriptPaths.has(rel),
+      system: /^plugins\/[^/]+\/systems\/.+\.system\.ts$/.test(rel),
+    });
   }
 
   const referencedAssets: string[] = [];

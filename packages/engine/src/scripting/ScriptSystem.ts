@@ -8,6 +8,15 @@ import { EntityHandle } from "./EntityHandle.js";
 import type { EventBus } from "./EventBus.js";
 import type { RuntimeLogger } from "./RuntimeLogger.js";
 import type { ScriptRegistry } from "./ScriptRegistry.js";
+import type { EntityAPI } from "./EntityAPI.js";
+import type { AssetManager } from "../assets/AssetManager.js";
+import type { AudioAPI } from "../audio/AudioSystem.js";
+import type { AnimationSystem } from "../animation/AnimationSystem.js";
+import type { TimerAPI } from "./TimerAPI.js";
+import type { StorageAPI } from "./StorageAPI.js";
+import type { SceneAPI } from "../runtime/SceneAPI.js";
+import type { RuntimeExtensions } from "../plugins/RuntimeExtensions.js";
+import type { ParticleSystem } from "../render/ParticleSystem.js";
 
 const SCRIPT_ID = "script.behaviour";
 
@@ -24,6 +33,7 @@ interface ScriptInstance {
  */
 export class ScriptSystem {
   private readonly instances = new Map<string, ScriptInstance>();
+  private readonly missingModules = new Set<string>();
   private scriptsEnabled = false;
 
   constructor(
@@ -33,7 +43,16 @@ export class ScriptSystem {
     private readonly events: EventBus,
     private readonly logger: RuntimeLogger,
     private getScene: () => Scene,
-    private readonly physics: PhysicsAPI
+    private readonly physics: PhysicsAPI,
+    private readonly entities: EntityAPI,
+    private readonly assets: AssetManager,
+    private readonly audio: AudioAPI,
+    private readonly animation: AnimationSystem,
+    private readonly timers: TimerAPI,
+    private readonly storage: StorageAPI,
+    private readonly scenes: SceneAPI,
+    private readonly extensions: RuntimeExtensions,
+    private readonly particles: ParticleSystem
   ) {}
 
   setEnabled(enabled: boolean): void {
@@ -68,12 +87,16 @@ export class ScriptSystem {
       if (!instance) {
         const ctor = this.registry.get(data.module);
         if (!ctor) {
-          this.logger.error(`Script module not registered: ${data.module}`, {
-            module: data.module,
-            entityId: entity.id,
-          });
+          if (!this.missingModules.has(data.module)) {
+            this.missingModules.add(data.module);
+            this.logger.error(`Script module not registered: ${data.module}`, {
+              module: data.module,
+              entityId: entity.id,
+            });
+          }
           continue;
         }
+        this.missingModules.delete(data.module);
         try {
           const behaviour = new ctor();
           applyProps(behaviour, data.props ?? {});
@@ -143,9 +166,12 @@ export class ScriptSystem {
   }
 
   destroyAll(): void {
+    // onDestroy may mutate script components, so destruction uses a stable snapshot.
+    // oxlint-disable-next-line unicorn/no-useless-spread
     for (const [key, instance] of [...this.instances.entries()]) {
       this.destroyInstance(key, instance);
     }
+    this.missingModules.clear();
   }
 
   private destroyInstance(key: string, instance: ScriptInstance): void {
@@ -169,6 +195,15 @@ export class ScriptSystem {
     return {
       time,
       entity: new EntityHandle(entityId, this.world),
+      entities: this.entities,
+      assets: this.assets,
+      audio: this.audio,
+      animation: this.animation,
+      timers: this.timers,
+      storage: this.storage,
+      scenes: this.scenes,
+      extensions: this.extensions,
+      particles: this.particles,
       world: this.world,
       scene: this.getScene(),
       input: this.input,

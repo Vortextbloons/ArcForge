@@ -17,6 +17,8 @@ export class EventBus {
   emit(event: string, payload?: unknown): void {
     const set = this.handlers.get(event);
     if (!set) return;
+    // Handlers may unsubscribe themselves while an event is being delivered.
+    // oxlint-disable-next-line unicorn/no-useless-spread
     for (const handler of [...set]) {
       handler(payload);
     }

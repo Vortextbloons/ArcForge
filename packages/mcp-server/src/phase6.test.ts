@@ -6,6 +6,7 @@ import { describe, expect, it, beforeEach, afterEach } from "vitest";
 import { createProjectContext } from "./projectContext.js";
 import { decidePermission } from "./auth/permissions.js";
 import { DEFAULT_POLICY } from "./auth/policyTypes.js";
+import { createPlugin, createPluginSystem } from "./mutations/pluginMutations.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PLATFORMER = path.join(ROOT, "examples", "platformer");
@@ -85,9 +86,37 @@ describe("phase 6 mutations", () => {
       component: "render.mesh",
       patch: { primitive: "sphere", color: "#ff00aa" },
     });
+    const duplicate = await ctx.mutator.duplicateEntity({
+      scene: "scenes/Main.scene.json",
+      entityId: entity.data.entityId,
+      id: "spawner_copy",
+    });
+    expect(duplicate.data.entityId).toBe("spawner_copy");
+    await ctx.mutator.renameEntity({
+      scene: "scenes/Main.scene.json",
+      entityId: "spawner_copy",
+      name: "Second Spawner",
+    });
+    await ctx.mutator.removeComponent({
+      scene: "scenes/Main.scene.json",
+      entityId: "spawner_copy",
+      component: "render.mesh",
+    });
 
     const prefab = await ctx.mutator.createPrefab({ name: "CoinPickup" });
     expect(prefab.data.path).toBe("prefabs/coinpickup.prefab.json");
+    const instance = await ctx.mutator.instantiatePrefab({
+      scene: "scenes/Main.scene.json",
+      prefab: prefab.data.path,
+      id: "coin_instance",
+    });
+    expect(instance.data.entityId).toBe("coin_instance");
+    await createPlugin(tempRoot, { id: "game.weather", name: "Weather" });
+    const system = await createPluginSystem(tempRoot, {
+      plugin: "game.weather",
+      name: "Weather Cycle",
+    });
+    expect(system.data.path).toMatch(/weather-cycle\.system\.ts$/);
 
     const script = await ctx.mutator.createScript({
       path: "scripts/spawner.controller.ts",

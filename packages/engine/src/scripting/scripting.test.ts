@@ -7,12 +7,23 @@ import {
   InputAPI,
   EventBus,
   RuntimeLogger,
-  typecheckScripts,
   loadScene,
   World,
   PhysicsAPI,
   NullPhysicsBackend,
+  EntityAPI,
+  ComponentRegistry,
+  AssetManager,
+  AudioSystem,
+  AnimationSystem,
+  TimerAPI,
+  StorageAPI,
+  SceneAPI,
+  RuntimeExtensions,
+  type RenderBridge,
+  ParticleSystem,
 } from "../index.js";
+import { typecheckScripts } from "../compiler.js";
 
 class MoveRight extends Behaviour {
   speed = 1;
@@ -50,6 +61,21 @@ export default class Bad extends Behaviour {}
     expect(result.diagnostics.some((d) => /Tauri/.test(d.message))).toBe(true);
   });
 
+  it("reports semantic TypeScript errors", () => {
+    const result = typecheckScripts([
+      {
+        path: "scripts/types.ts",
+        source: `const speed: number = "fast"; export { speed };`,
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    expect(
+      result.diagnostics.some((diagnostic) =>
+        /not assignable to type 'number'/.test(diagnostic.message)
+      )
+    ).toBe(true);
+  });
+
   it("runs behaviour update and moves transform", () => {
     const world = new World();
     const registry = new ScriptRegistry();
@@ -58,6 +84,19 @@ export default class Bad extends Behaviour {}
     const events = new EventBus();
     const logger = new RuntimeLogger();
     const physics = new PhysicsAPI(new NullPhysicsBackend());
+    const entities = new EntityAPI(world, ComponentRegistry.withCore());
+    const assets = new AssetManager();
+    const audio = new AudioSystem(assets);
+    const extensions = new RuntimeExtensions({
+      world,
+      entities,
+      input,
+      events,
+      assets,
+      audio: audio.api,
+      physics,
+      render: {} as RenderBridge,
+    });
 
     const loaded = loadScene(
       {
@@ -93,7 +132,16 @@ export default class Bad extends Behaviour {}
       events,
       logger,
       () => loaded.scene,
-      physics
+      physics,
+      entities,
+      assets,
+      audio.api,
+      new AnimationSystem(),
+      new TimerAPI(),
+      new StorageAPI("test"),
+      new SceneAPI(),
+      extensions,
+      new ParticleSystem()
     );
     scripts.setEnabled(true);
     scripts.update({ delta: 0.5, elapsed: 0.5, fixedDelta: 1 / 60 });

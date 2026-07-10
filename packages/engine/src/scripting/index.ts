@@ -1,6 +1,13 @@
-export { InputAPI, type Vec2 } from "../input/InputAPI.js";
+export {
+  InputAPI,
+  type Vec2,
+  type PointerState,
+  type InputActionBinding,
+  type InputActionMap,
+} from "../input/InputAPI.js";
 export { Behaviour, type GameContext, type BehaviourConstructor } from "./Behaviour.js";
 export { EntityHandle, TransformHandle } from "./EntityHandle.js";
+export { EntityAPI, type SpawnEntityOptions } from "./EntityAPI.js";
 export { EventBus } from "./EventBus.js";
 export {
   RuntimeLogger,
@@ -10,14 +17,10 @@ export {
 } from "./RuntimeLogger.js";
 export { ScriptRegistry } from "./ScriptRegistry.js";
 export { ScriptSystem } from "./ScriptSystem.js";
-export {
-  compileBehaviourModule,
-  transpileBehaviourSource,
-  type CompileBehaviourOutcome,
-} from "./compileBehaviourModule.js";
-export {
-  typecheckScripts,
-  type ScriptDiagnostic,
-  type ScriptSource,
-  type ScriptTypecheckResult,
-} from "./typecheckScripts.js";
+export { TimerAPI, type TimerId } from "./TimerAPI.js";
+export { StorageAPI } from "./StorageAPI.js";
+export type {
+  PhysicsCollisionEvent,
+  PhysicsCollisionListener,
+  RaycastHit,
+} from "../physics/types.js";

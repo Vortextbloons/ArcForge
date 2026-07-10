@@ -5,6 +5,9 @@ import {
   EditorSession,
   RenameEntityCommand,
   UpdateComponentCommand,
+  DuplicateEntityCommand,
+  ReparentEntityCommand,
+  RemoveComponentCommand,
 } from "./index.js";
 
 const SCENE = {
@@ -59,7 +62,7 @@ describe("EditorSession commands", () => {
     );
     expect(
       (
-        session.findEntity("coin")?.components["core.transform"] as {
+        session.findEntity("coin")!.components["core.transform"] as {
           position: number[];
         }
       ).position
@@ -68,7 +71,7 @@ describe("EditorSession commands", () => {
     await session.undo();
     expect(
       (
-        session.findEntity("coin")?.components["core.transform"] as {
+        session.findEntity("coin")!.components["core.transform"] as {
           position: number[];
         }
       ).position
@@ -110,5 +113,29 @@ describe("EditorSession commands", () => {
     await session.undo();
     expect(session.findEntity("root")).toBeDefined();
     expect(session.findEntity("child")).toBeDefined();
+  });
+
+  it("duplicates hierarchies, reparents entities, and removes components", async () => {
+    const session = new EditorSession({
+      scene: {
+        version: 1,
+        name: "Commands",
+        entities: [
+          { id: "root", name: "Root", parent: null, components: { "game.health": { hp: 10 } } },
+          { id: "child", name: "Child", parent: "root", components: {} },
+        ],
+      },
+    });
+    const duplicate = new DuplicateEntityCommand("root", "root_copy");
+    await session.execute(duplicate);
+    expect(duplicate.rootId).toBe("root_copy");
+    expect(session.findEntity("root_copy")?.name).toBe("Root Copy");
+    const copiedChild = session.getScene().entities.find((entity) => entity.parent === "root_copy");
+    expect(copiedChild).toBeDefined();
+
+    await session.execute(new ReparentEntityCommand(copiedChild!.id, null));
+    expect(session.findEntity(copiedChild!.id)?.parent).toBeNull();
+    await session.execute(new RemoveComponentCommand("root_copy", "game.health"));
+    expect(session.findEntity("root_copy")?.components["game.health"]).toBeUndefined();
   });
 });

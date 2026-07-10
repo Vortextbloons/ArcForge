@@ -8,7 +8,7 @@ import {
   type ProjectManifest,
   type Scene,
 } from "@arcforge/schemas";
-import { typecheckScripts } from "@arcforge/engine";
+import { typecheckScripts } from "@arcforge/engine/compiler";
 import { buildDocIndex, type DocIndex } from "@arcforge/docs-indexer";
 import { analyzeProjectPerformance } from "@arcforge/editor-core/node";
 import type { McpPolicy } from "./auth/policyTypes.js";
@@ -340,9 +340,7 @@ export async function createProjectContext(options: {
         try {
           scenesForPerf.push({
             path: rel,
-            scene: parseScene(
-              JSON.parse(await fs.readFile(abs, "utf8")) as unknown
-            ),
+            scene: parseScene(JSON.parse(await fs.readFile(abs, "utf8")) as unknown),
           });
         } catch {
           // already reported as invalid-scene
@@ -352,11 +350,7 @@ export async function createProjectContext(options: {
         projectRoot,
         (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts")
       );
-      const perf = await analyzeProjectPerformance(
-        projectRoot,
-        scenesForPerf,
-        allScripts
-      );
+      const perf = await analyzeProjectPerformance(projectRoot, scenesForPerf, allScripts);
       for (const w of perf) {
         warnings.push({
           code: w.code,

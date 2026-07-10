@@ -48,28 +48,41 @@ fn list_project_files(
 
     let ext = extension.unwrap_or_default();
     let mut out = Vec::new();
-    let entries = fs::read_dir(&dir).map_err(|e| e.to_string())?;
-    for entry in entries {
-        let entry = entry.map_err(|e| e.to_string())?;
-        let path = entry.path();
+    collect_project_files(&root, &dir, &ext, &mut out)?;
+    out.sort();
+    Ok(out)
+}
+
+fn collect_project_files(
+    root: &Path,
+    dir: &Path,
+    extension: &str,
+    out: &mut Vec<String>,
+) -> Result<(), String> {
+    for entry in fs::read_dir(dir).map_err(|e| e.to_string())? {
+        let path = entry.map_err(|e| e.to_string())?.path();
+        if path.is_dir() {
+            collect_project_files(root, &path, extension, out)?;
+            continue;
+        }
         if !path.is_file() {
             continue;
         }
-        if !ext.is_empty() {
-            let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-            if !name.ends_with(&ext) {
-                continue;
-            }
+        let name = path
+            .file_name()
+            .and_then(|name| name.to_str())
+            .unwrap_or("");
+        if !extension.is_empty() && !name.ends_with(extension) {
+            continue;
         }
-        let rel = path
-            .strip_prefix(&root)
-            .map_err(|e| e.to_string())?
-            .to_string_lossy()
-            .replace('\\', "/");
-        out.push(rel);
+        out.push(
+            path.strip_prefix(root)
+                .map_err(|e| e.to_string())?
+                .to_string_lossy()
+                .replace('\\', "/"),
+        );
     }
-    out.sort();
-    Ok(out)
+    Ok(())
 }
 
 #[tauri::command]

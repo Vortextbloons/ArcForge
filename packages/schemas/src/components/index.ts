@@ -6,6 +6,10 @@ import { LightComponent } from "./light.js";
 import { ScriptBehaviourComponent } from "./scriptBehaviour.js";
 import { RigidbodyComponent } from "./rigidbody.js";
 import { ColliderComponent } from "./collider.js";
+import { AudioSourceComponent } from "./audioSource.js";
+import { AnimatorComponent } from "./animator.js";
+import { UiElementComponent } from "./uiElement.js";
+import { ParticleEmitterComponent } from "./particleEmitter.js";
 import type { z } from "zod";
 
 export { TransformComponent, TransformSchema, type Transform } from "./transform.js";
@@ -29,6 +33,14 @@ export {
   ColliderShapeSchema,
   type Collider,
 } from "./collider.js";
+export { AudioSourceComponent, AudioSourceSchema, type AudioSource } from "./audioSource.js";
+export { AnimatorComponent, AnimatorSchema, type Animator } from "./animator.js";
+export { UiElementComponent, UiElementSchema, type UiElement } from "./uiElement.js";
+export {
+  ParticleEmitterComponent,
+  ParticleEmitterSchema,
+  type ParticleEmitter,
+} from "./particleEmitter.js";
 
 type AnyDef = ComponentDefinition<z.ZodTypeAny>;
 
@@ -41,6 +53,10 @@ export const CORE_COMPONENTS: readonly AnyDef[] = [
   ScriptBehaviourComponent,
   RigidbodyComponent,
   ColliderComponent,
+  AudioSourceComponent,
+  AnimatorComponent,
+  UiElementComponent,
+  ParticleEmitterComponent,
 ];
 
 export const CORE_COMPONENT_MAP: Record<string, AnyDef> = Object.fromEntries(

@@ -1,5 +1,4 @@
 import {
-  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -8,29 +7,11 @@ import {
   type ReactNode,
 } from "react";
 import { EditorSession, type EditorCommand } from "@arcforge/editor-core";
-import type { Entity, Scene } from "@arcforge/schemas";
+import type { Scene } from "@arcforge/schemas";
+import { EditorStoreContext } from "./editorStoreContextInstance";
+import type { EditorStoreValue } from "./editorStoreTypes";
 
-export interface EditorStoreValue {
-  session: EditorSession;
-  scene: Scene;
-  selection: string[];
-  dirty: boolean;
-  revision: number;
-  canUndo: boolean;
-  canRedo: boolean;
-  undoLabel?: string;
-  redoLabel?: string;
-  selectedEntity: Entity | undefined;
-  execute: (command: EditorCommand) => Promise<void>;
-  undo: () => Promise<void>;
-  redo: () => Promise<void>;
-  setSelection: (ids: string[]) => void;
-  loadScene: (data: unknown, path?: string | null) => void;
-  markSaved: (path?: string) => void;
-  getScenePath: () => string | null;
-}
-
-const EditorStoreContext = createContext<EditorStoreValue | null>(null);
+export type { EditorStoreValue } from "./editorStoreTypes";
 
 export function EditorStoreProvider({
   initialScene,
@@ -164,4 +145,10 @@ export function useEditorStore(): EditorStoreValue {
     throw new Error("useEditorStore must be used within EditorStoreProvider");
   }
   return ctx;
+}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    import.meta.hot?.invalidate();
+  });
 }

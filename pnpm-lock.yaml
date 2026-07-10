@@ -110,13 +110,13 @@ importers:
       three:
         specifier: ^0.166.1
         version: 0.166.1
+      typescript:
+        specifier: ^5.5.4
+        version: 5.9.3
     devDependencies:
       '@types/three':
         specifier: ^0.166.0
         version: 0.166.0
-      typescript:
-        specifier: ^5.5.4
-        version: 5.9.3
       vitest:
         specifier: ^2.0.5
         version: 2.1.9(@types/node@26.1.1)

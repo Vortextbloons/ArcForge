@@ -5,12 +5,25 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@arcforge/editor-core": path.resolve(__dirname, "../../packages/editor-core/src/index.ts"),
-      "@arcforge/engine": path.resolve(__dirname, "../../packages/engine/src/index.ts"),
-      "@arcforge/schemas": path.resolve(__dirname, "../../packages/schemas/src/index.ts"),
-    },
+    alias: [
+      {
+        find: "@arcforge/engine/compiler",
+        replacement: path.resolve(__dirname, "../../packages/engine/src/compiler.ts"),
+      },
+      {
+        find: "@arcforge/editor-core",
+        replacement: path.resolve(__dirname, "../../packages/editor-core/src/index.ts"),
+      },
+      {
+        find: "@arcforge/engine",
+        replacement: path.resolve(__dirname, "../../packages/engine/src/index.ts"),
+      },
+      {
+        find: "@arcforge/schemas",
+        replacement: path.resolve(__dirname, "../../packages/schemas/src/index.ts"),
+      },
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+    ],
   },
   clearScreen: false,
   server: {

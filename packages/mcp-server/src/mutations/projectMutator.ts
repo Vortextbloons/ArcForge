@@ -4,7 +4,11 @@ import {
   AddComponentCommand,
   CreateEntityCommand,
   DeleteEntityCommand,
+  DuplicateEntityCommand,
   EditorSession,
+  RemoveComponentCommand,
+  RenameEntityCommand,
+  ReparentEntityCommand,
   UpdateComponentCommand,
   createEntityId,
 } from "@arcforge/editor-core";
@@ -158,6 +162,120 @@ export class ProjectMutator {
       before,
       after,
     };
+  }
+
+  async renameEntity(input: {
+    scene: string;
+    entityId: string;
+    name: string;
+  }): Promise<MutationResult<{ entityId: string; name: string }>> {
+    const { session, rel, before } = await this.loadSceneSession(input.scene);
+    await session.execute(new RenameEntityCommand(input.entityId, input.name));
+    const after = await this.saveScene(session, rel);
+    return {
+      ok: true,
+      data: { entityId: input.entityId, name: input.name },
+      paths: [rel],
+      before,
+      after,
+    };
+  }
+
+  async reparentEntity(input: {
+    scene: string;
+    entityId: string;
+    parent: string | null;
+  }): Promise<MutationResult<{ entityId: string; parent: string | null }>> {
+    const { session, rel, before } = await this.loadSceneSession(input.scene);
+    await session.execute(new ReparentEntityCommand(input.entityId, input.parent));
+    const after = await this.saveScene(session, rel);
+    return {
+      ok: true,
+      data: { entityId: input.entityId, parent: input.parent },
+      paths: [rel],
+      before,
+      after,
+    };
+  }
+
+  async duplicateEntity(input: {
+    scene: string;
+    entityId: string;
+    id?: string;
+  }): Promise<MutationResult<{ entityId: string }>> {
+    const { session, rel, before } = await this.loadSceneSession(input.scene);
+    const command = new DuplicateEntityCommand(input.entityId, input.id);
+    await session.execute(command);
+    const after = await this.saveScene(session, rel);
+    return {
+      ok: true,
+      data: { entityId: command.rootId },
+      paths: [rel],
+      before,
+      after,
+    };
+  }
+
+  async removeComponent(input: {
+    scene: string;
+    entityId: string;
+    component: string;
+  }): Promise<MutationResult<{ entityId: string; component: string }>> {
+    const { session, rel, before } = await this.loadSceneSession(input.scene);
+    await session.execute(new RemoveComponentCommand(input.entityId, input.component));
+    const after = await this.saveScene(session, rel);
+    return {
+      ok: true,
+      data: { entityId: input.entityId, component: input.component },
+      paths: [rel],
+      before,
+      after,
+    };
+  }
+
+  async instantiatePrefab(input: {
+    scene: string;
+    prefab: string;
+    name?: string;
+    parent?: string | null;
+    id?: string;
+    overrides?: Record<string, unknown>;
+  }): Promise<MutationResult<{ entityId: string; prefab: string }>> {
+    const prefab = await this.readPrefab(input.prefab);
+    const { session, rel, before } = await this.loadSceneSession(input.scene);
+    const entityId = input.id ?? createEntityId("prefab");
+    await session.execute(
+      new CreateEntityCommand({
+        id: entityId,
+        name: input.name ?? prefab.prefab.name,
+        parent: input.parent ?? null,
+        components: {},
+        prefab: prefab.path,
+        overrides: input.overrides,
+      })
+    );
+    const after = await this.saveScene(session, rel);
+    return {
+      ok: true,
+      data: { entityId, prefab: prefab.path },
+      paths: [rel],
+      before,
+      after,
+    };
+  }
+
+  async createScene(input: {
+    path: string;
+    name: string;
+  }): Promise<MutationResult<{ path: string }>> {
+    const rel = normalizeProjectRel(input.path, "scenes/");
+    if (!rel.endsWith(".scene.json")) throw new Error("Scene path must end with .scene.json");
+    const abs = absUnderRoot(this.projectRoot, rel);
+    if (await pathExists(abs)) throw new Error(`Scene already exists: ${rel}`);
+    const scene = parseScene({ version: 1, name: input.name, entities: [] });
+    await fs.mkdir(path.dirname(abs), { recursive: true });
+    await fs.writeFile(abs, `${JSON.stringify(scene, null, 2)}\n`, "utf8");
+    return { ok: true, data: { path: rel }, paths: [rel], after: scene };
   }
 
   createPrefab(input: {

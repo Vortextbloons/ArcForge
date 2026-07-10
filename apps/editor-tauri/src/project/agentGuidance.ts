@@ -12,6 +12,7 @@ This is **${projectName}**, an ArcForge game project. Build the game by editing 
 - \`prefabs/*.prefab.json\`: reusable entity hierarchies.
 - \`scripts/*.ts\`: focused gameplay behaviours.
 - \`assets/\`: models, textures, audio, and materials.
+- \`plugins/\`: game-owned components, runtime systems, and render extensions.
 - \`docs/\`: game design and project conventions.
 
 ## Working rules
@@ -19,17 +20,18 @@ This is **${projectName}**, an ArcForge game project. Build the game by editing 
 - Read \`docs/GAME_DESIGN.md\` and \`docs/PROJECT_CONVENTIONS.md\` before making broad gameplay changes.
 - Prefer ArcForge MCP tools and validated scene, prefab, component, script, and asset commands when available.
 - Search or read the ArcForge scripting and component documentation before using an unfamiliar API or component.
+- Use the public entity, prefab, asset, audio, animation, physics, timer, scene, storage, and extension APIs freely to implement the requested game.
 - Keep scene and prefab data in JSON. Do not move scene data into TypeScript.
 - Use namespaced component IDs such as \`core.transform\`, \`render.mesh\`, \`physics.rigidbody\`, and \`script.behaviour\`.
 - Keep scripts small and focused, with descriptive names such as \`player.controller.ts\` or \`coin.collectable.ts\`.
 - Scripts may use only the documented public runtime API. Do not import ArcForge engine internals, editor code, Tauri, MCP server code, or private package paths.
 - Reuse assets and materials where practical. Avoid per-frame allocations, unbounded loops, and unnecessary duplicate meshes.
 - Do not edit generated cache, preview, build, audit, or index files inside ArcForge metadata directories.
-- Do not add dependencies unless the game genuinely needs them and the project owner approves.
+- Add game dependencies when they materially improve the result; keep them project-scoped and document why they are needed.
 
 ## Change order
 
-Prefer the smallest suitable layer: scene or prefab data, then gameplay script, then component or system. Treat engine changes as out of scope for this game repository.
+Prefer the smallest suitable layer: scene or prefab data, then gameplay script, then a game-owned component, runtime system, or render adapter. Treat ArcForge engine changes as out of scope because project extensions are the supported escape hatch.
 
 ## Validation
 

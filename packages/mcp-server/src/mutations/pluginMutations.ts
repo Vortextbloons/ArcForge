@@ -1,19 +1,12 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import {
-  parsePluginManifest,
-  type PluginManifest,
-} from "@arcforge/schemas";
+import { parsePluginManifest, type PluginManifest } from "@arcforge/schemas";
 import type { MutationResult } from "./types.js";
+import { typecheckScripts } from "@arcforge/engine/compiler";
 import { absUnderRoot, pathExists } from "./pathSafety.js";
-import {
-  discoverPlugins,
-  type LoadedPlugin,
-} from "../plugins/discoverPlugins.js";
+import { discoverPlugins, type LoadedPlugin } from "../plugins/discoverPlugins.js";
 
-export async function listPlugins(
-  projectRoot: string
-): Promise<LoadedPlugin[]> {
+export async function listPlugins(projectRoot: string): Promise<LoadedPlugin[]> {
   return discoverPlugins(projectRoot);
 }
 
@@ -23,8 +16,7 @@ export async function readPlugin(
 ): Promise<LoadedPlugin> {
   const plugins = await discoverPlugins(projectRoot);
   const found = plugins.find(
-    (p) =>
-      p.manifest.id === pluginIdOrFolder || p.folder === pluginIdOrFolder
+    (p) => p.manifest.id === pluginIdOrFolder || p.folder === pluginIdOrFolder
   );
   if (!found) {
     throw new Error(`Plugin not found: ${pluginIdOrFolder}`);
@@ -44,9 +36,7 @@ export async function validatePlugin(
     if (!plugin.manifest.name) errors.push("Missing manifest name");
     for (const id of plugin.manifest.components) {
       if (!plugin.components.some((c) => c.id === id)) {
-        warnings.push(
-          `Manifest lists component ${id} but no .component.json found`
-        );
+        warnings.push(`Manifest lists component ${id} but no .component.json found`);
       }
     }
     for (const doc of plugin.manifest.docs) {
@@ -54,6 +44,10 @@ export async function validatePlugin(
       if (!(await pathExists(abs))) {
         warnings.push(`Missing docs file: ${doc}`);
       }
+    }
+    for (const system of plugin.manifest.systems) {
+      const abs = path.resolve(path.join(plugin.manifestPath, ".."), system);
+      if (!(await pathExists(abs))) warnings.push(`Missing runtime system: ${system}`);
     }
   } catch (err) {
     errors.push(err instanceof Error ? err.message : String(err));
@@ -69,11 +63,7 @@ export async function setPluginEnabled(
   const plugin = await readPlugin(projectRoot, pluginIdOrFolder);
   const next: PluginManifest = { ...plugin.manifest, enabled };
   parsePluginManifest(next);
-  await fs.writeFile(
-    plugin.manifestPath,
-    `${JSON.stringify(next, null, 2)}\n`,
-    "utf8"
-  );
+  await fs.writeFile(plugin.manifestPath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
   return {
     ok: true,
     paths: [`plugins/${plugin.folder}/plugin.arcforge.json`],
@@ -162,5 +152,55 @@ export async function createPlugin(
       `plugins/${folder}/components/${shortName}.component.json`,
     ],
     data: { path: `plugins/${folder}`, id: input.id },
+  };
+}
+
+export async function createPluginSystem(
+  projectRoot: string,
+  input: { plugin: string; name: string; content?: string }
+): Promise<MutationResult<{ path: string; systemId: string }>> {
+  const plugin = await readPlugin(projectRoot, input.plugin);
+  const slug =
+    input.name
+      .trim()
+      .replace(/([a-z])([A-Z])/g, "$1-$2")
+      .replace(/[^a-z0-9]+/gi, "-")
+      .replace(/^-|-$/g, "")
+      .toLowerCase() || "game-system";
+  const relativeToPlugin = `systems/${slug}.system.ts`;
+  const projectRelative = `plugins/${plugin.folder}/${relativeToPlugin}`;
+  const absolute = absUnderRoot(projectRoot, projectRelative);
+  if (await pathExists(absolute))
+    throw new Error(`Runtime system already exists: ${projectRelative}`);
+  const systemId = `${plugin.manifest.id}.${slug.replace(/-/g, "_")}`;
+  const content =
+    input.content ??
+    `import type { RuntimeSystem } from "@arcforge/engine";
+
+const system: RuntimeSystem = {
+  id: ${JSON.stringify(systemId)},
+  update(ctx, time) {
+    void ctx;
+    void time;
+  },
+};
+
+export default system;
+`;
+  const check = typecheckScripts([{ path: projectRelative, source: content }]);
+  if (!check.ok) {
+    throw new Error(check.diagnostics.map((diagnostic) => diagnostic.message).join("; "));
+  }
+  await fs.mkdir(path.dirname(absolute), { recursive: true });
+  await fs.writeFile(absolute, content, "utf8");
+  const manifest: PluginManifest = parsePluginManifest({
+    ...plugin.manifest,
+    systems: [...new Set([...plugin.manifest.systems, relativeToPlugin])],
+  });
+  await fs.writeFile(plugin.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  return {
+    ok: true,
+    paths: [projectRelative, `plugins/${plugin.folder}/plugin.arcforge.json`],
+    data: { path: projectRelative, systemId },
   };
 }

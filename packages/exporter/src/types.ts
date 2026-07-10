@@ -1,5 +1,5 @@
 import type { ProjectManifest, Scene, Prefab } from "@arcforge/schemas";
-import type { ScriptDiagnostic } from "@arcforge/engine";
+import type { ScriptDiagnostic } from "@arcforge/engine/compiler";
 
 export interface ExportOptions {
   /** Absolute path to the game project root (contains project.arcforge.json). */
@@ -18,6 +18,10 @@ export interface CollectedScript {
   path: string;
   absolutePath: string;
   source: string;
+  /** True when directly attached by script.behaviour; false for shared helper modules. */
+  entry: boolean;
+  /** True for runtime extension modules inside a plugin systems directory. */
+  system: boolean;
 }
 
 export interface CollectedPrefab {

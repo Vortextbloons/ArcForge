@@ -3,3 +3,4 @@ export { syncTransforms } from "./TransformSyncSystem.js";
 export { syncMeshes } from "./MeshSystem.js";
 export { syncCameras } from "./CameraSystem.js";
 export { syncLights } from "./LightSystem.js";
+export { ParticleSystem } from "./ParticleSystem.js";

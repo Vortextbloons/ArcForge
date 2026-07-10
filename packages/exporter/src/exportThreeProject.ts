@@ -107,10 +107,12 @@ export async function exportThreeProject(options: ExportOptions): Promise<Export
 }
 
 async function writeGameBootstrap(bundle: ProjectBundle, output: string): Promise<void> {
-  const scriptEntries = bundle.scripts.map((s) => ({
-    modulePath: s.path,
-    importPath: `./${toPosix(s.path).replace(/\.ts$/, "")}`,
-  }));
+  const scriptEntries = bundle.scripts
+    .filter((script) => script.entry)
+    .map((s) => ({
+      modulePath: s.path,
+      importPath: `./${toPosix(s.path).replace(/\.ts$/, "")}`,
+    }));
 
   const importLines = scriptEntries
     .map((s, i) => `import script_${i} from ${JSON.stringify(s.importPath)};`)
@@ -118,15 +120,48 @@ async function writeGameBootstrap(bundle: ProjectBundle, output: string): Promis
   const registerLines = scriptEntries
     .map((s, i) => `  runtime.registerScript(${JSON.stringify(s.modulePath)}, script_${i});`)
     .join("\n");
+  const systemEntries = bundle.scripts
+    .filter((script) => script.system)
+    .map((system, index) => ({
+      variable: `system_${index}`,
+      importPath: `./${toPosix(system.path).replace(/\.ts$/, "")}`,
+    }));
+  const systemImportLines = systemEntries
+    .map((system) => `import ${system.variable} from ${JSON.stringify(system.importPath)};`)
+    .join("\n");
+  const systemRegisterLines = systemEntries
+    .map((system) => `  runtime.extensions.registerSystem(${system.variable});`)
+    .join("\n");
 
   const sceneImport = `./${toPosix(bundle.manifest.defaultScene)}`;
+  const sceneEntries = bundle.scenes.map((scene, index) => ({
+    path: scene.path,
+    variable: `scene_${index}`,
+    importPath: `./${toPosix(scene.path)}`,
+  }));
+  const prefabEntries = bundle.prefabs.map((prefab, index) => ({
+    path: prefab.path,
+    variable: `prefab_${index}`,
+    importPath: `./${toPosix(prefab.path)}`,
+  }));
+  const dataImportLines = [...sceneEntries, ...prefabEntries]
+    .map((entry) => `import ${entry.variable} from ${JSON.stringify(entry.importPath)};`)
+    .join("\n");
+  const sceneMap = `{${sceneEntries
+    .map((entry) => `${JSON.stringify(entry.path)}: ${entry.variable}`)
+    .join(",")}}`;
+  const prefabMap = `{${prefabEntries
+    .map((entry) => `${JSON.stringify(entry.path)}: ${entry.variable}`)
+    .join(",")}}`;
 
   await writeTextFile(
     path.join(output, "src", "game.ts"),
     `import { Runtime } from "@arcforge/engine";
 import manifest from "./project.manifest.json";
 import defaultScene from ${JSON.stringify(sceneImport)};
+${dataImportLines}
 ${importLines}
+${systemImportLines}
 
 /** Bootstraps the exported game with Runtime + registered Behaviour scripts. */
 export async function startGame(canvas: HTMLCanvasElement): Promise<Runtime> {
@@ -138,6 +173,10 @@ export async function startGame(canvas: HTMLCanvasElement): Promise<Runtime> {
   });
 
 ${registerLines}
+${systemRegisterLines}
+  runtime.registerScenes(${sceneMap});
+  runtime.registerPrefabs(${prefabMap});
+  runtime.setAssetUrlResolver((assetPath) => new URL(\`../\${assetPath}\`, import.meta.url).toString());
 
   const resize = () => {
     const parent = canvas.parentElement;
@@ -148,7 +187,7 @@ ${registerLines}
   resize();
   window.addEventListener("resize", resize);
 
-  runtime.load(defaultScene);
+  runtime.load(defaultScene, manifest.defaultScene);
   runtime.start();
   return runtime;
 }
@@ -208,12 +247,20 @@ async function vendorPackages(output: string): Promise<void> {
           import: "./dist/index.js",
           types: "./dist/index.d.ts",
         },
+        ...(name === "engine"
+          ? {
+              "./compiler": {
+                import: "./dist/compiler.js",
+                types: "./dist/compiler.d.ts",
+              },
+            }
+          : {}),
       },
     };
 
     if (name === "engine") {
       vendorPkg.dependencies = {
-        three: "^0.166.1",
+        ...srcPkg.dependencies,
         "@arcforge/schemas": "file:../schemas",
       };
     } else if (srcPkg.dependencies) {

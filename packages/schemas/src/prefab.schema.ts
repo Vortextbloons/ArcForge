@@ -5,6 +5,9 @@ const PrefabNodeBaseSchema = z.object({
   name: z.string().min(1),
   components: z.record(z.unknown()),
   children: z.array(z.lazy(() => PrefabNodeSchema)),
+  /** Optional nested prefab source merged into this node. */
+  prefab: z.string().optional(),
+  overrides: z.record(z.unknown()).optional(),
 });
 
 export type PrefabNode = {
@@ -12,6 +15,8 @@ export type PrefabNode = {
   name: string;
   components: Record<string, unknown>;
   children: PrefabNode[];
+  prefab?: string;
+  overrides?: Record<string, unknown>;
 };
 
 export const PrefabNodeSchema: z.ZodType<PrefabNode> = PrefabNodeBaseSchema;

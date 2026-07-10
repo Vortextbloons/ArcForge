@@ -1,6 +1,7 @@
 import { parseScene, type Scene, type Entity as SceneEntity } from "@arcforge/schemas";
 import { World } from "../ecs/World.js";
 import { ComponentRegistry } from "../ecs/ComponentRegistry.js";
+import { PrefabRegistry, resolveScenePrefabs } from "./PrefabRegistry.js";
 
 export interface LoadedScene {
   scene: Scene;
@@ -11,6 +12,7 @@ export interface LoadSceneOptions {
   /** Existing world to populate (cleared first). Defaults to a new World. */
   world?: World;
   registry?: ComponentRegistry;
+  prefabs?: PrefabRegistry;
 }
 
 /**
@@ -18,7 +20,11 @@ export interface LoadSceneOptions {
  */
 export function loadScene(data: unknown, options: LoadSceneOptions = {}): LoadedScene {
   const registry = options.registry ?? ComponentRegistry.withCore();
-  const scene = parseScene(data);
+  const parsed = parseScene(data);
+  if (!options.prefabs && parsed.entities.some((entity) => entity.prefab)) {
+    throw new Error("Scene contains prefab instances but no prefab registry was provided");
+  }
+  const scene = options.prefabs ? resolveScenePrefabs(parsed, options.prefabs) : parsed;
   const world = options.world ?? new World();
   world.clear();
 

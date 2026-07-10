@@ -11,6 +11,7 @@ export {
   RemoveComponentCommand,
   UpdateComponentCommand,
 } from "./commands/entityCommands.js";
+export { DuplicateEntityCommand } from "./commands/duplicateEntity.js";
 export {
   assetImportSettingsPath,
   buildDefaultAssetImportSettings,

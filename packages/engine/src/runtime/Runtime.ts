@@ -24,6 +24,18 @@ import {
   NullPhysicsBackend,
 } from "../physics/index.js";
 import { FrameProfiler } from "../profiler/FrameProfiler.js";
+import { EntityAPI } from "../scripting/EntityAPI.js";
+import type { WorldEvent } from "../ecs/World.js";
+import { PrefabRegistry } from "./PrefabRegistry.js";
+import { AssetManager, type AssetUrlResolver } from "../assets/AssetManager.js";
+import { AudioSystem } from "../audio/AudioSystem.js";
+import { AnimationSystem } from "../animation/AnimationSystem.js";
+import { UiSystem } from "../ui/UiSystem.js";
+import { ParticleSystem } from "../render/ParticleSystem.js";
+import { TimerAPI } from "../scripting/TimerAPI.js";
+import { StorageAPI } from "../scripting/StorageAPI.js";
+import { SceneAPI } from "./SceneAPI.js";
+import { RuntimeExtensions } from "../plugins/RuntimeExtensions.js";
 
 export interface RuntimeOptions extends RendererOptions {
   fixedDelta?: number;
@@ -31,6 +43,8 @@ export interface RuntimeOptions extends RendererOptions {
   scriptsEnabled?: boolean;
   /** Physics backend. Default "none". Use "rapier" after await createPhysicsBackend. */
   physics?: PhysicsBackendKind;
+  assetUrlResolver?: AssetUrlResolver;
+  storageNamespace?: string;
 }
 
 /**
@@ -48,6 +62,18 @@ export class Runtime {
   readonly scriptSystem: ScriptSystem;
   readonly physics: PhysicsAPI;
   readonly profiler: FrameProfiler;
+  readonly entities: EntityAPI;
+  readonly prefabs: PrefabRegistry;
+  readonly assets: AssetManager;
+  readonly audioSystem: AudioSystem;
+  readonly audio: AudioSystem["api"];
+  readonly animation: AnimationSystem;
+  readonly particles: ParticleSystem;
+  readonly ui: UiSystem;
+  readonly timers: TimerAPI;
+  readonly storage: StorageAPI;
+  readonly scenes: SceneAPI;
+  readonly extensions: RuntimeExtensions;
 
   private sceneName = "Untitled";
   private sceneVersion = 1;
@@ -66,6 +92,27 @@ export class Runtime {
     this.scripts = new ScriptRegistry();
     this.profiler = new FrameProfiler();
     this.physics = new PhysicsAPI(new NullPhysicsBackend());
+    this.assets = new AssetManager(options.assetUrlResolver);
+    this.audioSystem = new AudioSystem(this.assets);
+    this.audio = this.audioSystem.api;
+    this.animation = new AnimationSystem();
+    this.particles = new ParticleSystem();
+    this.ui = new UiSystem(this.bridge.renderer.domElement, this.events);
+    this.timers = new TimerAPI();
+    this.storage = new StorageAPI(options.storageNamespace);
+    this.scenes = new SceneAPI();
+    this.prefabs = new PrefabRegistry();
+    this.entities = new EntityAPI(this.world, this.registry, this.prefabs);
+    this.extensions = new RuntimeExtensions({
+      world: this.world,
+      entities: this.entities,
+      input: this.input,
+      events: this.events,
+      assets: this.assets,
+      audio: this.audio,
+      physics: this.physics,
+      render: this.bridge,
+    });
     this.scriptSystem = new ScriptSystem(
       this.world,
       this.scripts,
@@ -73,8 +120,18 @@ export class Runtime {
       this.events,
       this.logger,
       () => this.toScene(),
-      this.physics
+      this.physics,
+      this.entities,
+      this.assets,
+      this.audio,
+      this.animation,
+      this.timers,
+      this.storage,
+      this.scenes,
+      this.extensions,
+      this.particles
     );
+    this.world.subscribe((event) => this.handleWorldEvent(event));
 
     const kind = options.physics ?? "none";
     this.physicsReady =
@@ -89,17 +146,28 @@ export class Runtime {
     }
 
     this.loop.setUpdate((time) => {
+      const pendingScene = this.scenes._consumePending();
+      if (pendingScene) this.load(pendingScene.scene, pendingScene.path);
       const t0 = this.profiler.beginSection();
-      this.scriptSystem.update(time);
+      if (this.scriptSystem.enabled) {
+        this.timers.update(time.delta);
+        this.scriptSystem.update(time);
+        this.extensions.update(time);
+        this.animation.update(this.world, this.bridge, time.delta);
+        this.particles.update(this.world, this.bridge, time.delta);
+      }
       void this.profiler.endSection(t0);
     });
     this.loop.setFixedUpdate((time) => {
       const t0 = this.profiler.beginSection();
-      this.scriptSystem.fixedUpdate(time);
+      if (this.scriptSystem.enabled) {
+        this.scriptSystem.fixedUpdate(time);
+        this.extensions.fixedUpdate(time);
+      }
       const fixedMs = this.profiler.endSection(t0);
 
       const p0 = this.profiler.beginSection();
-      this.physics._step(this.world, time.fixedDelta);
+      if (this.scriptSystem.enabled) this.physics._step(this.world, time.fixedDelta);
       const physicsMs = this.profiler.endSection(p0);
 
       if (this.profiler.isEnabled) {
@@ -114,8 +182,9 @@ export class Runtime {
         });
       }
     });
-    this.loop.setRender((_time) => {
+    this.loop.setRender((time) => {
       const t0 = this.profiler.beginSection();
+      this.extensions.render(time);
       this.syncAndRender();
       this.input.endFrame();
       const renderMs = this.profiler.endSection(t0);
@@ -153,8 +222,35 @@ export class Runtime {
     }
   }
 
+  registerPrefab(path: string, data: unknown): void {
+    this.prefabs.register(path, data);
+  }
+
+  registerPrefabs(entries: Record<string, unknown>): void {
+    this.prefabs.registerMany(entries);
+  }
+
+  registerScene(path: string, data: unknown): void {
+    this.scenes.register(path, data);
+  }
+
+  registerScenes(entries: Record<string, unknown>): void {
+    this.scenes.registerMany(entries);
+  }
+
+  setAssetUrlResolver(resolver: AssetUrlResolver): void {
+    this.assets.setResolver(resolver);
+    this.dirtyRender = true;
+  }
+
   setScriptsEnabled(enabled: boolean): void {
     this.scriptSystem.setEnabled(enabled);
+    if (!enabled) {
+      this.audioSystem.dispose();
+      this.animation.dispose();
+      this.particles.dispose();
+      this.timers.clearAll();
+    }
   }
 
   get scriptsEnabled(): boolean {
@@ -162,15 +258,22 @@ export class Runtime {
   }
 
   /** Load scene JSON into this runtime (replaces current world contents). */
-  load(data: unknown): Scene {
+  load(data: unknown, scenePath: string | null = null): Scene {
     this.scriptSystem.destroyAll();
+    this.animation.dispose();
+    this.particles.dispose();
+    this.audioSystem.dispose();
+    this.timers.clearAll();
     this.clearVisuals();
     const loaded = loadScene(data, {
       world: this.world,
       registry: this.registry,
+      prefabs: this.prefabs,
     });
     this.sceneName = loaded.scene.name;
     this.sceneVersion = loaded.scene.version;
+    this.scenes._setCurrent(scenePath);
+    this.extensions.onSceneLoaded();
     this.dirtyRender = true;
     if (this.scriptSystem.enabled) {
       this.scriptSystem.syncInstances();
@@ -215,20 +318,29 @@ export class Runtime {
     this.input.detach();
     this.events.clear();
     this.physics._dispose();
+    this.audioSystem.dispose();
+    this.animation.dispose();
+    this.particles.dispose();
+    this.ui.dispose();
+    this.timers.clearAll();
+    this.extensions.dispose();
     this.clearVisuals();
+    this.assets.clear();
     this.world.clear();
     this.bridge.dispose();
   }
 
   private syncAndRender(): void {
     if (this.dirtyRender) {
-      syncMeshes(this.world, this.bridge);
+      syncMeshes(this.world, this.bridge, this.assets);
       syncLights(this.world, this.bridge);
       syncCameras(this.world, this.bridge);
       this.dirtyRender = false;
     }
     syncTransforms(this.world, this.bridge);
     syncLights(this.world, this.bridge);
+    if (this.scriptSystem.enabled) this.audioSystem.sync(this.world, this.bridge);
+    this.ui.sync(this.world);
     this.bridge.render();
   }
 
@@ -237,4 +349,35 @@ export class Runtime {
       this.bridge.removeObject(entity.id);
     }
   }
+
+  private handleWorldEvent(event: WorldEvent): void {
+    if (event.type === "world.cleared") {
+      this.clearVisuals();
+      this.dirtyRender = true;
+      return;
+    }
+    if (event.type === "entity.destroyed") {
+      this.bridge.removeObject(event.entity.id);
+      this.dirtyRender = true;
+      return;
+    }
+    if (event.type === "entity.created" || event.type === "entity.reparented") {
+      this.dirtyRender = true;
+      return;
+    }
+    if (event.type === "component.added" || event.type === "component.updated") {
+      if (isRenderComponent(event.component)) this.dirtyRender = true;
+      return;
+    }
+    if (event.type === "component.removed" && isRenderComponent(event.component)) {
+      this.bridge.removeObject(event.entityId);
+      this.dirtyRender = true;
+    }
+  }
+}
+
+function isRenderComponent(component: string): boolean {
+  return (
+    component === "render.mesh" || component === "render.camera" || component === "render.light"
+  );
 }

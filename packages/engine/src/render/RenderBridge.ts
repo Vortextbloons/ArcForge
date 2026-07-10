@@ -64,6 +64,7 @@ export class RenderBridge {
   removeObject(id: EntityId): void {
     const object = this.objects.get(id);
     if (!object) return;
+    if (object === this.activeCamera) this.activeCamera = this.defaultCamera;
     object.removeFromParent();
     disposeObject(object);
     this.objects.delete(id);
@@ -92,7 +93,7 @@ export class RenderBridge {
   }
 
   dispose(): void {
-    for (const id of [...this.objects.keys()]) {
+    for (const id of this.objects.keys()) {
       this.removeObject(id);
     }
     this.renderer.dispose();
@@ -103,7 +104,7 @@ function disposeObject(object: THREE.Object3D): void {
   object.traverse((child) => {
     const mesh = child as THREE.Mesh;
     if (mesh.isMesh) {
-      mesh.geometry?.dispose();
+      if (!mesh.userData.arcforgeSharedGeometry) mesh.geometry?.dispose();
       const material = mesh.material;
       if (Array.isArray(material)) {
         material.forEach((m) => m.dispose());

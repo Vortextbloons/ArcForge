@@ -1,42 +1,24 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import {
-  typecheckScripts,
-  type Runtime,
-  type RuntimeLogEntry,
-  type ScriptTypecheckResult,
-} from "@arcforge/engine";
+import { useCallback, useContext, useMemo, useRef, useState, type ReactNode } from "react";
+import type { Runtime } from "@arcforge/engine";
+import type { ScriptTypecheckResult } from "@arcforge/engine/compiler";
 import type { Scene } from "@arcforge/schemas";
 import { DEMO_SCRIPTS, DEMO_SCRIPT_SOURCES } from "../scripts/demoScripts";
 import { useEditorStore } from "./EditorStore";
 import { useProjectSession } from "./ProjectSession";
 import { loadProjectBehaviourScripts } from "../project/loadProjectScripts";
+import { loadProjectPrefabs } from "../project/loadProjectPrefabs";
+import { loadProjectScenes } from "../project/loadProjectScenes";
+import { joinProjectPath } from "../project/projectModel";
+import { PlayModeContext } from "./playModeContextInstance";
+import type { PlayModeValue } from "./playModeTypes";
 
-export interface PlayModeValue {
-  playing: boolean;
-  logs: RuntimeLogEntry[];
-  typecheck: ScriptTypecheckResult | null;
-  setRuntime: (runtime: Runtime | null) => void;
-  play: () => void;
-  stop: () => void;
-  clearLogs: () => void;
-  runTypecheck: () => Promise<ScriptTypecheckResult>;
-}
-
-const PlayModeContext = createContext<PlayModeValue | null>(null);
+export type { PlayModeValue } from "./playModeTypes";
 
 export function PlayModeProvider({ children }: { children: ReactNode }) {
   const { scene } = useEditorStore();
   const { project } = useProjectSession();
   const [playing, setPlaying] = useState(false);
-  const [logs, setLogs] = useState<RuntimeLogEntry[]>([]);
+  const [logs, setLogs] = useState<PlayModeValue["logs"]>([]);
   const [typecheck, setTypecheck] = useState<ScriptTypecheckResult | null>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const unsubRef = useRef<(() => void) | null>(null);
@@ -65,11 +47,24 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
         runtime.logger.clear();
         setLogs([]);
 
-        // Always keep demo scripts; overlay project scripts when a disk project is open.
         runtime.scripts.clear();
         runtime.registerScripts(DEMO_SCRIPTS);
+        runtime.prefabs.clear();
+        runtime.scenes.clear();
+        runtime.extensions.clearSystems();
 
         if (project?.root) {
+          const { convertFileSrc } = await import("@tauri-apps/api/core");
+          runtime.setAssetUrlResolver((path) =>
+            convertFileSrc(joinProjectPath(project.root, path))
+          );
+          const loadedPrefabs = await loadProjectPrefabs(project.root);
+          runtime.registerPrefabs(loadedPrefabs.prefabs);
+          for (const message of loadedPrefabs.errors) runtime.logger.error(message);
+          const loadedScenes = await loadProjectScenes(project.root);
+          runtime.registerScenes(loadedScenes.scenes);
+          for (const message of loadedScenes.errors) runtime.logger.error(message);
+
           const loaded = await loadProjectBehaviourScripts(project.root);
           if (loaded.errors.length > 0) {
             for (const message of loaded.errors) {
@@ -83,6 +78,11 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
           } else {
             runtime.logger.warn("No project scripts compiled — using demo scripts only");
           }
+          for (const system of loaded.systems) runtime.extensions.registerSystem(system);
+          if (loaded.systems.length > 0) {
+            runtime.logger.info(`Loaded ${loaded.systems.length} project runtime system(s)`);
+          }
+          const { typecheckScripts } = await import("@arcforge/engine/compiler");
           setTypecheck(typecheckScripts(loaded.sources));
         }
 
@@ -123,6 +123,7 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
       const loaded = await loadProjectBehaviourScripts(project.root);
       if (loaded.sources.length > 0) sources = loaded.sources;
     }
+    const { typecheckScripts } = await import("@arcforge/engine/compiler");
     const result = typecheckScripts(sources);
     setTypecheck(result);
     const runtime = runtimeRef.current;
@@ -139,7 +140,7 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
     return result;
   }, [project?.root]);
 
-  const value = useMemo(
+  const value = useMemo<PlayModeValue>(
     () => ({
       playing,
       logs,
@@ -162,4 +163,11 @@ export function usePlayMode(): PlayModeValue {
     throw new Error("usePlayMode must be used within PlayModeProvider");
   }
   return ctx;
+}
+
+// Force full reload of this module on HMR so Provider/hook stay in sync with consumers.
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    import.meta.hot?.invalidate();
+  });
 }

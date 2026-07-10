@@ -1,9 +1,5 @@
-import {
-  compileBehaviourModule,
-  type BehaviourConstructor,
-  type ScriptSource,
-  typecheckScripts,
-} from "@arcforge/engine";
+import type { BehaviourConstructor, RuntimeSystem } from "@arcforge/engine";
+import type { ScriptSource } from "@arcforge/engine/compiler";
 import { joinProjectPath } from "./projectModel";
 import { tryTauriReadFile } from "./projectIo";
 
@@ -29,6 +25,23 @@ export async function listProjectScriptPaths(projectRoot: string): Promise<strin
   }
 }
 
+export async function listProjectRuntimeSystemPaths(projectRoot: string): Promise<string[]> {
+  if (!projectRoot) return [];
+  try {
+    const files = await invoke<string[]>("list_project_files", {
+      projectRoot,
+      relativeDir: "plugins",
+      extension: ".system.ts",
+    });
+    return files
+      .map((file) => file.replace(/\\/g, "/"))
+      .filter((file) => /^plugins\/[^/]+\/systems\/.+\.system\.ts$/.test(file))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
 export async function readProjectScriptSources(
   projectRoot: string,
   paths?: string[]
@@ -48,19 +61,26 @@ export interface LoadedProjectScripts {
   modules: Record<string, BehaviourConstructor>;
   sources: ScriptSource[];
   errors: string[];
+  systems: RuntimeSystem[];
 }
 
 /** Read, typecheck (lightweight), and compile all project Behaviour scripts. */
 export async function loadProjectBehaviourScripts(
   projectRoot: string
 ): Promise<LoadedProjectScripts> {
-  const sources = await readProjectScriptSources(projectRoot);
+  const paths = [
+    ...(await listProjectScriptPaths(projectRoot)),
+    ...(await listProjectRuntimeSystemPaths(projectRoot)),
+  ];
+  const sources = await readProjectScriptSources(projectRoot, paths);
   const errors: string[] = [];
   const modules: Record<string, BehaviourConstructor> = {};
 
   if (sources.length === 0) {
-    return { modules, sources, errors };
+    return { modules, systems: [], sources, errors };
   }
+
+  const { compileBehaviourModules, typecheckScripts } = await import("@arcforge/engine/compiler");
 
   const typecheck = typecheckScripts(sources);
   for (const diag of typecheck.diagnostics) {
@@ -69,14 +89,9 @@ export async function loadProjectBehaviourScripts(
     }
   }
 
-  for (const script of sources) {
-    const compiled = compileBehaviourModule(script.source, script.path);
-    if (!compiled.ok) {
-      errors.push(compiled.message);
-      continue;
-    }
-    modules[script.path] = compiled.ctor;
-  }
+  const compiled = compileBehaviourModules(sources);
+  errors.push(...compiled.diagnostics);
+  Object.assign(modules, compiled.modules);
 
-  return { modules, sources, errors };
+  return { modules, systems: compiled.systems, sources, errors };
 }

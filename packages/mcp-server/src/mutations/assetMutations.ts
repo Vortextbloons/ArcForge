@@ -1,6 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { typecheckScripts } from "@arcforge/engine";
+import { typecheckScripts } from "@arcforge/engine/compiler";
 import { parsePrefab, type Prefab } from "@arcforge/schemas";
 import type { MutationResult } from "./types.js";
 import { absUnderRoot, normalizeProjectRel, pathExists, validateComponents } from "./pathSafety.js";

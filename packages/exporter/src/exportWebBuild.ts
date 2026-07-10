@@ -51,12 +51,12 @@ export async function exportWebBuild(options: ExportOptions): Promise<ExportResu
       publicDir: path.join(staging, "public"),
       configFile: false,
       resolve: {
-        alias: {
-          "@arcforge/engine": path.join(engineRoot, "dist/index.js"),
-          "@arcforge/schemas": path.join(schemasRoot, "dist/index.js"),
-          three: threeEntry,
-          zod: zodEntry,
-        },
+        alias: [
+          { find: /^@arcforge\/engine$/, replacement: path.join(engineRoot, "dist/index.js") },
+          { find: /^@arcforge\/schemas$/, replacement: path.join(schemasRoot, "dist/index.js") },
+          { find: /^three$/, replacement: threeEntry },
+          { find: /^zod$/, replacement: zodEntry },
+        ],
       },
       build: {
         outDir: output,
@@ -123,22 +123,18 @@ async function writeProjectData(bundle: ProjectBundle, dest: string): Promise<vo
 }
 
 async function writeStagingSources(bundle: ProjectBundle, staging: string): Promise<void> {
-  const scriptImports = bundle.scripts.map((s, i) => {
-    const safeName = toPosix(s.path)
-      .replace(/^scripts\//, "")
-      .replace(/\.ts$/, "")
-      .replace(/[^a-zA-Z0-9_]/g, "_");
-    return {
-      varName: `script_${i}`,
-      rel: `./scripts/${safeName}.ts`,
-      modulePath: s.path,
-      source: s.source,
-      safeName,
-    };
-  });
+  const scriptImports = bundle.scripts
+    .filter((script) => script.entry)
+    .map((s, i) => {
+      return {
+        varName: `script_${i}`,
+        rel: `./${toPosix(s.path)}`,
+        modulePath: s.path,
+      };
+    });
 
-  for (const script of scriptImports) {
-    await writeTextFile(path.join(staging, "scripts", `${script.safeName}.ts`), script.source);
+  for (const script of bundle.scripts) {
+    await writeTextFile(path.join(staging, toPosix(script.path)), script.source);
   }
 
   const registerLines = scriptImports
@@ -147,11 +143,24 @@ async function writeStagingSources(bundle: ProjectBundle, staging: string): Prom
   const importLines = scriptImports
     .map((s) => `import ${s.varName} from ${JSON.stringify(s.rel)};`)
     .join("\n");
+  const systemImports = bundle.scripts
+    .filter((script) => script.system)
+    .map((system, index) => ({
+      variable: `system_${index}`,
+      rel: `./${toPosix(system.path)}`,
+    }));
+  const systemImportLines = systemImports
+    .map((system) => `import ${system.variable} from ${JSON.stringify(system.rel)};`)
+    .join("\n");
+  const systemRegisterLines = systemImports
+    .map((system) => `  runtime.extensions.registerSystem(${system.variable});`)
+    .join("\n");
 
   await writeTextFile(
     path.join(staging, "main.ts"),
     `import { Runtime } from "@arcforge/engine";
 ${importLines}
+${systemImportLines}
 
 async function main() {
   const canvas = document.querySelector("#game") as HTMLCanvasElement | null;
@@ -171,6 +180,10 @@ async function main() {
   });
 
 ${registerLines}
+${systemRegisterLines}
+  runtime.registerScenes(data.scenes);
+  runtime.registerPrefabs(data.prefabs);
+  runtime.setAssetUrlResolver((assetPath) => new URL(assetPath, document.baseURI).toString());
 
   const resize = () => {
     runtime.setSize(window.innerWidth, window.innerHeight);
@@ -178,7 +191,7 @@ ${registerLines}
   resize();
   window.addEventListener("resize", resize);
 
-  runtime.load(scene);
+  runtime.load(scene, scenePath);
   runtime.start();
 }
 

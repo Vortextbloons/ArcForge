@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./compiler": {
+      "import": "./dist/compiler.js",
+      "types": "./dist/compiler.d.ts"
     }
   },
   "scripts": {
@@ -21,11 +25,11 @@
   "dependencies": {
     "@arcforge/schemas": "workspace:*",
     "@dimforge/rapier3d-compat": "^0.19.3",
-    "three": "^0.166.1"
+    "three": "^0.166.1",
+    "typescript": "^5.5.4"
   },
   "devDependencies": {
     "@types/three": "^0.166.0",
-    "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   }
 }

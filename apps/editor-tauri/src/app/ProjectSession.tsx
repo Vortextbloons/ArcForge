@@ -1,5 +1,4 @@
 import {
-  createContext,
   useCallback,
   useContext,
   useEffect,
@@ -7,7 +6,6 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { ProjectManifest, Scene } from "@arcforge/schemas";
 import type { OpenedProject } from "../project/projectIo";
 import {
   getAttachedMcpStatus,
@@ -16,24 +14,10 @@ import {
   stopAttachedMcpServer,
   type McpRuntimeStatus,
 } from "../mcp/mcpRuntime";
+import { ProjectSessionContext } from "./projectSessionContextInstance";
+import type { ActiveProject, ProjectSessionValue } from "./projectSessionTypes";
 
-export interface ActiveProject {
-  root: string;
-  manifestPath: string;
-  manifest: ProjectManifest;
-  scenePath: string | null;
-  initialScene: Scene;
-}
-
-interface ProjectSessionValue {
-  project: ActiveProject | null;
-  mcpStatus: McpRuntimeStatus;
-  openProject: (opened: OpenedProject) => void;
-  closeProject: () => void;
-  restartMcp: (write?: boolean) => Promise<void>;
-}
-
-const ProjectSessionContext = createContext<ProjectSessionValue | null>(null);
+export type { ActiveProject, ProjectSessionValue } from "./projectSessionTypes";
 
 export function ProjectSessionProvider({ children }: { children: ReactNode }) {
   const [project, setProject] = useState<ActiveProject | null>(null);
@@ -114,7 +98,6 @@ export function ProjectSessionProvider({ children }: { children: ReactNode }) {
       void getAttachedMcpStatus()
         .then((status) => {
           setMcpStatus(status);
-          // If the child died but we still have a project, try one restart.
           if (!status.running && !status.error) {
             void syncMcpForProject(project.root);
           }
@@ -151,4 +134,10 @@ export function useProjectSession(): ProjectSessionValue {
     throw new Error("useProjectSession must be used within ProjectSessionProvider");
   }
   return ctx;
+}
+
+if (import.meta.hot) {
+  import.meta.hot.accept(() => {
+    import.meta.hot?.invalidate();
+  });
 }

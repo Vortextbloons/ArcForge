@@ -68,26 +68,26 @@ Before non-trivial edits, AI clients should call `docs.get_relevant`.
 
 ### Read (Phase 5)
 
-| Tool                   | Purpose                               |
-| ---------------------- | ------------------------------------- |
-| `project.get_info`     | Project manifest metadata             |
-| `project.list_files`   | List scenes/scripts/prefabs/docs      |
-| `scene.list`           | List scenes                           |
-| `scene.open`           | Scene entity summary                  |
-| `scene.get_entity`     | One entity + components               |
-| `component.list`       | Core component catalog                |
-| `component.get_schema` | One component schema/docs             |
+| Tool                   | Purpose                                          |
+| ---------------------- | ------------------------------------------------ |
+| `project.get_info`     | Project manifest metadata                        |
+| `project.list_files`   | List scenes/scripts/prefabs/docs                 |
+| `scene.list`           | List scenes                                      |
+| `scene.open`           | Scene entity summary                             |
+| `scene.get_entity`     | One entity + components                          |
+| `component.list`       | Core component catalog                           |
+| `component.get_schema` | One component schema/docs                        |
 | `build.get_errors`     | Scene validation + script + performance warnings |
 
 ### Plugins / Assets / Auth (Phase 8)
 
-| Tool | Purpose |
-| --- | --- |
-| `plugin.list` / `plugin.read` / `plugin.validate` | Inspect plugins |
-| `plugin.create` / `plugin.enable` / `plugin.disable` | Scaffold / toggle (write) |
-| `asset.list` / `asset.inspect` / `asset.get_import_settings` | Inspect assets |
-| `asset.import` / `asset.update_import_settings` | Import + settings (write) |
-| `auth.list_clients` / `auth.pair_client` / `auth.revoke_client` | Local pairing (OAuth deferred) |
+| Tool                                                                          | Purpose                           |
+| ----------------------------------------------------------------------------- | --------------------------------- |
+| `plugin.list` / `plugin.read` / `plugin.validate`                             | Inspect plugins                   |
+| `plugin.create` / `plugin.create_system` / `plugin.enable` / `plugin.disable` | Scaffold systems / toggle (write) |
+| `asset.list` / `asset.inspect` / `asset.get_import_settings`                  | Inspect assets                    |
+| `asset.import` / `asset.update_import_settings`                               | Import + settings (write)         |
+| `auth.list_clients` / `auth.pair_client` / `auth.revoke_client`               | Local pairing (OAuth deferred)    |
 
 ### Write (Phase 6)
 
@@ -98,6 +98,11 @@ Enable with `--write`. Mutations go through **editor-core commands**, `.threefor
 | `scene.create_entity`                           | Create entity via `CreateEntityCommand`             |
 | `scene.update_component`                        | Patch/replace component via commands                |
 | `scene.delete_entity`                           | Delete entity via `DeleteEntityCommand`             |
+| `scene.create`                                  | Create a validated scene                            |
+| `scene.rename_entity` / `scene.reparent_entity` | Rename or reorganize hierarchy                      |
+| `scene.duplicate_entity`                        | Duplicate an entity hierarchy                       |
+| `scene.remove_component`                        | Remove a component via command                      |
+| `scene.instantiate_prefab`                      | Add a prefab instance with sparse overrides         |
 | `prefab.list` / `prefab.read` / `prefab.create` | Prefab inspect + create                             |
 | `script.read` / `script.create` / `script.edit` | Script inspect + write (typechecked)                |
 | `build.preview`                                 | Preview marker (live viewport needs attached Tauri) |
@@ -107,7 +112,7 @@ Enable with `--write`. Mutations go through **editor-core commands**, `.threefor
 pnpm mcp -- --project ./examples/platformer --write
 ```
 
-Policy defaults: reads/docs/preview **allow**; scene/prefab/script writes **ask** (auto-approved with `--write` in headless mode); shell/engine **deny**.
+New-project policy defaults allow project-scoped scene, prefab, script, asset, plugin, preview, and export operations. Dependency installation remains **ask**; arbitrary shell and engine modification remain **deny**.
 
 Audit: `.threeforge/mcp.audit.log` · Diffs: `.threeforge/mcp.diff.json` · Docs index: `.arcforge/docs.index.json`
 
