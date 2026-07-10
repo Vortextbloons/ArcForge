@@ -33,6 +33,8 @@ export function ViewportCanvas() {
 
     const runtime = new Runtime({
       canvas,
+      // Scope pointer to the viewport host so look/zoom ignore editor panels.
+      inputTarget: host,
       antialias: true,
       shadows: true,
       scriptsEnabled: false,

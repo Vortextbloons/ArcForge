@@ -101,10 +101,22 @@ export class InputAPI {
   private readonly onWheel = (event: WheelEvent) => {
     this.pointer.wheel += event.deltaY;
   };
+  private readonly onPointerLeave = () => {
+    // Drop queued look/zoom deltas when the cursor leaves the input target
+    // (e.g. editor panels outside the viewport).
+    this.pointer.deltaX = 0;
+    this.pointer.deltaY = 0;
+    this.pointer.wheel = 0;
+  };
   private readonly onPointerLockChange = () => {
     this.pointer.locked = typeof document !== "undefined" && document.pointerLockElement !== null;
   };
 
+  /**
+   * Attach input listeners.
+   * Pass a viewport/canvas element in the editor so pointer move is scoped to the game view.
+   * Keyboard still works when that element is focused.
+   */
   attach(target: EventTarget = window): void {
     if (this.target) return;
     this.target = target;
@@ -113,7 +125,13 @@ export class InputAPI {
     target.addEventListener("pointerdown", this.onPointerDown as EventListener);
     target.addEventListener("pointerup", this.onPointerUp as EventListener);
     target.addEventListener("pointermove", this.onPointerMove as EventListener);
-    target.addEventListener("wheel", this.onWheel as EventListener);
+    target.addEventListener("wheel", this.onWheel as EventListener, { passive: true });
+    target.addEventListener("pointerleave", this.onPointerLeave as EventListener);
+    // Release buttons even if the pointer is released outside the target.
+    if (typeof window !== "undefined" && target !== window) {
+      window.addEventListener("pointerup", this.onPointerUp as EventListener);
+      window.addEventListener("blur", this.onPointerLeave);
+    }
     if (typeof document !== "undefined") {
       document.addEventListener("pointerlockchange", this.onPointerLockChange);
     }
@@ -128,6 +146,11 @@ export class InputAPI {
     target.removeEventListener("pointerup", this.onPointerUp as EventListener);
     target.removeEventListener("pointermove", this.onPointerMove as EventListener);
     target.removeEventListener("wheel", this.onWheel as EventListener);
+    target.removeEventListener("pointerleave", this.onPointerLeave as EventListener);
+    if (typeof window !== "undefined" && target !== window) {
+      window.removeEventListener("pointerup", this.onPointerUp as EventListener);
+      window.removeEventListener("blur", this.onPointerLeave);
+    }
     if (typeof document !== "undefined") {
       document.removeEventListener("pointerlockchange", this.onPointerLockChange);
     }
@@ -136,6 +159,11 @@ export class InputAPI {
     this.pressed.clear();
     this.released.clear();
     this.mouseButtons.clear();
+    this.mousePressed.clear();
+    this.mouseReleased.clear();
+    this.pointer.deltaX = 0;
+    this.pointer.deltaY = 0;
+    this.pointer.wheel = 0;
   }
 
   configure(actions: InputActionMap): void {

@@ -36,6 +36,13 @@ script.create / script.edit
 build.get_errors (typecheck)
 ```
 
+Use only documented methods. Common false friends:
+
+- `ctx.entities.get(id)` — not `.find(id)`
+- `ctx.input.getPointer()` — not `getMouseDelta` / `getScrollDelta`
+- `ctx.input.isKeyPressed("Space")` or `getButtonPressed("jump")` — not `getKeyDown`
+- Live handles come from `ctx.entities` / `ctx.entity` — not `ctx.scene.entities`
+
 Before adding components:
 
 ```txt

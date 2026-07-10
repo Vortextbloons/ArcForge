@@ -19,7 +19,10 @@ This is **${projectName}**, an ArcForge game project. Build the game by editing 
 
 - Read \`docs/GAME_DESIGN.md\` and \`docs/PROJECT_CONVENTIONS.md\` before making broad gameplay changes.
 - Prefer ArcForge MCP tools and validated scene, prefab, component, script, and asset commands when available.
-- Search or read the ArcForge scripting and component documentation before using an unfamiliar API or component.
+- Before writing or editing scripts, read ArcForge docs \`arcforge://docs/scripting/behaviour\` (entities + input tables). Do not invent Unity/Godot-style APIs.
+- Public lookups: \`ctx.entities.get(id)\`, \`findByName(name)\`, \`query(...)\`. Never \`ctx.entities.find\`, never treat \`ctx.scene.entities\` as live handles.
+- Public input: \`getVector\`, \`getKey\`, \`isKeyPressed\`, \`getPointer()\` (\`deltaX\`/\`deltaY\`/\`wheel\`). Never \`getMouseDelta\`, \`getScrollDelta\`, or \`getKeyDown\`.
+- \`getComponent("script.behaviour")\` returns \`{ module, props, enabled }\` data — not another Behaviour instance. Cross-script communication uses \`ctx.events\` or shared components.
 - Use the public entity, prefab, asset, audio, animation, physics, timer, scene, storage, and extension APIs freely to implement the requested game.
 - Keep scene and prefab data in JSON. Do not move scene data into TypeScript.
 - Use namespaced component IDs such as \`core.transform\`, \`render.mesh\`, \`physics.rigidbody\`, and \`script.behaviour\`.

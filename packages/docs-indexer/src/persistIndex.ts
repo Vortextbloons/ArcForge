@@ -69,7 +69,30 @@ export async function writeGeneratedDocs(options: {
     behaviour: {
       import: 'import { Behaviour, type GameContext } from "@arcforge/engine"',
       lifecycle: ["onStart", "update", "fixedUpdate", "onDestroy"],
-      context: ["time", "entity", "world", "scene", "input", "events", "debug"],
+      context: [
+        "time",
+        "entity",
+        "entities",
+        "world",
+        "scene",
+        "input",
+        "events",
+        "debug",
+        "physics",
+      ],
+      entities: {
+        get: "ctx.entities.get(id)",
+        findByName: "ctx.entities.findByName(name)",
+        query: "ctx.entities.query(...componentIds)",
+        forbidden: ["ctx.entities.find", "ctx.scene.entities as live handles"],
+      },
+      input: {
+        getVector: 'ctx.input.getVector("move")',
+        getPointer: "ctx.input.getPointer() → { deltaX, deltaY, wheel, locked }",
+        getKey: 'ctx.input.getKey("space")',
+        isKeyPressed: 'ctx.input.isKeyPressed("Space")',
+        forbidden: ["getMouseDelta", "getScrollDelta", "getMouse", "getKeyDown"],
+      },
       docsUri: "arcforge://docs/scripting/behaviour",
     },
   };

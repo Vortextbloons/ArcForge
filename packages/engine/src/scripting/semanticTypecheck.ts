@@ -57,6 +57,59 @@ declare module "@arcforge/engine" {
     getComponent<T>(typeId: string): T | undefined;
     hasComponent(typeId: string): boolean;
   }
+  export interface EntityAPI {
+    get(id: string): EntityHandle | undefined;
+    require(id: string): EntityHandle;
+    findByName(name: string): EntityHandle | undefined;
+    query(...components: string[]): EntityHandle[];
+    all(): EntityHandle[];
+    spawn(options?: {
+      id?: string; name?: string; parent?: string | null;
+      components?: Record<string, unknown>; overrides?: Record<string, unknown>;
+    }): EntityHandle;
+    spawnPrefab(path: string, options?: {
+      id?: string; name?: string; parent?: string | null;
+      components?: Record<string, unknown>; overrides?: Record<string, unknown>;
+    }): EntityHandle;
+    destroy(entity: string | EntityHandle): boolean;
+    addComponent<T>(entityId: string, component: string, data?: unknown): T;
+    setComponent<T>(entityId: string, component: string, data: unknown): T;
+    removeComponent(entityId: string, component: string): boolean;
+    rename(entityId: string, name: string): void;
+    setParent(entityId: string, parent: string | null): void;
+  }
+  export interface PointerState {
+    x: number; y: number; deltaX: number; deltaY: number; wheel: number; locked: boolean;
+  }
+  export interface InputAPI {
+    getVector(action: string): { x: number; y: number };
+    getAxis(action: string): number;
+    getButton(action: string): boolean;
+    getButtonPressed(action: string): boolean;
+    getKey(name: string): boolean;
+    isKeyDown(code: string): boolean;
+    isKeyPressed(code: string): boolean;
+    isKeyReleased(code: string): boolean;
+    getPointer(): PointerState;
+    getMouseButton(button: number): boolean;
+    requestPointerLock(element: any): Promise<void>;
+    exitPointerLock(): void;
+  }
+  export interface PhysicsAPI {
+    applyImpulse(entityId: string, impulse: [number, number, number]): void;
+    setLinearVelocity(entityId: string, velocity: [number, number, number]): void;
+    getLinearVelocity(entityId: string): [number, number, number] | null;
+    applyForce(entityId: string, force: [number, number, number]): void;
+    applyTorque(entityId: string, torque: [number, number, number]): void;
+    teleport(entityId: string, position: [number, number, number]): void;
+    raycast(
+      origin: [number, number, number],
+      direction: [number, number, number],
+      maxDistance?: number,
+      excludeEntity?: string
+    ): { entityId: string; point: [number, number, number]; normal: [number, number, number]; distance: number } | null;
+    onCollision(listener: (event: any) => void): () => void;
+  }
   export interface World {
     get(id: string): any;
     getComponent<T>(id: string, typeId: string): T | undefined;
@@ -69,12 +122,16 @@ declare module "@arcforge/engine" {
     onDestroy(ctx: GameContext): void;
   }
   export interface GameContext {
-    [key: string]: any;
     time: { delta: number; elapsed: number; fixedDelta: number };
-    entity: EntityHandle; entities: any; world: World; scene: any; input: any;
+    entity: EntityHandle;
+    entities: EntityAPI;
+    world: World;
+    scene: { version: number; name: string; entities: Array<{ id: string; name: string; parent: string | null; components: Record<string, unknown> }> };
+    input: InputAPI;
     events: { on(event: string, handler: (payload: unknown) => void): () => void; emit(event: string, payload?: unknown): void };
     debug: { info(message: string, meta?: Record<string, unknown>): void; warn(message: string, meta?: Record<string, unknown>): void; error(message: string, meta?: Record<string, unknown>): void };
-    physics: any; assets: any; audio: any; animation: any;
+    physics: PhysicsAPI;
+    assets: any; audio: any; animation: any;
     timers: any; storage: any; scenes: any; extensions: any; particles: any;
   }
   export interface RuntimeSystem {

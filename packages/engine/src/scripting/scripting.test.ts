@@ -76,6 +76,25 @@ export default class Bad extends Behaviour {}
     ).toBe(true);
   });
 
+  it("rejects invented entity and input APIs", () => {
+    const result = typecheckScripts([
+      {
+        path: "scripts/invented.ts",
+        source: `import { Behaviour, type GameContext } from "@arcforge/engine";
+export default class Invented extends Behaviour {
+  update(ctx: GameContext) {
+    ctx.entities.find("camera");
+    ctx.input.getMouseDelta();
+  }
+}
+`,
+      },
+    ]);
+    expect(result.ok).toBe(false);
+    expect(result.diagnostics.some((d) => /find/.test(d.message))).toBe(true);
+    expect(result.diagnostics.some((d) => /getMouseDelta/.test(d.message))).toBe(true);
+  });
+
   it("runs behaviour update and moves transform", () => {
     const world = new World();
     const registry = new ScriptRegistry();

@@ -32,6 +32,28 @@ describe("InputAPI", () => {
     expect(input.getButton("fire")).toBe(false);
     input.detach();
   });
+
+  it("clears pointer deltas on pointerleave", () => {
+    const target = new EventTarget();
+    const input = new InputAPI();
+    input.attach(target);
+
+    target.dispatchEvent(
+      Object.assign(new Event("pointermove"), {
+        clientX: 10,
+        clientY: 20,
+        movementX: 4,
+        movementY: -3,
+      })
+    );
+    expect(input.getPointer().deltaX).toBe(4);
+    expect(input.getPointer().deltaY).toBe(-3);
+
+    target.dispatchEvent(new Event("pointerleave"));
+    expect(input.getPointer().deltaX).toBe(0);
+    expect(input.getPointer().deltaY).toBe(0);
+    input.detach();
+  });
 });
 
 function keyEvent(type: string, code: string): Event {

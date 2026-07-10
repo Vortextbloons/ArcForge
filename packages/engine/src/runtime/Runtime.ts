@@ -45,6 +45,12 @@ export interface RuntimeOptions extends RendererOptions {
   physics?: PhysicsBackendKind;
   assetUrlResolver?: AssetUrlResolver;
   storageNamespace?: string;
+  /**
+   * DOM target for pointer/keyboard input.
+   * Prefer the viewport host in the editor so mouse look does not track over panels.
+   * Defaults to `canvas`, then `window`.
+   */
+  inputTarget?: EventTarget;
 }
 
 /**
@@ -141,8 +147,12 @@ export class Runtime {
             this.physics._setBackend(backend);
           });
 
-    if (typeof window !== "undefined") {
-      this.input.attach(window);
+    const inputTarget =
+      options.inputTarget ??
+      options.canvas ??
+      (typeof window !== "undefined" ? window : undefined);
+    if (inputTarget) {
+      this.input.attach(inputTarget);
     }
 
     this.loop.setUpdate((time) => {
