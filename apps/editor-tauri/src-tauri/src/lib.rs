@@ -3,6 +3,7 @@ use std::path::{Path, PathBuf};
 
 use tauri::{AppHandle, RunEvent};
 use tauri_plugin_dialog::{DialogExt, FilePath};
+use tauri_plugin_updater::UpdaterExt;
 
 mod mcp_sidecar;
 
@@ -142,11 +143,19 @@ async fn save_scene_dialog(
     }))
 }
 
+#[tauri::command]
+async fn check_for_update(app: AppHandle) -> Result<bool, String> {
+    let update = app.updater().map_err(|e| e.to_string())?.check().await.map_err(|e| e.to_string())?;
+    Ok(update.is_some())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
         .manage(McpSidecarState::default())
         .invoke_handler(tauri::generate_handler![
             read_project_file,
@@ -161,7 +170,8 @@ pub fn run() {
             start_mcp_server,
             stop_mcp_server,
             get_mcp_server_status,
-            get_mcp_server_logs
+            get_mcp_server_logs,
+            check_for_update
         ])
         .build(tauri::generate_context!())
         .expect("error while building tauri application")
@@ -169,7 +179,6 @@ pub fn run() {
             if let RunEvent::Exit = event {
                 on_app_exit(app_handle);
             }
-            // Also stop when the last window is destroyed (before full Exit on some platforms).
             if let RunEvent::ExitRequested { .. } = event {
                 on_app_exit(app_handle);
             }

@@ -11,6 +11,8 @@ import { ConsolePanel } from "./console/ConsolePanel";
 import { ViewportCanvas } from "./viewport/ViewportCanvas";
 import { StartScreen } from "./start/StartScreen";
 import { useProjectHotReload } from "./project/useProjectHotReload";
+import { useUpdater } from "./updater/useUpdater";
+import { UpdateDialog } from "./updater/UpdateDialog";
 
 function useEditorHotkeys() {
   const { canUndo, canRedo, undo, redo, selection, execute } = useEditorStore();
@@ -111,9 +113,12 @@ function AppShell() {
 }
 
 function App() {
+  const updater = useUpdater();
+
   return (
     <ProjectSessionProvider>
       <AppShell />
+      <UpdateDialog updater={updater} />
     </ProjectSessionProvider>
   );
 }

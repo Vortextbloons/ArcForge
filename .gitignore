@@ -35,6 +35,10 @@ pnpm-debug.log*
 # Test coverage
 coverage/
 
+# Scripts (dev tooling, screenshots)
+scripts/
+docs/screenshots/
+
 # Generated
 .generated/
 *.tsbuildinfo
