@@ -1,7 +1,7 @@
 # 4. Repository Structure
 
 ```txt
-threeforge/
+arcforge/
   apps/
     editor-tauri/
       src/
