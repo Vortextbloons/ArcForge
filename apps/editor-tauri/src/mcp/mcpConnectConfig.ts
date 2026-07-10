@@ -1,6 +1,25 @@
-/** Build copy-paste MCP client config for AI IDEs (Cursor, Claude, etc.). */
+/** Build copy-paste MCP client config using each editor's native schema. */
 
 export type McpAccessMode = "readonly" | "write";
+export type McpEditor = "opencode" | "cursor" | "claude-desktop" | "windsurf" | "vscode";
+
+export interface McpEditorOption {
+  id: McpEditor;
+  label: string;
+  configLocation: string;
+}
+
+export const MCP_EDITOR_OPTIONS: readonly McpEditorOption[] = [
+  { id: "opencode", label: "OpenCode", configLocation: "~/.config/opencode/opencode.json" },
+  { id: "cursor", label: "Cursor", configLocation: ".cursor/mcp.json" },
+  {
+    id: "claude-desktop",
+    label: "Claude Desktop",
+    configLocation: "claude_desktop_config.json",
+  },
+  { id: "windsurf", label: "Windsurf", configLocation: "~/.codeium/windsurf/mcp_config.json" },
+  { id: "vscode", label: "VS Code", configLocation: ".vscode/mcp.json" },
+];
 
 export interface McpConnectPaths {
   projectRoot: string | null;
@@ -78,24 +97,50 @@ export function resolveMcpConnectPaths(
   };
 }
 
-export function buildMcpServersJson(
+export function buildMcpConfigJson(
   paths: McpConnectPaths,
-  mode: McpAccessMode
+  mode: McpAccessMode,
+  editor: McpEditor
 ): { json: string; complete: boolean } {
   const cli = paths.mcpCliPath ?? "C:/path/to/ArcForge/packages/mcp-server/dist/cli.js";
   const project = paths.projectRoot ?? "C:/path/to/YourGame";
   const complete = Boolean(paths.mcpCliPath && paths.projectRoot);
 
-  const config = {
-    mcpServers: {
-      [paths.serverName]: {
-        command: "node",
-        args: [cli, "--project", project, mode === "write" ? "--write" : "--readonly"],
-      },
-    },
-  };
+  const args = [cli, "--project", project, mode === "write" ? "--write" : "--readonly"];
+  const standardServer = { command: "node", args };
+  const config =
+    editor === "opencode"
+      ? {
+          $schema: "https://opencode.ai/config.json",
+          mcp: {
+            [paths.serverName]: {
+              type: "local",
+              command: ["node", ...args],
+              enabled: false,
+            },
+          },
+        }
+      : editor === "vscode"
+        ? {
+            servers: {
+              [paths.serverName]: { type: "stdio", ...standardServer },
+            },
+          }
+        : {
+            mcpServers: {
+              [paths.serverName]: standardServer,
+            },
+          };
 
   return { json: JSON.stringify(config, null, 2), complete };
+}
+
+/** Backwards-compatible default for clients using the common mcpServers schema. */
+export function buildMcpServersJson(
+  paths: McpConnectPaths,
+  mode: McpAccessMode
+): { json: string; complete: boolean } {
+  return buildMcpConfigJson(paths, mode, "cursor");
 }
 
 export function buildMcpCliCommand(paths: McpConnectPaths, mode: McpAccessMode): string {

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   buildMcpCliCommand,
-  buildMcpServersJson,
+  buildMcpConfigJson,
+  MCP_EDITOR_OPTIONS,
   resolveMcpConnectPaths,
   type McpAccessMode,
+  type McpEditor,
 } from "./mcpConnectConfig";
 
 interface ConnectMcpDialogProps {
@@ -43,6 +45,7 @@ export function ConnectMcpDialog({
   projectRoot = null,
 }: ConnectMcpDialogProps) {
   const [mode, setMode] = useState<McpAccessMode>("readonly");
+  const [editor, setEditor] = useState<McpEditor>("opencode");
   const [copied, setCopied] = useState<"json" | "cli" | null>(null);
 
   const paths = useMemo(
@@ -50,8 +53,12 @@ export function ConnectMcpDialog({
     [scenePath, sceneName, projectRoot]
   );
 
-  const { json, complete } = useMemo(() => buildMcpServersJson(paths, mode), [paths, mode]);
+  const { json, complete } = useMemo(
+    () => buildMcpConfigJson(paths, mode, editor),
+    [paths, mode, editor]
+  );
   const cliCommand = useMemo(() => buildMcpCliCommand(paths, mode), [paths, mode]);
+  const editorOption = MCP_EDITOR_OPTIONS.find((option) => option.id === editor)!;
 
   useEffect(() => {
     if (!open) return;
@@ -109,7 +116,17 @@ export function ConnectMcpDialog({
             </p>
           )}
 
-          <div className="modal__row">
+          <div className="modal__row modal__row--config">
+            <label className="field field--inline">
+              <span>Editor</span>
+              <select value={editor} onChange={(e) => setEditor(e.target.value as McpEditor)}>
+                {MCP_EDITOR_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="field field--inline">
               <span>Access</span>
               <select
@@ -127,7 +144,9 @@ export function ConnectMcpDialog({
               Build the MCP server once:{" "}
               <code>pnpm --filter @arcforge/mcp-server build</code>
             </li>
-            <li>Copy the JSON below into your IDE&apos;s MCP settings.</li>
+            <li>
+              Merge the JSON below into <code>{editorOption.configLocation}</code>.
+            </li>
             <li>Restart the IDE MCP client / reload MCP servers.</li>
             <li>
               Ask the AI to call <code>docs.get_relevant</code> before editing.
@@ -136,7 +155,7 @@ export function ConnectMcpDialog({
 
           <div className="modal__section">
             <div className="modal__section-head">
-              <h3>IDE MCP config</h3>
+              <h3>{editorOption.label} MCP config</h3>
               <button type="button" className="btn btn--small" onClick={() => void handleCopyJson()}>
                 {copied === "json" ? "Copied" : "Copy JSON"}
               </button>
@@ -154,11 +173,19 @@ export function ConnectMcpDialog({
             <pre className="modal__code">{cliCommand}</pre>
           </div>
 
-          <p className="muted modal__foot">
-            Cursor: Settings → MCP → add server, or merge into{" "}
-            <code>.cursor/mcp.json</code>. Claude Desktop: merge into{" "}
-            <code>claude_desktop_config.json</code>.
-          </p>
+          {editor === "opencode" && (
+            <p className="muted modal__foot">
+              OpenCode keeps this server disabled until you change <code>enabled</code> to{" "}
+              <code>true</code>.
+            </p>
+          )}
+
+          {editor !== "opencode" && (
+            <p className="muted modal__foot">
+              Save this configuration to <code>{editorOption.configLocation}</code>, then reload the
+              editor's MCP servers.
+            </p>
+          )}
         </div>
       </div>
     </div>
