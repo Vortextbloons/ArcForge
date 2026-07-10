@@ -47,6 +47,15 @@ export {
   LightSchema,
   LightTypeSchema,
   type Light,
+  ScriptBehaviourComponent,
+  ScriptBehaviourSchema,
+  type ScriptBehaviour,
   CORE_COMPONENTS,
   CORE_COMPONENT_MAP,
 } from "./components/index.js";
+
+export {
+  ScriptModulePathSchema,
+  parseScriptModulePath,
+  type ScriptModulePath,
+} from "./script.schema.js";

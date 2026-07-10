@@ -1,18 +1,23 @@
 import { useEffect, useRef } from "react";
 import { Runtime } from "@threeforge/engine";
 import { useEditorStore } from "../app/EditorStore";
+import { usePlayMode } from "../app/PlayModeContext";
+import { DEMO_SCRIPTS } from "../scripts/demoScripts";
 
 /**
  * Three.js viewport backed by the engine Runtime.
- * Reloads when the editor scene revision changes.
+ * Reloads when the editor scene revision changes (edit mode only).
  */
 export function ViewportCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const { scene, revision } = useEditorStore();
+  const { playing, setRuntime } = usePlayMode();
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -23,8 +28,11 @@ export function ViewportCanvas() {
       canvas,
       antialias: true,
       shadows: true,
+      scriptsEnabled: false,
     });
+    runtime.registerScripts(DEMO_SCRIPTS);
     runtimeRef.current = runtime;
+    setRuntime(runtime);
     runtime.load(sceneRef.current);
 
     const resize = () => {
@@ -41,20 +49,22 @@ export function ViewportCanvas() {
 
     return () => {
       observer.disconnect();
+      setRuntime(null);
       runtime.dispose();
       runtimeRef.current = null;
     };
-  }, []);
+  }, [setRuntime]);
 
   useEffect(() => {
     const runtime = runtimeRef.current;
-    if (!runtime) return;
+    if (!runtime || playingRef.current) return;
     runtime.load(scene);
   }, [revision, scene]);
 
   return (
-    <div className="viewport" ref={hostRef}>
+    <div className={`viewport${playing ? " is-playing" : ""}`} ref={hostRef}>
       <canvas ref={canvasRef} className="viewport__canvas" />
+      {playing ? <div className="viewport__badge">PLAYING</div> : null}
     </div>
   );
 }

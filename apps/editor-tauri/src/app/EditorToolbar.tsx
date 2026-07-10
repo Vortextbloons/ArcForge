@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { CreateEntityCommand } from "@threeforge/editor-core";
 import { useEditorStore } from "../app/EditorStore";
+import { usePlayMode } from "../app/PlayModeContext";
 import {
   downloadSceneJson,
   openSceneFile,
@@ -25,8 +26,10 @@ export function EditorToolbar() {
     markSaved,
     getScenePath,
   } = useEditorStore();
+  const { playing, play, stop, runTypecheck } = usePlayMode();
 
   const handleOpen = useCallback(async () => {
+    if (playing) return;
     const tauriPath = await tryTauriOpenSceneDialog();
     if (tauriPath) {
       const contents = await tryTauriReadFile(tauriPath);
@@ -37,7 +40,7 @@ export function EditorToolbar() {
     }
     const file = await openSceneFile();
     loadScene(file.scene, file.path);
-  }, [loadScene]);
+  }, [loadScene, playing]);
 
   const handleSave = useCallback(async () => {
     const text = JSON.stringify(scene, null, 2);
@@ -72,19 +75,30 @@ export function EditorToolbar() {
       <span className="editor__scene">
         {scene.name}
         {dirty ? " •" : ""}
+        {playing ? " — Play" : ""}
       </span>
 
       <div className="toolbar__actions">
-        <button type="button" className="btn btn--small" onClick={() => void handleOpen()}>
+        <button
+          type="button"
+          className="btn btn--small"
+          disabled={playing}
+          onClick={() => void handleOpen()}
+        >
           Open
         </button>
-        <button type="button" className="btn btn--small" onClick={() => void handleSave()}>
+        <button
+          type="button"
+          className="btn btn--small"
+          disabled={playing}
+          onClick={() => void handleSave()}
+        >
           Save
         </button>
         <button
           type="button"
           className="btn btn--small"
-          disabled={!canUndo}
+          disabled={!canUndo || playing}
           title={undoLabel}
           onClick={() => void undo()}
         >
@@ -93,7 +107,7 @@ export function EditorToolbar() {
         <button
           type="button"
           className="btn btn--small"
-          disabled={!canRedo}
+          disabled={!canRedo || playing}
           title={redoLabel}
           onClick={() => void redo()}
         >
@@ -102,10 +116,37 @@ export function EditorToolbar() {
         <button
           type="button"
           className="btn btn--small"
-          onClick={() => void execute(new CreateEntityCommand({ name: "Entity" }))}
+          disabled={playing}
+          onClick={() =>
+            void execute(new CreateEntityCommand({ name: "Entity" }))
+          }
         >
           + Entity
         </button>
+        <button
+          type="button"
+          className="btn btn--small"
+          onClick={() => runTypecheck()}
+        >
+          Typecheck
+        </button>
+        {playing ? (
+          <button
+            type="button"
+            className="btn btn--small btn--danger"
+            onClick={stop}
+          >
+            Stop
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn btn--small btn--play"
+            onClick={play}
+          >
+            Play
+          </button>
+        )}
       </div>
     </header>
   );

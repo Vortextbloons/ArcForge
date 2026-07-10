@@ -1,15 +1,18 @@
 import { useEffect } from "react";
 import { DeleteEntityCommand } from "@threeforge/editor-core";
 import { EditorStoreProvider, useEditorStore } from "./app/EditorStore";
+import { PlayModeProvider, usePlayMode } from "./app/PlayModeContext";
 import { EditorToolbar } from "./app/EditorToolbar";
 import { HierarchyPanel } from "./hierarchy/HierarchyPanel";
 import { InspectorPanel } from "./inspector/InspectorPanel";
 import { AssetBrowserPanel } from "./asset-browser/AssetBrowserPanel";
+import { ConsolePanel } from "./console/ConsolePanel";
 import { ViewportCanvas } from "./viewport/ViewportCanvas";
 import sampleScene from "./fixtures/Main.scene.json";
 
 function useEditorHotkeys() {
   const { canUndo, canRedo, undo, redo, selection, execute } = useEditorStore();
+  const { playing, play, stop } = usePlayMode();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -23,8 +26,15 @@ function useEditorHotkeys() {
 
       const mod = event.ctrlKey || event.metaKey;
 
+      if (!typing && event.key === "F5") {
+        event.preventDefault();
+        if (playing) stop();
+        else play();
+        return;
+      }
+
       if (mod && event.key.toLowerCase() === "z" && !event.shiftKey) {
-        if (typing) return;
+        if (typing || playing) return;
         event.preventDefault();
         if (canUndo) void undo();
         return;
@@ -34,13 +44,17 @@ function useEditorHotkeys() {
         (mod && event.key.toLowerCase() === "y") ||
         (mod && event.shiftKey && event.key.toLowerCase() === "z")
       ) {
-        if (typing) return;
+        if (typing || playing) return;
         event.preventDefault();
         if (canRedo) void redo();
         return;
       }
 
-      if (!typing && (event.key === "Delete" || event.key === "Backspace")) {
+      if (
+        !typing &&
+        !playing &&
+        (event.key === "Delete" || event.key === "Backspace")
+      ) {
         const id = selection[0];
         if (!id) return;
         event.preventDefault();
@@ -50,7 +64,7 @@ function useEditorHotkeys() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [canUndo, canRedo, undo, redo, selection, execute]);
+  }, [canUndo, canRedo, undo, redo, selection, execute, playing, play, stop]);
 }
 
 function EditorLayout() {
@@ -64,7 +78,10 @@ function EditorLayout() {
         <main className="editor__viewport">
           <ViewportCanvas />
         </main>
-        <AssetBrowserPanel />
+        <div className="editor__bottom">
+          <AssetBrowserPanel />
+          <ConsolePanel />
+        </div>
       </div>
       <InspectorPanel />
     </div>
@@ -74,7 +91,9 @@ function EditorLayout() {
 function App() {
   return (
     <EditorStoreProvider initialScene={sampleScene}>
-      <EditorLayout />
+      <PlayModeProvider>
+        <EditorLayout />
+      </PlayModeProvider>
     </EditorStoreProvider>
   );
 }

@@ -99,7 +99,7 @@ select {
 .editor__center {
   grid-area: center;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) 140px;
+  grid-template-rows: minmax(0, 1fr) 160px;
   min-width: 0;
   min-height: 0;
 }
@@ -111,9 +111,25 @@ select {
   border-bottom: 1px solid var(--border);
 }
 
-.editor__assets {
+.editor__bottom {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  min-height: 0;
+  border-top: 1px solid var(--border);
+}
+
+.editor__assets,
+.editor__console {
   background: var(--panel-2);
   padding: 0.5rem 0.75rem;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor__assets {
+  border-right: 1px solid var(--border);
 }
 
 .panel__header {
@@ -126,7 +142,8 @@ select {
 
 .panel__header h2,
 .editor__inspector > h2,
-.editor__assets h2 {
+.editor__assets h2,
+.editor__console h2 {
   margin: 0;
   font-size: 0.75rem;
   font-weight: 600;
@@ -311,6 +328,91 @@ select {
 
 .btn--danger {
   color: var(--danger);
+}
+
+.btn--play {
+  color: #7dcea0;
+  border-color: #3d5c4a;
+}
+
+.viewport.is-playing {
+  outline: 1px solid #3d5c4a;
+  outline-offset: -1px;
+}
+
+.viewport__badge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  background: rgba(61, 92, 74, 0.9);
+  color: #c8f0d8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
+.console__badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  min-width: 1.1rem;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  background: var(--danger);
+  color: #fff;
+  font-size: 0.65rem;
+  text-align: center;
+}
+
+.console__typecheck {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+}
+
+.console__typecheck.is-ok {
+  color: #7dcea0;
+}
+
+.console__typecheck.is-bad {
+  color: var(--danger);
+}
+
+.console__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  flex: 1;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.72rem;
+}
+
+.console__entry {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 0.4rem;
+  padding: 0.15rem 0;
+  border-bottom: 1px solid transparent;
+}
+
+.console__level {
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.console__entry--error .console__level,
+.console__entry--error .console__msg {
+  color: var(--danger);
+}
+
+.console__entry--warn .console__level {
+  color: #e5c07b;
+}
+
+.console__meta {
+  color: var(--muted);
 }
 
 .assets__list {

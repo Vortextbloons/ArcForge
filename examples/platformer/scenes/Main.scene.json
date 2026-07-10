@@ -89,6 +89,11 @@
           "color": "#4ea8de",
           "castShadow": true,
           "receiveShadow": true
+        },
+        "script.behaviour": {
+          "module": "scripts/player.controller.ts",
+          "props": { "speed": 4 },
+          "enabled": true
         }
       }
     },
@@ -107,6 +112,11 @@
           "color": "#f4d35e",
           "castShadow": true,
           "receiveShadow": true
+        },
+        "script.behaviour": {
+          "module": "scripts/coin.collectable.ts",
+          "props": { "spinSpeed": 2 },
+          "enabled": true
         }
       }
     }
