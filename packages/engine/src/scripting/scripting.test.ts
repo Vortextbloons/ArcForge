@@ -10,6 +10,8 @@ import {
   typecheckScripts,
   loadScene,
   World,
+  PhysicsAPI,
+  NullPhysicsBackend,
 } from "../index.js";
 
 class MoveRight extends Behaviour {
@@ -55,6 +57,7 @@ export default class Bad extends Behaviour {}
     const input = new InputAPI();
     const events = new EventBus();
     const logger = new RuntimeLogger();
+    const physics = new PhysicsAPI(new NullPhysicsBackend());
 
     const loaded = loadScene(
       {
@@ -83,7 +86,15 @@ export default class Bad extends Behaviour {}
       { world }
     );
 
-    const scripts = new ScriptSystem(world, registry, input, events, logger, () => loaded.scene);
+    const scripts = new ScriptSystem(
+      world,
+      registry,
+      input,
+      events,
+      logger,
+      () => loaded.scene,
+      physics
+    );
     scripts.setEnabled(true);
     scripts.update({ delta: 0.5, elapsed: 0.5, fixedDelta: 1 / 60 });
 

@@ -2,6 +2,7 @@ import type { Scene, ScriptBehaviour } from "@arcforge/schemas";
 import type { World } from "../ecs/World.js";
 import type { TimeState } from "../runtime/GameLoop.js";
 import type { InputAPI } from "../input/InputAPI.js";
+import type { PhysicsAPI } from "../physics/PhysicsAPI.js";
 import { Behaviour, type GameContext } from "./Behaviour.js";
 import { EntityHandle } from "./EntityHandle.js";
 import type { EventBus } from "./EventBus.js";
@@ -31,7 +32,8 @@ export class ScriptSystem {
     private readonly input: InputAPI,
     private readonly events: EventBus,
     private readonly logger: RuntimeLogger,
-    private getScene: () => Scene
+    private getScene: () => Scene,
+    private readonly physics: PhysicsAPI
   ) {}
 
   setEnabled(enabled: boolean): void {
@@ -172,6 +174,7 @@ export class ScriptSystem {
       input: this.input,
       events: this.events,
       debug: this.logger,
+      physics: this.physics,
     };
   }
 

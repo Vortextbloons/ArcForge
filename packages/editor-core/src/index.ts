@@ -11,3 +11,16 @@ export {
   RemoveComponentCommand,
   UpdateComponentCommand,
 } from "./commands/entityCommands.js";
+export {
+  assetImportSettingsPath,
+  guessAssetKind,
+  importAssetFile,
+  readAssetImportSettings,
+  updateAssetImportSettings,
+} from "./commands/assetImport.js";
+export {
+  analyzeScenePerformance,
+  analyzeProjectPerformance,
+  type PerformanceWarning,
+  type PerformanceScanOptions,
+} from "./validation/performanceWarnings.js";

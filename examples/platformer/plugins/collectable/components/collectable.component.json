@@ -1,0 +1,16 @@
+{
+  "id": "game.collectable",
+  "displayName": "Collectable",
+  "defaults": {
+    "points": 1,
+    "autoDestroy": true
+  },
+  "docs": {
+    "summary": "Marks an entity as a collectable pickup.",
+    "aiUsage": "Attach game.collectable to coin-like entities. Pair with a Behaviour that listens for player overlap."
+  },
+  "inspector": [
+    { "key": "points", "label": "Points", "type": "number" },
+    { "key": "autoDestroy", "label": "Auto Destroy", "type": "boolean" }
+  ]
+}

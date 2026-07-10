@@ -5,13 +5,13 @@ function usage(): never {
   console.error(`Usage:
   arcforge-mcp --project <path> [--readonly | --write] [--attached] [--docs <engineDocsPath>] [--client <id>]
 
-Phase 5–7 tools (write tools require --write):
+Phase 5–8 tools (write tools require --write):
   Docs:  docs.get_relevant, docs.search, docs.read, docs.list_sources, docs.refresh_index
-  Read:  project.get_info, scene.list/open, component.list, build.get_errors
-  Write: scene.create_entity, scene.update_component, prefab.create, script.create/edit, build.preview
+  Read:  project.get_info, scene.list/open, component.list, plugin.*, asset.list/inspect, build.get_errors
+  Write: scene.*, prefab.*, script.*, plugin.create/enable/disable, asset.import, auth.pair/revoke, build.preview
   Review: diff.list, diff.summarize
 
-Policy: <project>/.threeforge/mcp.policy.json · Docs index: <project>/.arcforge/docs.index.json
+Policy: <project>/.threeforge/mcp.policy.json · Clients: .threeforge/mcp.clients.json · Docs: .arcforge/docs.index.json
 `);
   process.exit(1);
 }

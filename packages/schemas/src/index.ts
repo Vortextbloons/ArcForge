@@ -50,6 +50,14 @@ export {
   ScriptBehaviourComponent,
   ScriptBehaviourSchema,
   type ScriptBehaviour,
+  RigidbodyComponent,
+  RigidbodySchema,
+  RigidbodyTypeSchema,
+  type Rigidbody,
+  ColliderComponent,
+  ColliderSchema,
+  ColliderShapeSchema,
+  type Collider,
   CORE_COMPONENTS,
   CORE_COMPONENT_MAP,
 } from "./components/index.js";
@@ -59,3 +67,19 @@ export {
   parseScriptModulePath,
   type ScriptModulePath,
 } from "./script.schema.js";
+
+export {
+  PluginManifestSchema,
+  parsePluginManifest,
+  PluginComponentDefSchema,
+  parsePluginComponentDef,
+  type PluginManifest,
+  type PluginComponentDef,
+} from "./plugin.schema.js";
+
+export {
+  AssetImportSettingsSchema,
+  parseAssetImportSettings,
+  defaultImportSettings,
+  type AssetImportSettings,
+} from "./asset.importSettings.schema.js";

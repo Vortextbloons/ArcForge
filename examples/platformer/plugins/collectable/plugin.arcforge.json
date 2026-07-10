@@ -1,0 +1,10 @@
+{
+  "id": "game.collectable",
+  "name": "Collectable",
+  "version": "0.1.0",
+  "description": "Demo plugin: mark entities as collectables with a point value.",
+  "enabled": true,
+  "components": ["game.collectable"],
+  "systems": [],
+  "docs": ["docs/overview.md", "docs/ai-usage.md"]
+}

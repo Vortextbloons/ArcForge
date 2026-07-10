@@ -1,4 +1,4 @@
-# MCP Server (Phase 5–7)
+# MCP Server (Phase 5–8)
 
 ArcForge exposes a project MCP server for AI clients.
 
@@ -52,7 +52,17 @@ Before non-trivial edits, AI clients should call `docs.get_relevant`.
 | `scene.get_entity`     | One entity + components               |
 | `component.list`       | Core component catalog                |
 | `component.get_schema` | One component schema/docs             |
-| `build.get_errors`     | Scene validation + script diagnostics |
+| `build.get_errors`     | Scene validation + script + performance warnings |
+
+### Plugins / Assets / Auth (Phase 8)
+
+| Tool | Purpose |
+| --- | --- |
+| `plugin.list` / `plugin.read` / `plugin.validate` | Inspect plugins |
+| `plugin.create` / `plugin.enable` / `plugin.disable` | Scaffold / toggle (write) |
+| `asset.list` / `asset.inspect` / `asset.get_import_settings` | Inspect assets |
+| `asset.import` / `asset.update_import_settings` | Import + settings (write) |
+| `auth.list_clients` / `auth.pair_client` / `auth.revoke_client` | Local pairing (OAuth deferred) |
 
 ### Write (Phase 6)
 

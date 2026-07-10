@@ -17,11 +17,20 @@ import { RuntimeLogger } from "../scripting/RuntimeLogger.js";
 import { ScriptRegistry } from "../scripting/ScriptRegistry.js";
 import { ScriptSystem } from "../scripting/ScriptSystem.js";
 import type { BehaviourConstructor } from "../scripting/Behaviour.js";
+import {
+  PhysicsAPI,
+  createPhysicsBackend,
+  type PhysicsBackendKind,
+  NullPhysicsBackend,
+} from "../physics/index.js";
+import { FrameProfiler } from "../profiler/FrameProfiler.js";
 
 export interface RuntimeOptions extends RendererOptions {
   fixedDelta?: number;
   /** When true, Behaviour scripts run (play mode). Default false for editor edit mode. */
   scriptsEnabled?: boolean;
+  /** Physics backend. Default "none". Use "rapier" after await createPhysicsBackend. */
+  physics?: PhysicsBackendKind;
 }
 
 /**
@@ -37,11 +46,14 @@ export class Runtime {
   readonly logger: RuntimeLogger;
   readonly scripts: ScriptRegistry;
   readonly scriptSystem: ScriptSystem;
+  readonly physics: PhysicsAPI;
+  readonly profiler: FrameProfiler;
 
   private sceneName = "Untitled";
   private sceneVersion = 1;
   private dirtyRender = true;
   private disposed = false;
+  private physicsReady: Promise<void>;
 
   constructor(options: RuntimeOptions = {}) {
     this.world = new World();
@@ -52,33 +64,79 @@ export class Runtime {
     this.events = new EventBus();
     this.logger = new RuntimeLogger();
     this.scripts = new ScriptRegistry();
+    this.profiler = new FrameProfiler();
+    this.physics = new PhysicsAPI(new NullPhysicsBackend());
     this.scriptSystem = new ScriptSystem(
       this.world,
       this.scripts,
       this.input,
       this.events,
       this.logger,
-      () => this.toScene()
+      () => this.toScene(),
+      this.physics
     );
+
+    const kind = options.physics ?? "none";
+    this.physicsReady =
+      kind === "none"
+        ? Promise.resolve()
+        : createPhysicsBackend(kind).then((backend) => {
+            this.physics._setBackend(backend);
+          });
 
     if (typeof window !== "undefined") {
       this.input.attach(window);
     }
 
     this.loop.setUpdate((time) => {
+      const t0 = this.profiler.beginSection();
       this.scriptSystem.update(time);
+      void this.profiler.endSection(t0);
     });
     this.loop.setFixedUpdate((time) => {
+      const t0 = this.profiler.beginSection();
       this.scriptSystem.fixedUpdate(time);
+      const fixedMs = this.profiler.endSection(t0);
+
+      const p0 = this.profiler.beginSection();
+      this.physics._step(this.world, time.fixedDelta);
+      const physicsMs = this.profiler.endSection(p0);
+
+      if (this.profiler.isEnabled) {
+        this.profiler.record({
+          ...this.profiler.snapshot(),
+          fixedUpdateMs: fixedMs,
+          physicsMs,
+          entityCount: this.world.all().length,
+          meshCount: this.world.query("render.mesh").length,
+          lightCount: this.world.query("render.light").length,
+          bodyCount: this.world.query("physics.rigidbody").length,
+        });
+      }
     });
     this.loop.setRender((_time) => {
+      const t0 = this.profiler.beginSection();
       this.syncAndRender();
       this.input.endFrame();
+      const renderMs = this.profiler.endSection(t0);
+      if (this.profiler.isEnabled) {
+        const snap = this.profiler.snapshot();
+        this.profiler.record({
+          ...snap,
+          renderMs,
+          frameMs: snap.updateMs + snap.fixedUpdateMs + snap.physicsMs + renderMs,
+        });
+      }
     });
 
     if (options.scriptsEnabled) {
       this.scriptSystem.setEnabled(true);
     }
+  }
+
+  /** Resolves when the physics backend (if any) is ready. */
+  whenPhysicsReady(): Promise<void> {
+    return this.physicsReady;
   }
 
   registerScript(modulePath: string, ctor: BehaviourConstructor): void {
@@ -156,6 +214,7 @@ export class Runtime {
     this.stop();
     this.input.detach();
     this.events.clear();
+    this.physics._dispose();
     this.clearVisuals();
     this.world.clear();
     this.bridge.dispose();

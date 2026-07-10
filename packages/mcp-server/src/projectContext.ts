@@ -10,6 +10,7 @@ import {
 } from "@arcforge/schemas";
 import { typecheckScripts } from "@arcforge/engine";
 import { buildDocIndex, type DocIndex } from "@arcforge/docs-indexer";
+import { analyzeProjectPerformance } from "@arcforge/editor-core";
 import type { McpPolicy } from "./auth/policyTypes.js";
 import { loadOrCreatePolicy } from "./auth/permissions.js";
 import { AuditLog } from "./auth/audit.js";
@@ -331,6 +332,37 @@ export async function createProjectContext(options: {
         };
         if (diag.severity === "error") errors.push(item);
         else warnings.push(item);
+      }
+
+      const scenesForPerf: Array<{ path: string; scene: Scene }> = [];
+      for (const rel of sceneFiles) {
+        const abs = path.join(projectRoot, ...rel.split("/"));
+        try {
+          scenesForPerf.push({
+            path: rel,
+            scene: parseScene(
+              JSON.parse(await fs.readFile(abs, "utf8")) as unknown
+            ),
+          });
+        } catch {
+          // already reported as invalid-scene
+        }
+      }
+      const allScripts = await listFiles(
+        projectRoot,
+        (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts")
+      );
+      const perf = await analyzeProjectPerformance(
+        projectRoot,
+        scenesForPerf,
+        allScripts
+      );
+      for (const w of perf) {
+        warnings.push({
+          code: w.code,
+          message: w.message,
+          path: w.path,
+        });
       }
 
       return {

@@ -37,6 +37,7 @@ export default class PlayerController extends Behaviour {
 | `ctx.scene`  | Current scene snapshot                    |
 | `ctx.events` | `on` / `emit`                             |
 | `ctx.debug`  | `info` / `warn` / `error` (console panel) |
+| `ctx.physics` | `applyImpulse`, `setLinearVelocity`, `kind` |
 
 ## Scene binding
 

@@ -89,6 +89,7 @@ export function decidePermission(
   const isWrite =
     capability.endsWith(".write") ||
     capability === "asset.import" ||
+    capability === "plugin.create" ||
     capability === "build.export" ||
     capability === "shell.run" ||
     capability === "dependency.install" ||

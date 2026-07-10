@@ -19,8 +19,9 @@
     "lint": "oxlint src"
   },
   "dependencies": {
-    "three": "^0.166.1",
-    "@arcforge/schemas": "workspace:*"
+    "@arcforge/schemas": "workspace:*",
+    "@dimforge/rapier3d-compat": "^0.19.3",
+    "three": "^0.166.1"
   },
   "devDependencies": {
     "@types/three": "^0.166.0",

@@ -20,6 +20,8 @@ function allowedToolsForContext(ctx: ProjectContext): string[] {
         "scene.read",
         "prefab.read",
         "script.read",
+        "asset.read",
+        "plugin.read",
         "build.preview",
       ].includes(capability);
     }

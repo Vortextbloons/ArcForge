@@ -4,7 +4,7 @@ import { indexComponentSchemas } from "./indexSchemas.js";
 import { writeDocsIndexFile, writeGeneratedDocs } from "./persistIndex.js";
 import type { BuildDocIndexOptions, DocIndex, DocSource } from "./types.js";
 
-const MCP_TOOLS_BODY = `# MCP Tools (Phase 5–7)
+const MCP_TOOLS_BODY = `# MCP Tools (Phase 5–8)
 
 ## Documentation (required before non-trivial edits)
 
@@ -16,13 +16,19 @@ const MCP_TOOLS_BODY = `# MCP Tools (Phase 5–7)
 - \`project.get_info\` — project metadata
 - \`scene.list\` / \`scene.open\` / \`scene.get_entity\` — inspect scenes
 - \`component.list\` / \`component.get_schema\` — component schemas
-- \`build.get_errors\` — validation / script diagnostics
+- \`plugin.list\` / \`plugin.read\` / \`plugin.validate\`
+- \`asset.list\` / \`asset.inspect\` / \`asset.get_import_settings\`
+- \`auth.list_clients\` — local pairing registry
+- \`build.get_errors\` — validation / script / performance warnings
 
 ## Write tools (require \`--write\` / policy allow)
 
 - \`scene.create_entity\` / \`scene.update_component\` / \`scene.delete_entity\`
 - \`prefab.list\` / \`prefab.read\` / \`prefab.create\`
 - \`script.read\` / \`script.create\` / \`script.edit\`
+- \`plugin.create\` / \`plugin.enable\` / \`plugin.disable\`
+- \`asset.import\` / \`asset.update_import_settings\`
+- \`auth.pair_client\` / \`auth.revoke_client\`
 - \`build.preview\`
 - \`diff.list\` / \`diff.summarize\`
 
@@ -59,7 +65,7 @@ export async function buildDocIndex(options: BuildDocIndexOptions = {}): Promise
 
   sources.push({
     uri: "arcforge://docs/mcp/tools",
-    title: "MCP Tools (Phase 5–7)",
+    title: "MCP Tools (Phase 5–8)",
     kind: "markdown",
     path: "",
     tags: ["mcp", "tools"],

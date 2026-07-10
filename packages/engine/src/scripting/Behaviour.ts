@@ -5,6 +5,7 @@ import type { InputAPI } from "../input/InputAPI.js";
 import type { EventBus } from "./EventBus.js";
 import type { RuntimeLogger } from "./RuntimeLogger.js";
 import type { EntityHandle } from "./EntityHandle.js";
+import type { PhysicsAPI } from "../physics/PhysicsAPI.js";
 
 /** Public scripting context — no editor/Tauri/private engine access. */
 export interface GameContext {
@@ -15,6 +16,7 @@ export interface GameContext {
   input: InputAPI;
   events: EventBus;
   debug: RuntimeLogger;
+  physics: PhysicsAPI;
 }
 
 export class Behaviour {

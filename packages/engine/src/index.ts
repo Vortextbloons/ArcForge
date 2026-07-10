@@ -1,3 +1,15 @@
+export type { PhysicsBackend, PhysicsBackendKind } from "./physics/PhysicsBackend.js";
+export { NullPhysicsBackend } from "./physics/NullPhysicsBackend.js";
+export {
+  RapierPhysicsBackend,
+  initRapier,
+} from "./physics/RapierPhysicsBackend.js";
+export { PhysicsAPI, createPhysicsBackend } from "./physics/PhysicsAPI.js";
+
+export { FrameProfiler, type FrameProfilerSample } from "./profiler/FrameProfiler.js";
+
+export { registerPluginComponents } from "./plugins/registerPluginComponents.js";
+
 export { InputAPI, type Vec2 } from "./input/InputAPI.js";
 
 // ECS
