@@ -111,9 +111,9 @@ Each user game project should be file-based and portable.
 
 ```txt
 MyGame/
-  project.threeforge.json
+  project.arcforge.json
 
-  .threeforge/
+  .arcforge/
     project-id.json
     mcp.policy.json
     mcp.clients.json
@@ -159,7 +159,7 @@ MyGame/
 
 # 6. Project Manifest
 
-`project.threeforge.json`
+`project.arcforge.json`
 
 ```json
 {
