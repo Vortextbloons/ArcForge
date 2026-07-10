@@ -62,7 +62,11 @@ export interface ProjectContext {
     summary: string;
   }>;
   getErrors(): Promise<ProjectValidationResult>;
-  refreshDocs(): Promise<DocIndex>;
+  listScriptPaths(): Promise<string[]>;
+  refreshDocs(options?: {
+    includeProjectDocs?: boolean;
+    includeGeneratedSchemas?: boolean;
+  }): Promise<DocIndex>;
 }
 
 async function pathExists(target: string): Promise<boolean> {
@@ -129,9 +133,21 @@ export async function createProjectContext(options: {
   engineDocsRoot?: string;
 }): Promise<ProjectContext> {
   const projectRoot = path.resolve(options.projectRoot);
-  const manifestPath = path.join(projectRoot, "project.threeforge.json");
-  if (!(await pathExists(manifestPath))) {
-    throw new Error(`project.threeforge.json not found in ${projectRoot}`);
+  const manifestCandidates = [
+    path.join(projectRoot, "project.arcforge.json"),
+    path.join(projectRoot, "project.threeforge.json"),
+  ];
+  let manifestPath: string | null = null;
+  for (const candidate of manifestCandidates) {
+    if (await pathExists(candidate)) {
+      manifestPath = candidate;
+      break;
+    }
+  }
+  if (!manifestPath) {
+    throw new Error(
+      `project.arcforge.json (or project.threeforge.json) not found in ${projectRoot}`
+    );
   }
 
   const raw = JSON.parse(await fs.readFile(manifestPath, "utf8")) as unknown;
@@ -139,11 +155,17 @@ export async function createProjectContext(options: {
   const engineDocsRoot = await resolveEngineDocsRoot(options.engineDocsRoot);
   const policy = await loadOrCreatePolicy(projectRoot);
 
-  const loadDocs = async () =>
+  const loadDocs = async (opts?: {
+    includeProjectDocs?: boolean;
+    includeGeneratedSchemas?: boolean;
+  }) =>
     buildDocIndex({
       projectRoot,
       engineDocsRoot: engineDocsRoot ?? undefined,
-      includeComponentSchemas: true,
+      includeProjectDocs: opts?.includeProjectDocs !== false,
+      includeComponentSchemas: opts?.includeGeneratedSchemas !== false,
+      persistIndex: true,
+      writeGenerated: true,
     });
 
   let docs = await loadDocs();
@@ -333,8 +355,15 @@ export async function createProjectContext(options: {
       };
     },
 
-    async refreshDocs() {
-      docs = await loadDocs();
+    async listScriptPaths() {
+      return listFiles(
+        projectRoot,
+        (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts")
+      );
+    },
+
+    async refreshDocs(opts) {
+      docs = await loadDocs(opts);
       return docs;
     },
   };

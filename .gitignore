@@ -43,3 +43,7 @@ exports/
 **/.threeforge/mcp.audit.log
 **/.threeforge/mcp.diff.json
 **/.threeforge/preview/
+**/.arcforge/docs.index.json
+**/.arcforge/cache/
+**/.arcforge/preview/
+**/.arcforge/build/

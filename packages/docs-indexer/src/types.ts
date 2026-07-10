@@ -39,6 +39,12 @@ export interface BuildDocIndexOptions {
   projectRoot?: string;
   /** Absolute path to ArcForge monorepo docs/ folder. */
   engineDocsRoot?: string;
+  /** Include project docs/ folder. Default true when projectRoot is set. */
+  includeProjectDocs?: boolean;
   /** Include component schemas as docs. Default true. */
   includeComponentSchemas?: boolean;
+  /** Write .arcforge/docs.index.json when projectRoot is set. Default true. */
+  persistIndex?: boolean;
+  /** Write .generated/docs/*.json. Default true when a root is available. */
+  writeGenerated?: boolean;
 }

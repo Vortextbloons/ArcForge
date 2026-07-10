@@ -1,8 +1,35 @@
 import { z } from "zod";
-import { findDocByUri, searchDocs } from "@arcforge/docs-indexer";
+import {
+  findDocByUri,
+  getRelevantDocs,
+  searchDocs,
+} from "@arcforge/docs-indexer";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
+import { TOOL_POLICY_MAP, type PolicyTool } from "../auth/policyTypes.js";
 import { errorResult, jsonResult } from "../toolResult.js";
+
+function allowedToolsForContext(ctx: ProjectContext): string[] {
+  const names = Object.keys(TOOL_POLICY_MAP);
+  return names.filter((tool) => {
+    const capability = TOOL_POLICY_MAP[tool] as PolicyTool | undefined;
+    if (!capability) return false;
+    const mode = ctx.policy.mcp.allowedTools[capability] ?? ctx.policy.mcp.defaultMode;
+    if (mode === "deny") return false;
+    if (ctx.readonly) {
+      return [
+        "project.read",
+        "docs.read",
+        "docs.search",
+        "scene.read",
+        "prefab.read",
+        "script.read",
+        "build.preview",
+      ].includes(capability);
+    }
+    return true;
+  });
+}
 
 export function registerDocsTools(
   server: McpServer,
@@ -91,22 +118,59 @@ export function registerDocsTools(
   );
 
   server.registerTool(
+    "docs.get_relevant",
+    {
+      title: "Get relevant docs",
+      description:
+        "Returns docs, components, scripts, conventions, allowed tools, and warnings for a task. Call before non-trivial edits.",
+      inputSchema: {
+        task: z
+          .string()
+          .describe(
+            'Task description, e.g. "Add a third-person player with coin pickup."'
+          ),
+        limit: z.number().int().min(1).max(25).default(10),
+      },
+      annotations: { readOnlyHint: true },
+    },
+    async ({ task, limit }) => {
+      const [scriptPaths, components] = await Promise.all([
+        ctx.listScriptPaths(),
+        Promise.resolve(ctx.listComponents()),
+      ]);
+      const relevant = getRelevantDocs(ctx.docs, task, {
+        limit,
+        scriptPaths,
+        componentIds: components.map((c) => c.id),
+        allowedTools: allowedToolsForContext(ctx),
+      });
+      return jsonResult(relevant);
+    }
+  );
+
+  server.registerTool(
     "docs.refresh_index",
     {
       title: "Refresh docs index",
-      description: "Rebuilds the documentation index from disk and schemas.",
+      description:
+        "Rebuilds the documentation index from disk and schemas. Writes .arcforge/docs.index.json and .generated/docs.",
       inputSchema: {
         includeProjectDocs: z.boolean().default(true),
         includeGeneratedSchemas: z.boolean().default(true),
       },
       annotations: { readOnlyHint: true },
     },
-    async () => {
-      const docs = await ctx.refreshDocs();
+    async ({ includeProjectDocs, includeGeneratedSchemas }) => {
+      const docs = await ctx.refreshDocs({
+        includeProjectDocs,
+        includeGeneratedSchemas,
+      });
       return jsonResult({
         ok: true,
         generatedAt: docs.generatedAt,
         sourceCount: docs.sources.length,
+        includeProjectDocs,
+        includeGeneratedSchemas,
       });
     }
   );

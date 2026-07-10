@@ -78,6 +78,7 @@ export const TOOL_POLICY_MAP: Record<string, PolicyTool> = {
   "component.get_schema": "project.read",
   "docs.search": "docs.search",
   "docs.read": "docs.read",
+  "docs.get_relevant": "docs.search",
   "docs.list_sources": "docs.read",
   "docs.refresh_index": "docs.read",
   "build.get_errors": "project.read",

@@ -1,9 +1,9 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { searchDocs, getRelevantDocs } from "@arcforge/docs-indexer";
 import { createProjectContext } from "./projectContext.js";
 import { createMcpServer } from "./createServer.js";
-import { searchDocs } from "@arcforge/docs-indexer";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -41,6 +41,29 @@ describe("mcp-server phase 5", () => {
 
     const components = ctx.listComponents();
     expect(components.some((c) => c.id === "core.transform")).toBe(true);
+
+    const scripts = await ctx.listScriptPaths();
+    expect(scripts.some((s) => s.includes("player"))).toBe(true);
+  });
+
+  it("exposes get_relevant style index content for tasks", async () => {
+    const ctx = await createProjectContext({
+      projectRoot: PLATFORMER,
+      engineDocsRoot: ENGINE_DOCS,
+    });
+    const relevant = getRelevantDocs(
+      ctx.docs,
+      "Implement coin collectable pickup for the player",
+      {
+        scriptPaths: await ctx.listScriptPaths(),
+        componentIds: ctx.listComponents().map((c) => c.id),
+      }
+    );
+    expect(relevant.scripts.length).toBeGreaterThan(0);
+    expect(
+      relevant.conventions.some((c) => c.uri.includes("project")) ||
+        relevant.docs.length > 0
+    ).toBe(true);
   });
 
   it("creates an MCP server with read-only tools registered", async () => {

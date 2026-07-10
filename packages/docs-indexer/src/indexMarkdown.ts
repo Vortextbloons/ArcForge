@@ -27,6 +27,13 @@ function scopeFromRel(rel: string): DocScope {
   return "engine";
 }
 
+function tagsForRel(rel: string, basename: string): string[] {
+  const top = rel.split("/")[0] ?? "";
+  const tags = ["engine", "markdown", basename, scopeFromRel(rel)];
+  if (top === "ai-rules") tags.push("ai-rules", "conventions");
+  return tags;
+}
+
 function uriFromRel(rel: string, prefix: "docs" | "project"): string {
   const withoutExt = rel.replace(/\.md$/i, "");
   return `arcforge://${prefix}/${withoutExt}`;
@@ -69,12 +76,20 @@ export async function indexMarkdown(
     const body = await fs.readFile(full, "utf8");
     const basename = path.basename(rel, ".md");
     if (options?.projectDocs) {
+      const convention =
+        /CONVENTION|AI_NOTES|GAME_DESIGN|AI_RULE/i.test(basename) ||
+        /conventions/i.test(rel);
       sources.push({
         uri: uriFromRel(rel, "project"),
         title: titleFromMarkdown(body, basename),
         kind: "markdown",
         path: full,
-        tags: ["project", "markdown", basename],
+        tags: [
+          "project",
+          "markdown",
+          basename,
+          ...(convention ? ["conventions"] : []),
+        ],
         scope: "project",
         body,
       });
@@ -84,7 +99,7 @@ export async function indexMarkdown(
         title: titleFromMarkdown(body, basename),
         kind: "markdown",
         path: full,
-        tags: ["engine", "markdown", basename, scopeFromRel(rel)],
+        tags: tagsForRel(rel, basename),
         scope: scopeFromRel(rel),
         body,
       });

@@ -2,7 +2,7 @@
 
 ## 1. Product Goal
 
-ThreeForge is a desktop game editor and runtime framework for building shippable Three.js games with both visual user editing and AI-assisted development.
+ArcForge is a desktop game editor and runtime framework for building shippable Three.js games with both visual user editing and AI-assisted development.
 
 The system must support:
 
@@ -136,7 +136,7 @@ Do not put gameplay logic in Rust for the MVP.
 # 4. Repository Structure
 
 ```txt
-threeforge/
+arcforge/
   apps/
     editor-tauri/
       src/
@@ -246,9 +246,9 @@ Each user game project should be file-based and portable.
 
 ```txt
 MyGame/
-  project.threeforge.json
+  project.arcforge.json
 
-  .threeforge/
+  .arcforge/
     project-id.json
     mcp.policy.json
     mcp.clients.json
@@ -294,7 +294,7 @@ MyGame/
 
 # 6. Project Manifest
 
-`project.threeforge.json`
+`project.arcforge.json`
 
 ```json
 {
@@ -559,7 +559,7 @@ Scripts are TypeScript modules that use a restricted engine API.
 Example:
 
 ```ts
-import { Behaviour, GameContext } from "@threeforge/runtime";
+import { Behaviour, GameContext } from "@arcforge/runtime";
 
 export default class PlayerController extends Behaviour {
   speed = 5;
@@ -722,9 +722,9 @@ TypeScript MCP server launched as a sidecar or CLI.
 Supported launch modes:
 
 ```txt
-threeforge-mcp --project /path/to/MyGame
-threeforge-mcp --project /path/to/MyGame --attached
-threeforge-mcp --project /path/to/MyGame --readonly
+arcforge-mcp --project /path/to/MyGame
+arcforge-mcp --project /path/to/MyGame --attached
+arcforge-mcp --project /path/to/MyGame --readonly
 ```
 
 Editor configuration example:
@@ -732,8 +732,8 @@ Editor configuration example:
 ```json
 {
   "mcpServers": {
-    "threeforge-my-game": {
-      "command": "threeforge-mcp",
+    "arcforge-my-game": {
+      "command": "arcforge-mcp",
       "args": [
         "--project",
         "C:/Users/Isaac/Documents/MyGame"
@@ -1101,16 +1101,16 @@ Expose docs as MCP resources.
 Resource URI examples:
 
 ```txt
-threeforge://docs/engine/overview
-threeforge://docs/scripting/behaviour
-threeforge://docs/components/core.transform
-threeforge://docs/components/render.mesh
-threeforge://docs/mcp/tools
-threeforge://docs/project/conventions
-threeforge://docs/project/game-design
-threeforge://schemas/scene
-threeforge://schemas/prefab
-threeforge://schemas/component/game.health
+arcforge://docs/engine/overview
+arcforge://docs/scripting/behaviour
+arcforge://docs/components/core.transform
+arcforge://docs/components/render.mesh
+arcforge://docs/mcp/tools
+arcforge://docs/project/conventions
+arcforge://docs/project/game-design
+arcforge://schemas/scene
+arcforge://schemas/prefab
+arcforge://schemas/component/game.health
 ```
 
 Resources are appropriate here because MCP resources are designed to share contextual data, such as files or application-specific information, with models.
@@ -1138,7 +1138,7 @@ Output:
   "results": [
     {
       "title": "Collectable Component",
-      "uri": "threeforge://docs/components/game.collectable",
+      "uri": "arcforge://docs/components/game.collectable",
       "snippet": "Use game.collectable for objects that trigger pickup behavior..."
     }
   ]
@@ -1153,7 +1153,7 @@ Input:
 
 ```json
 {
-  "uri": "threeforge://docs/scripting/behaviour"
+  "uri": "arcforge://docs/scripting/behaviour"
 }
 ```
 
@@ -1218,7 +1218,7 @@ Before writing scripts, the AI should call:
 
 ```txt
 script.get_api
-docs.read threeforge://docs/scripting/behaviour
+docs.read arcforge://docs/scripting/behaviour
 script.typecheck after editing
 ```
 
@@ -1237,7 +1237,7 @@ build.get_errors
 
 ## 15.6 Documentation Index Format
 
-`.threeforge/docs.index.json`
+`.arcforge/docs.index.json`
 
 ```json
 {
@@ -1245,7 +1245,7 @@ build.get_errors
   "generatedAt": "2026-07-09T00:00:00Z",
   "sources": [
     {
-      "uri": "threeforge://docs/scripting/behaviour",
+      "uri": "arcforge://docs/scripting/behaviour",
       "title": "Behaviour Scripting API",
       "kind": "markdown",
       "path": "docs/scripting/behaviour.md",
@@ -1367,7 +1367,7 @@ Safe by default
 ## 17.2 Project MCP Files
 
 ```txt
-MyGame/.threeforge/
+MyGame/.arcforge/
   mcp.policy.json
   mcp.clients.json
   mcp.audit.log
@@ -1634,7 +1634,7 @@ Running shell commands
 
 Every MCP action must be logged.
 
-`.threeforge/mcp.audit.log`
+`.arcforge/mcp.audit.log`
 
 Example:
 
@@ -1752,7 +1752,7 @@ Create build report
 
 ```txt
 plugins/inventory/
-  plugin.threeforge.json
+  plugin.arcforge.json
   components/
     inventory.component.ts
     item.component.ts
@@ -2069,7 +2069,7 @@ Accept/revert buttons
 # 29. Final System Summary
 
 ```txt
-ThreeForge is a Tauri desktop editor for building Three.js games.
+ArcForge is a Tauri desktop editor for building Three.js games.
 
 The visual editor and external AI clients both modify projects through the same command system.
 
