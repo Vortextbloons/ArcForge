@@ -26,9 +26,7 @@ export async function resolveTemplateRoot(): Promise<string> {
 /**
  * Resolve built engine / schemas package roots for vendoring.
  */
-export async function resolveWorkspacePackage(
-  name: "engine" | "schemas"
-): Promise<string> {
+export async function resolveWorkspacePackage(name: "engine" | "schemas"): Promise<string> {
   const candidates = [
     path.resolve(HERE, `../../${name}`),
     path.resolve(HERE, `../../../packages/${name}`),

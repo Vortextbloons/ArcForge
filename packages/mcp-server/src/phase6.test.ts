@@ -7,10 +7,7 @@ import { createProjectContext } from "./projectContext.js";
 import { decidePermission } from "./auth/permissions.js";
 import { DEFAULT_POLICY } from "./auth/policyTypes.js";
 
-const ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
-);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PLATFORMER = path.join(ROOT, "examples", "platformer");
 const ENGINE_DOCS = path.join(ROOT, "docs");
 
@@ -115,10 +112,7 @@ describe("phase 6 mutations", () => {
     expect(errors.ok).toBe(true);
 
     // policy file created
-    const policy = await fs.readFile(
-      path.join(tempRoot, ".threeforge", "mcp.policy.json"),
-      "utf8"
-    );
+    const policy = await fs.readFile(path.join(tempRoot, ".threeforge", "mcp.policy.json"), "utf8");
     expect(policy).toContain("scene.write");
   });
 
@@ -129,8 +123,6 @@ describe("phase 6 mutations", () => {
       readonly: false,
       approveAsks: true,
     });
-    await expect(
-      ctx.mutator.createScript({ path: "../evil.ts" })
-    ).rejects.toThrow(/under scripts/);
+    await expect(ctx.mutator.createScript({ path: "../evil.ts" })).rejects.toThrow(/under scripts/);
   });
 });

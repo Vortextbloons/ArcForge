@@ -97,10 +97,6 @@ export class DiffLog {
 
   private async persist(): Promise<void> {
     await fs.mkdir(threeforgeDir(this.projectRoot), { recursive: true });
-    await fs.writeFile(
-      this.file(),
-      `${JSON.stringify(this.state, null, 2)}\n`,
-      "utf8"
-    );
+    await fs.writeFile(this.file(), `${JSON.stringify(this.state, null, 2)}\n`, "utf8");
   }
 }

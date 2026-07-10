@@ -5,11 +5,7 @@ import {
   RenameEntityCommand,
   UpdateComponentCommand,
 } from "@arcforge/editor-core";
-import {
-  CORE_COMPONENTS,
-  CORE_COMPONENT_MAP,
-  type InspectorField,
-} from "@arcforge/schemas";
+import { CORE_COMPONENTS, CORE_COMPONENT_MAP, type InspectorField } from "@arcforge/schemas";
 import { useEditorStore } from "../app/EditorStore";
 
 function NameField({ entityId, name }: { entityId: string; name: string }) {
@@ -154,9 +150,7 @@ function FieldEditor({
         step={field.type === "number" ? "0.1" : undefined}
         value={draft === undefined || draft === null ? "" : String(draft)}
         onChange={(e) =>
-          setDraft(
-            field.type === "number" ? Number(e.target.value) : e.target.value
-          )
+          setDraft(field.type === "number" ? Number(e.target.value) : e.target.value)
         }
         onBlur={() => onCommit(draft)}
         onKeyDown={(e) => {
@@ -199,9 +193,7 @@ function ComponentSection({
           <button
             type="button"
             className="btn btn--small btn--danger"
-            onClick={() =>
-              void execute(new RemoveComponentCommand(entityId, componentId))
-            }
+            onClick={() => void execute(new RemoveComponentCommand(entityId, componentId))}
           >
             Remove
           </button>
@@ -227,9 +219,7 @@ export function InspectorPanel() {
   const { selectedEntity, execute } = useEditorStore();
   const missingComponents = useMemo(() => {
     if (!selectedEntity) return [];
-    return CORE_COMPONENTS.filter(
-      (c) => selectedEntity.components[c.id] === undefined
-    );
+    return CORE_COMPONENTS.filter((c) => selectedEntity.components[c.id] === undefined);
   }, [selectedEntity]);
 
   if (!selectedEntity) {
@@ -244,11 +234,7 @@ export function InspectorPanel() {
   return (
     <aside className="editor__inspector">
       <h2>Inspector</h2>
-      <NameField
-        key={selectedEntity.id}
-        entityId={selectedEntity.id}
-        name={selectedEntity.name}
-      />
+      <NameField key={selectedEntity.id} entityId={selectedEntity.id} name={selectedEntity.name} />
       <p className="muted inspector__id">{selectedEntity.id}</p>
 
       {Object.entries(selectedEntity.components).map(([componentId, data]) => (

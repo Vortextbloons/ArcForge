@@ -83,21 +83,11 @@ export default class Bad extends Behaviour {}
       { world }
     );
 
-    const scripts = new ScriptSystem(
-      world,
-      registry,
-      input,
-      events,
-      logger,
-      () => loaded.scene
-    );
+    const scripts = new ScriptSystem(world, registry, input, events, logger, () => loaded.scene);
     scripts.setEnabled(true);
     scripts.update({ delta: 0.5, elapsed: 0.5, fixedDelta: 1 / 60 });
 
-    const pos = world.getComponent<{ position: number[] }>(
-      "box",
-      "core.transform"
-    )?.position;
+    const pos = world.getComponent<{ position: number[] }>("box", "core.transform")?.position;
     expect(pos?.[0]).toBeCloseTo(1, 5);
   });
 
@@ -118,10 +108,7 @@ export default class Bad extends Behaviour {}
         },
       ],
     });
-    const data = world.getComponent<{ module: string; enabled: boolean }>(
-      "a",
-      "script.behaviour"
-    );
+    const data = world.getComponent<{ module: string; enabled: boolean }>("a", "script.behaviour");
     expect(data?.module).toBe("scripts/player.controller.ts");
     expect(data?.enabled).toBe(true);
   });

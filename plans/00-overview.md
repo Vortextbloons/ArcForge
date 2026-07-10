@@ -4,15 +4,15 @@ ArcForge is a desktop game editor and runtime framework for building shippable T
 
 The system must support:
 
-* A Unity-like desktop editor.
-* A clean Three.js runtime.
-* AI editing through MCP.
-* Per-project MCP authorization.
-* Live preview inside the desktop app.
-* Export to playable web builds.
-* Export to editable Three.js/Vite projects.
-* AI-accessible documentation through MCP.
-* Clean, maintainable, schema-driven project structure.
+- A Unity-like desktop editor.
+- A clean Three.js runtime.
+- AI editing through MCP.
+- Per-project MCP authorization.
+- Live preview inside the desktop app.
+- Export to playable web builds.
+- Export to editable Three.js/Vite projects.
+- AI-accessible documentation through MCP.
+- Clean, maintainable, schema-driven project structure.
 
 The central design rule:
 

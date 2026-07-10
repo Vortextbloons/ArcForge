@@ -4,13 +4,7 @@ import type { z } from "zod";
 export type Vec3 = [number, number, number];
 
 export type InspectorFieldType =
-  | "number"
-  | "boolean"
-  | "string"
-  | "vec3"
-  | "enum"
-  | "asset"
-  | "color";
+  "number" | "boolean" | "string" | "vec3" | "enum" | "asset" | "color";
 
 export interface InspectorField {
   key: string;

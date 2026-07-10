@@ -35,10 +35,7 @@ export function createBuildReport(partial: {
   };
 }
 
-export async function writeBuildReport(
-  outputDir: string,
-  report: BuildReport
-): Promise<string> {
+export async function writeBuildReport(outputDir: string, report: BuildReport): Promise<string> {
   const jsonPath = path.join(outputDir, "build-report.json");
   await writeJsonFile(jsonPath, report);
 

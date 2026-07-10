@@ -7,10 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import {
-  EditorSession,
-  type EditorCommand,
-} from "@arcforge/editor-core";
+import { EditorSession, type EditorCommand } from "@arcforge/editor-core";
 import type { Entity, Scene } from "@arcforge/schemas";
 
 export interface EditorStoreValue {
@@ -42,10 +39,7 @@ export function EditorStoreProvider({
   initialScene: Scene;
   children: ReactNode;
 }) {
-  const session = useMemo(
-    () => new EditorSession({ scene: initialScene }),
-    [initialScene]
-  );
+  const session = useMemo(() => new EditorSession({ scene: initialScene }), [initialScene]);
 
   const [scene, setScene] = useState(() => session.getScene());
   const [selection, setSelectionState] = useState(() => session.getSelection());
@@ -131,9 +125,7 @@ export function EditorStoreProvider({
       canRedo: session.canRedo,
       undoLabel: session.undoLabel,
       redoLabel: session.redoLabel,
-      selectedEntity: selection[0]
-        ? scene.entities.find((e) => e.id === selection[0])
-        : undefined,
+      selectedEntity: selection[0] ? scene.entities.find((e) => e.id === selection[0]) : undefined,
       execute,
       undo,
       redo,
@@ -158,11 +150,7 @@ export function EditorStoreProvider({
     ]
   );
 
-  return (
-    <EditorStoreContext.Provider value={value}>
-      {children}
-    </EditorStoreContext.Provider>
-  );
+  return <EditorStoreContext.Provider value={value}>{children}</EditorStoreContext.Provider>;
 }
 
 export function useEditorStore(): EditorStoreValue {

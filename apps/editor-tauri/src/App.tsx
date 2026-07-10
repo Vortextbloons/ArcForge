@@ -50,11 +50,7 @@ function useEditorHotkeys() {
         return;
       }
 
-      if (
-        !typing &&
-        !playing &&
-        (event.key === "Delete" || event.key === "Backspace")
-      ) {
+      if (!typing && !playing && (event.key === "Delete" || event.key === "Backspace")) {
         const id = selection[0];
         if (!id) return;
         event.preventDefault();

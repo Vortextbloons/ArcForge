@@ -1,11 +1,7 @@
 import type { Scene } from "@arcforge/schemas";
 import { parseScene } from "@arcforge/schemas";
 import { CommandHistory, type EditorCommand } from "../undo/CommandHistory.js";
-import type {
-  EditorContext,
-  EditorEvent,
-  EditorListener,
-} from "../types.js";
+import type { EditorContext, EditorEvent, EditorListener } from "../types.js";
 
 export interface EditorSessionOptions {
   scene: Scene;
@@ -72,8 +68,7 @@ export class EditorSession implements EditorContext {
   setSelection(ids: string[]): void {
     const unique = [...new Set(ids)];
     const same =
-      unique.length === this.selection.length &&
-      unique.every((id, i) => id === this.selection[i]);
+      unique.length === this.selection.length && unique.every((id, i) => id === this.selection[i]);
     if (same) return;
     this.selection = unique;
     this.notify({ type: "selection.changed", selection: [...unique] });

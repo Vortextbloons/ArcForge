@@ -54,9 +54,7 @@ export function EditorToolbar() {
       }
     }
 
-    const savePath = await tryTauriSaveSceneDialog(
-      existing ?? `${scene.name}.scene.json`
-    );
+    const savePath = await tryTauriSaveSceneDialog(existing ?? `${scene.name}.scene.json`);
     if (savePath) {
       const written = await tryTauriWriteFile(savePath, text);
       if (written) {
@@ -117,33 +115,19 @@ export function EditorToolbar() {
           type="button"
           className="btn btn--small"
           disabled={playing}
-          onClick={() =>
-            void execute(new CreateEntityCommand({ name: "Entity" }))
-          }
+          onClick={() => void execute(new CreateEntityCommand({ name: "Entity" }))}
         >
           + Entity
         </button>
-        <button
-          type="button"
-          className="btn btn--small"
-          onClick={() => runTypecheck()}
-        >
+        <button type="button" className="btn btn--small" onClick={() => runTypecheck()}>
           Typecheck
         </button>
         {playing ? (
-          <button
-            type="button"
-            className="btn btn--small btn--danger"
-            onClick={stop}
-          >
+          <button type="button" className="btn btn--small btn--danger" onClick={stop}>
             Stop
           </button>
         ) : (
-          <button
-            type="button"
-            className="btn btn--small btn--play"
-            onClick={play}
-          >
+          <button type="button" className="btn btn--small btn--play" onClick={play}>
             Play
           </button>
         )}

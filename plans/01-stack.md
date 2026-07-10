@@ -22,11 +22,11 @@ The engine, runtime, editor command system, MCP schemas, and exported projects s
 
 Reasons:
 
-* Three.js is naturally JavaScript/TypeScript-based.
-* Exported projects remain understandable.
-* AI coding tools handle TypeScript well.
-* Component schemas can be reused across the editor, runtime, and MCP server.
-* TypeScript makes it easy to export a normal Vite + Three.js project.
+- Three.js is naturally JavaScript/TypeScript-based.
+- Exported projects remain understandable.
+- AI coding tools handle TypeScript well.
+- Component schemas can be reused across the editor, runtime, and MCP server.
+- TypeScript makes it easy to export a normal Vite + Three.js project.
 
 ## 3.3 Why Rust for Tauri
 

@@ -86,10 +86,7 @@ export class GameLoop {
 
     this.accumulator += rawDelta;
     let steps = 0;
-    while (
-      this.accumulator >= this.fixedDelta &&
-      steps < this.maxSubSteps
-    ) {
+    while (this.accumulator >= this.fixedDelta && steps < this.maxSubSteps) {
       this.onFixedUpdate?.({
         delta: this.fixedDelta,
         elapsed: this.elapsed,

@@ -1,12 +1,5 @@
 export type DocScope =
-  | "all"
-  | "engine"
-  | "project"
-  | "scripting"
-  | "components"
-  | "mcp"
-  | "plugins"
-  | "exporting";
+  "all" | "engine" | "project" | "scripting" | "components" | "mcp" | "plugins" | "exporting";
 
 export interface DocSource {
   uri: string;

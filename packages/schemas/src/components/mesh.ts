@@ -1,13 +1,7 @@
 import { z } from "zod";
 import { defineComponent } from "../defineComponent.js";
 
-export const MeshPrimitiveSchema = z.enum([
-  "box",
-  "sphere",
-  "plane",
-  "cylinder",
-  "capsule",
-]);
+export const MeshPrimitiveSchema = z.enum(["box", "sphere", "plane", "cylinder", "capsule"]);
 
 export const MeshSchema = z.object({
   /** Built-in primitive when no asset is set. */
@@ -46,7 +40,6 @@ export const MeshComponent = defineComponent({
   ],
   docs: {
     summary: "Renders a mesh primitive or loaded model asset.",
-    aiUsage:
-      "Use primitive meshes for prototypes. Set asset to a GLB path for authored models.",
+    aiUsage: "Use primitive meshes for prototypes. Set asset to a GLB path for authored models.",
   },
 });

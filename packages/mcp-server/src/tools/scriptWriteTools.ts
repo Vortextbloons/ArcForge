@@ -1,25 +1,16 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
-import {
-  jsonResult,
-  recordWriteSuccess,
-  withPermission,
-} from "../toolGate.js";
+import { jsonResult, recordWriteSuccess, withPermission } from "../toolGate.js";
 
-export function registerScriptWriteTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerScriptWriteTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "script.read",
     {
       title: "Read script",
       description: "Reads a project script under scripts/.",
       inputSchema: {
-        path: z
-          .string()
-          .describe('Script path, e.g. "scripts/player.controller.ts"'),
+        path: z.string().describe('Script path, e.g. "scripts/player.controller.ts"'),
       },
       annotations: { readOnlyHint: true },
     },
@@ -33,12 +24,9 @@ export function registerScriptWriteTools(
     "script.create",
     {
       title: "Create script",
-      description:
-        "Creates a Behaviour script under scripts/ after lightweight typecheck.",
+      description: "Creates a Behaviour script under scripts/ after lightweight typecheck.",
       inputSchema: {
-        path: z
-          .string()
-          .describe('Script path under scripts/, e.g. "scripts/enemy.ai.ts"'),
+        path: z.string().describe('Script path under scripts/, e.g. "scripts/enemy.ai.ts"'),
         purpose: z.string().optional(),
         content: z
           .string()

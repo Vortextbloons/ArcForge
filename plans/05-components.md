@@ -21,22 +21,22 @@ export const HealthComponent = defineComponent({
   schema: z.object({
     max: z.number().min(1).default(100),
     current: z.number().min(0).default(100),
-    invincible: z.boolean().default(false)
+    invincible: z.boolean().default(false),
   }),
   defaults: {
     max: 100,
     current: 100,
-    invincible: false
+    invincible: false,
   },
   inspector: [
     { key: "max", label: "Max Health", type: "number" },
     { key: "current", label: "Current Health", type: "number" },
-    { key: "invincible", label: "Invincible", type: "boolean" }
+    { key: "invincible", label: "Invincible", type: "boolean" },
   ],
   docs: {
     summary: "Adds hit points and damage state to an entity.",
-    aiUsage: "Use this for players, enemies, destructible objects, and bosses."
-  }
+    aiUsage: "Use this for players, enemies, destructible objects, and bosses.",
+  },
 });
 ```
 

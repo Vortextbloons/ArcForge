@@ -8,10 +8,7 @@ async function ensureDir(dir: string): Promise<void> {
 }
 
 /** Persist a lightweight docs index (no bodies) under .arcforge/docs.index.json. */
-export async function writeDocsIndexFile(
-  projectRoot: string,
-  index: DocIndex
-): Promise<string> {
+export async function writeDocsIndexFile(projectRoot: string, index: DocIndex): Promise<string> {
   const dir = path.join(projectRoot, ".arcforge");
   await ensureDir(dir);
   const outPath = path.join(dir, "docs.index.json");
@@ -72,15 +69,7 @@ export async function writeGeneratedDocs(options: {
     behaviour: {
       import: 'import { Behaviour, type GameContext } from "@arcforge/engine"',
       lifecycle: ["onStart", "update", "fixedUpdate", "onDestroy"],
-      context: [
-        "time",
-        "entity",
-        "world",
-        "scene",
-        "input",
-        "events",
-        "debug",
-      ],
+      context: ["time", "entity", "world", "scene", "input", "events", "debug"],
       docsUri: "arcforge://docs/scripting/behaviour",
     },
   };
@@ -90,9 +79,7 @@ export async function writeGeneratedDocs(options: {
     "utf8"
   );
 
-  const mcpSource = options.sources?.find(
-    (s) => s.uri === "arcforge://docs/mcp/tools"
-  );
+  const mcpSource = options.sources?.find((s) => s.uri === "arcforge://docs/mcp/tools");
   const mcpTools = {
     generatedAt: new Date().toISOString(),
     docsUri: "arcforge://docs/mcp/tools",

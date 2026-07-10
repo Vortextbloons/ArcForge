@@ -26,9 +26,7 @@ export class RenderBridge {
       canvas: options.canvas,
       antialias: options.antialias ?? true,
     });
-    this.renderer.setPixelRatio(
-      typeof window !== "undefined" ? window.devicePixelRatio : 1
-    );
+    this.renderer.setPixelRatio(typeof window !== "undefined" ? window.devicePixelRatio : 1);
     this.renderer.shadowMap.enabled = options.shadows ?? true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;

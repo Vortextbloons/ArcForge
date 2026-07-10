@@ -57,11 +57,7 @@ function matchesLightType(object: THREE.Object3D, type: string): boolean {
   return object.userData.lightType === type;
 }
 
-function applyLightProps(
-  light: THREE.Light,
-  data: LightData,
-  bridge: RenderBridge
-): void {
+function applyLightProps(light: THREE.Light, data: LightData, bridge: RenderBridge): void {
   light.color.set(data.color ?? "#ffffff");
   light.intensity = data.intensity ?? 1;
 

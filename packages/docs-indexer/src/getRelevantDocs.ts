@@ -64,8 +64,7 @@ const TASK_WARNINGS: Array<{ pattern: RegExp; warning: string }> = [
   },
   {
     pattern: /\b(script|behaviour|controller)\b/i,
-    warning:
-      "Read arcforge://docs/scripting/behaviour and typecheck after script edits.",
+    warning: "Read arcforge://docs/scripting/behaviour and typecheck after script edits.",
   },
 ];
 
@@ -158,10 +157,7 @@ function categorizeHits(
   return { docs, components, examples, conventions };
 }
 
-function matchScripts(
-  task: string,
-  scriptPaths: string[]
-): RelevantScript[] {
+function matchScripts(task: string, scriptPaths: string[]): RelevantScript[] {
   if (scriptPaths.length === 0) return [];
   const terms = tokenize(task);
   const scored: Array<RelevantScript & { score: number }> = [];
@@ -204,13 +200,10 @@ function matchCatalogComponents(
     if (seen.has(id)) continue;
     const idTerms = tokenize(id.replace(/\./g, " "));
     const overlap =
-      idTerms.some((t) => terms.includes(t)) ||
-      terms.some((t) => id.toLowerCase().includes(t));
+      idTerms.some((t) => terms.includes(t)) || terms.some((t) => id.toLowerCase().includes(t));
     if (!overlap) continue;
 
-    const source = index.sources.find(
-      (s) => s.uri === `arcforge://docs/components/${id}`
-    );
+    const source = index.sources.find((s) => s.uri === `arcforge://docs/components/${id}`);
     if (!source) continue;
     seen.add(id);
     extra.push({
@@ -234,9 +227,7 @@ function ensureEngineRules(
   }
 
   const rules = index.sources.find(
-    (s) =>
-      s.uri === "arcforge://docs/ai-rules/ENGINE_RULES" ||
-      s.uri.endsWith("/ENGINE_RULES")
+    (s) => s.uri === "arcforge://docs/ai-rules/ENGINE_RULES" || s.uri.endsWith("/ENGINE_RULES")
   );
   if (!rules) return conventions;
   if (conventions.some((h) => h.uri === rules.uri)) return conventions;
@@ -273,20 +264,11 @@ export function getRelevantDocs(
   ).slice(0, 8);
 
   const scripts = matchScripts(task, options?.scriptPaths ?? []);
-  const conventions = ensureEngineRules(
-    index,
-    task,
-    categorized.conventions
-  ).slice(0, 6);
+  const conventions = ensureEngineRules(index, task, categorized.conventions).slice(0, 6);
 
-  const warnings = TASK_WARNINGS.filter((w) => w.pattern.test(task)).map(
-    (w) => w.warning
-  );
+  const warnings = TASK_WARNINGS.filter((w) => w.pattern.test(task)).map((w) => w.warning);
 
-  if (
-    components.length === 0 &&
-    /\b(component|entity|prefab)\b/i.test(task)
-  ) {
+  if (components.length === 0 && /\b(component|entity|prefab)\b/i.test(task)) {
     warnings.push(
       "No matching component docs found — call component.list and component.get_schema."
     );

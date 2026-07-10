@@ -34,9 +34,7 @@ export function openSceneFile(): Promise<{ path: string; scene: unknown }> {
   });
 }
 
-export async function tryTauriReadFile(
-  path: string
-): Promise<string | null> {
+export async function tryTauriReadFile(path: string): Promise<string | null> {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<string>("read_project_file", { path });
@@ -45,10 +43,7 @@ export async function tryTauriReadFile(
   }
 }
 
-export async function tryTauriWriteFile(
-  path: string,
-  contents: string
-): Promise<boolean> {
+export async function tryTauriWriteFile(path: string, contents: string): Promise<boolean> {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
     await invoke("write_project_file", { path, contents });
@@ -67,9 +62,7 @@ export async function tryTauriOpenSceneDialog(): Promise<string | null> {
   }
 }
 
-export async function tryTauriSaveSceneDialog(
-  defaultName: string
-): Promise<string | null> {
+export async function tryTauriSaveSceneDialog(defaultName: string): Promise<string | null> {
   try {
     const { invoke } = await import("@tauri-apps/api/core");
     return await invoke<string | null>("save_scene_dialog", { defaultName });

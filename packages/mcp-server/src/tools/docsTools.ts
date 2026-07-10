@@ -1,9 +1,5 @@
 import { z } from "zod";
-import {
-  findDocByUri,
-  getRelevantDocs,
-  searchDocs,
-} from "@arcforge/docs-indexer";
+import { findDocByUri, getRelevantDocs, searchDocs } from "@arcforge/docs-indexer";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { TOOL_POLICY_MAP, type PolicyTool } from "../auth/policyTypes.js";
@@ -31,10 +27,7 @@ function allowedToolsForContext(ctx: ProjectContext): string[] {
   });
 }
 
-export function registerDocsTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerDocsTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "docs.search",
     {
@@ -70,21 +63,16 @@ export function registerDocsTools(
     "docs.read",
     {
       title: "Read docs",
-      description:
-        "Reads one documentation resource by arcforge:// URI from docs.search.",
+      description: "Reads one documentation resource by arcforge:// URI from docs.search.",
       inputSchema: {
-        uri: z
-          .string()
-          .describe('Doc URI, e.g. "arcforge://docs/scripting/behaviour"'),
+        uri: z.string().describe('Doc URI, e.g. "arcforge://docs/scripting/behaviour"'),
       },
       annotations: { readOnlyHint: true },
     },
     async ({ uri }) => {
       const doc = findDocByUri(ctx.docs, uri);
       if (!doc) {
-        return errorResult(
-          `Doc not found: ${uri}. Use docs.search or docs.list_sources.`
-        );
+        return errorResult(`Doc not found: ${uri}. Use docs.search or docs.list_sources.`);
       }
       return jsonResult({
         uri: doc.uri,
@@ -126,9 +114,7 @@ export function registerDocsTools(
       inputSchema: {
         task: z
           .string()
-          .describe(
-            'Task description, e.g. "Add a third-person player with coin pickup."'
-          ),
+          .describe('Task description, e.g. "Add a third-person player with coin pickup."'),
         limit: z.number().int().min(1).max(25).default(10),
       },
       annotations: { readOnlyHint: true },

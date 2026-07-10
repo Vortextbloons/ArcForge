@@ -22,9 +22,7 @@ export async function withPermission(
       ok: false,
       message: decision.reason,
     });
-    return errorResult(
-      `Permission denied (${decision.mode}) for ${toolName}: ${decision.reason}`
-    );
+    return errorResult(`Permission denied (${decision.mode}) for ${toolName}: ${decision.reason}`);
   }
 
   try {

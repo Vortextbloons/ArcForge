@@ -9,7 +9,5 @@
     "types": ["node"]
   },
   "include": ["src"],
-  "references": [
-    { "path": "../schemas" }
-  ]
+  "references": [{ "path": "../schemas" }]
 }

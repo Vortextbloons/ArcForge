@@ -24,17 +24,9 @@ plugins/inventory/
   "id": "game.inventory",
   "name": "Inventory",
   "version": "1.0.0",
-  "components": [
-    "game.inventory",
-    "game.item"
-  ],
-  "systems": [
-    "InventorySystem"
-  ],
-  "docs": [
-    "docs/inventory.md",
-    "docs/ai-usage.md"
-  ]
+  "components": ["game.inventory", "game.item"],
+  "systems": ["InventorySystem"],
+  "docs": ["docs/inventory.md", "docs/ai-usage.md"]
 }
 ```
 

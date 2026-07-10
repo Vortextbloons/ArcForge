@@ -22,9 +22,7 @@ export interface RunningMcpServer {
  * Start ArcForge MCP over stdio (sidecar / CLI).
  * Logs must go to stderr only — stdout is the JSON-RPC channel.
  */
-export async function startMcpServer(
-  options: StartMcpOptions
-): Promise<RunningMcpServer> {
+export async function startMcpServer(options: StartMcpOptions): Promise<RunningMcpServer> {
   const readonly = options.readonly !== false;
   const ctx = await createProjectContext({
     projectRoot: options.projectRoot,

@@ -7,10 +7,7 @@ import { loadProjectBundle } from "./loadProject.js";
 import { validateProjectBundle } from "./validateProject.js";
 import { pathExists } from "./fsUtils.js";
 
-const ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
-);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PLATFORMER = path.join(ROOT, "examples", "platformer");
 
 describe("exporter", () => {
@@ -48,13 +45,9 @@ describe("exporter", () => {
     expect(result.report.ok).toBe(true);
     expect(await pathExists(path.join(out, "package.json"))).toBe(true);
     expect(await pathExists(path.join(out, "src", "game.ts"))).toBe(true);
+    expect(await pathExists(path.join(out, "src", "scenes", "Main.scene.json"))).toBe(true);
     expect(
-      await pathExists(path.join(out, "src", "scenes", "Main.scene.json"))
-    ).toBe(true);
-    expect(
-      await pathExists(
-        path.join(out, "vendor", "@arcforge", "engine", "dist", "index.js")
-      )
+      await pathExists(path.join(out, "vendor", "@arcforge", "engine", "dist", "index.js"))
     ).toBe(true);
     expect(await pathExists(path.join(out, "build-report.json"))).toBe(true);
   }, 60_000);

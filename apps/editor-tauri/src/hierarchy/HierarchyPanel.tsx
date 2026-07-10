@@ -1,8 +1,5 @@
 import { useMemo } from "react";
-import {
-  CreateEntityCommand,
-  DeleteEntityCommand,
-} from "@arcforge/editor-core";
+import { CreateEntityCommand, DeleteEntityCommand } from "@arcforge/editor-core";
 import type { Entity } from "@arcforge/schemas";
 import { useEditorStore } from "../app/EditorStore";
 
@@ -93,12 +90,7 @@ export function HierarchyPanel() {
       </div>
       <ul className="hierarchy__tree">
         {roots.map((entity) => (
-          <HierarchyNode
-            key={entity.id}
-            entity={entity}
-            depth={0}
-            childrenMap={childrenMap}
-          />
+          <HierarchyNode key={entity.id} entity={entity} depth={0} childrenMap={childrenMap} />
         ))}
       </ul>
     </aside>

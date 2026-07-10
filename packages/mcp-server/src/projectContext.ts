@@ -9,10 +9,7 @@ import {
   type Scene,
 } from "@arcforge/schemas";
 import { typecheckScripts } from "@arcforge/engine";
-import {
-  buildDocIndex,
-  type DocIndex,
-} from "@arcforge/docs-indexer";
+import { buildDocIndex, type DocIndex } from "@arcforge/docs-indexer";
 import type { McpPolicy } from "./auth/policyTypes.js";
 import { loadOrCreatePolicy } from "./auth/permissions.js";
 import { AuditLog } from "./auth/audit.js";
@@ -78,10 +75,7 @@ async function pathExists(target: string): Promise<boolean> {
   }
 }
 
-async function listFiles(
-  root: string,
-  predicate: (rel: string) => boolean
-): Promise<string[]> {
+async function listFiles(root: string, predicate: (rel: string) => boolean): Promise<string[]> {
   const results: string[] = [];
   if (!(await pathExists(root))) return results;
 
@@ -105,16 +99,11 @@ function normalizeScenePath(scenePath: string): string {
   return scenePath.replace(/\\/g, "/").replace(/^\/+/, "");
 }
 
-export async function resolveEngineDocsRoot(
-  explicit?: string
-): Promise<string | null> {
+export async function resolveEngineDocsRoot(explicit?: string): Promise<string | null> {
   if (explicit && (await pathExists(explicit))) return path.resolve(explicit);
 
   const here = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    path.resolve(here, "../../../docs"),
-    path.resolve(process.cwd(), "docs"),
-  ];
+  const candidates = [path.resolve(here, "../../../docs"), path.resolve(process.cwd(), "docs")];
   for (const candidate of candidates) {
     if (await pathExists(candidate)) return candidate;
   }
@@ -196,9 +185,7 @@ export async function createProjectContext(options: {
       for (const rel of files) {
         const abs = path.join(projectRoot, ...rel.split("/"));
         try {
-          const scene = parseScene(
-            JSON.parse(await fs.readFile(abs, "utf8")) as unknown
-          );
+          const scene = parseScene(JSON.parse(await fs.readFile(abs, "utf8")) as unknown);
           out.push({
             path: rel,
             name: scene.name,
@@ -261,9 +248,7 @@ export async function createProjectContext(options: {
       for (const rel of sceneFiles) {
         const abs = path.join(projectRoot, ...rel.split("/"));
         try {
-          const scene = parseScene(
-            JSON.parse(await fs.readFile(abs, "utf8")) as unknown
-          );
+          const scene = parseScene(JSON.parse(await fs.readFile(abs, "utf8")) as unknown);
           const ids = new Set<string>();
           for (const entity of scene.entities) {
             if (ids.has(entity.id)) {
@@ -356,10 +341,7 @@ export async function createProjectContext(options: {
     },
 
     async listScriptPaths() {
-      return listFiles(
-        projectRoot,
-        (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts")
-      );
+      return listFiles(projectRoot, (rel) => rel.startsWith("scripts/") && rel.endsWith(".ts"));
     },
 
     async refreshDocs(opts) {

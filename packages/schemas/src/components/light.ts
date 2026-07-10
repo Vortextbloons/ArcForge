@@ -2,12 +2,7 @@ import { z } from "zod";
 import { defineComponent } from "../defineComponent.js";
 import { vec3 } from "../vec3.js";
 
-export const LightTypeSchema = z.enum([
-  "directional",
-  "point",
-  "ambient",
-  "hemi",
-]);
+export const LightTypeSchema = z.enum(["directional", "point", "ambient", "hemi"]);
 
 export const LightSchema = z.object({
   type: LightTypeSchema.default("directional"),

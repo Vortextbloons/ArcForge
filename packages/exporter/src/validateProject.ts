@@ -22,12 +22,7 @@ export function validateProjectBundle(
     for (const entity of scene.scene.entities) {
       if (ids.has(entity.id)) {
         issues.push(
-          issue(
-            "error",
-            "duplicate-entity",
-            `Duplicate entity id "${entity.id}"`,
-            scene.path
-          )
+          issue("error", "duplicate-entity", `Duplicate entity id "${entity.id}"`, scene.path)
         );
       }
       ids.add(entity.id);
@@ -51,9 +46,7 @@ export function validateProjectBundle(
   );
 
   for (const diag of typecheck.diagnostics) {
-    issues.push(
-      issue(diag.severity, "script-typecheck", diag.message, diag.file)
-    );
+    issues.push(issue(diag.severity, "script-typecheck", diag.message, diag.file));
   }
 
   const hasErrors = issues.some((i) => i.severity === "error");

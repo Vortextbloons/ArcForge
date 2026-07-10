@@ -11,9 +11,7 @@ export class ScriptRegistry {
     this.modules.set(normalizeModulePath(modulePath), ctor);
   }
 
-  registerMany(
-    entries: Record<string, BehaviourConstructor>
-  ): void {
+  registerMany(entries: Record<string, BehaviourConstructor>): void {
     for (const [path, ctor] of Object.entries(entries)) {
       this.register(path, ctor);
     }

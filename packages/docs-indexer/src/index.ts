@@ -1,10 +1,4 @@
-export type {
-  DocScope,
-  DocSource,
-  DocSearchHit,
-  DocIndex,
-  BuildDocIndexOptions,
-} from "./types.js";
+export type { DocScope, DocSource, DocSearchHit, DocIndex, BuildDocIndexOptions } from "./types.js";
 
 export type {
   GetRelevantOptions,

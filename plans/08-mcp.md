@@ -69,10 +69,7 @@ Editor configuration example:
   "mcpServers": {
     "arcforge-my-game": {
       "command": "arcforge-mcp",
-      "args": [
-        "--project",
-        "C:/Users/Isaac/Documents/MyGame"
-      ]
+      "args": ["--project", "C:/Users/Isaac/Documents/MyGame"]
     }
   }
 }

@@ -11,10 +11,7 @@ export async function pathExists(target: string): Promise<boolean> {
   }
 }
 
-export function normalizeProjectRel(
-  rel: string,
-  allowedPrefix: string
-): string {
+export function normalizeProjectRel(rel: string, allowedPrefix: string): string {
   const posix = rel.replace(/\\/g, "/").replace(/^\/+/, "");
   if (
     !posix.startsWith(allowedPrefix) ||
@@ -46,10 +43,7 @@ export function deepMerge(
       typeof prev === "object" &&
       !Array.isArray(prev)
     ) {
-      out[key] = deepMerge(
-        prev as Record<string, unknown>,
-        value as Record<string, unknown>
-      );
+      out[key] = deepMerge(prev as Record<string, unknown>, value as Record<string, unknown>);
     } else {
       out[key] = value;
     }

@@ -1,8 +1,4 @@
-import {
-  parseScene,
-  type Scene,
-  type Entity as SceneEntity,
-} from "@arcforge/schemas";
+import { parseScene, type Scene, type Entity as SceneEntity } from "@arcforge/schemas";
 import { World } from "../ecs/World.js";
 import { ComponentRegistry } from "../ecs/ComponentRegistry.js";
 
@@ -20,10 +16,7 @@ export interface LoadSceneOptions {
 /**
  * Load a scene JSON document into an ECS world, validating known components.
  */
-export function loadScene(
-  data: unknown,
-  options: LoadSceneOptions = {}
-): LoadedScene {
+export function loadScene(data: unknown, options: LoadSceneOptions = {}): LoadedScene {
   const registry = options.registry ?? ComponentRegistry.withCore();
   const scene = parseScene(data);
   const world = options.world ?? new World();
@@ -38,11 +31,7 @@ export function loadScene(
   return { scene, world };
 }
 
-function createEntity(
-  world: World,
-  registry: ComponentRegistry,
-  entity: SceneEntity
-): void {
+function createEntity(world: World, registry: ComponentRegistry, entity: SceneEntity): void {
   world.create(entity.id, entity.name, entity.parent ?? null);
 
   for (const [typeId, raw] of Object.entries(entity.components ?? {})) {
@@ -55,9 +44,7 @@ function validateHierarchy(world: World): void {
   for (const entity of world.all()) {
     if (entity.parent === null) continue;
     if (!world.has(entity.parent)) {
-      throw new Error(
-        `Entity "${entity.id}" references missing parent "${entity.parent}"`
-      );
+      throw new Error(`Entity "${entity.id}" references missing parent "${entity.parent}"`);
     }
     const seen = new Set<string>();
     let current: string | null = entity.id;

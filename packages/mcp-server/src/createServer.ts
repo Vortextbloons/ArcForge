@@ -34,9 +34,7 @@ export function createMcpServer(ctx: ProjectContext): McpServer {
   registerAllTools(server, ctx);
 
   for (const source of ctx.docs.sources) {
-    const resourceName = source.uri
-      .replace(/^arcforge:\/\//, "")
-      .replace(/\//g, ".");
+    const resourceName = source.uri.replace(/^arcforge:\/\//, "").replace(/\//g, ".");
     server.registerResource(
       resourceName,
       source.uri,

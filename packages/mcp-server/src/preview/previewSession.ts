@@ -36,11 +36,7 @@ export class PreviewSession {
       note: this.noteForMode(),
     };
     await fs.mkdir(path.dirname(this.file()), { recursive: true });
-    await fs.writeFile(
-      this.file(),
-      `${JSON.stringify(this.state, null, 2)}\n`,
-      "utf8"
-    );
+    await fs.writeFile(this.file(), `${JSON.stringify(this.state, null, 2)}\n`, "utf8");
     return this.state;
   }
 

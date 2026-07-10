@@ -20,12 +20,7 @@ export function syncCameras(world: World, bridge: RenderBridge): void {
     if (existing instanceof THREE.PerspectiveCamera) {
       camera = existing;
     } else {
-      camera = new THREE.PerspectiveCamera(
-        data.fov ?? 60,
-        1,
-        data.near ?? 0.1,
-        data.far ?? 1000
-      );
+      camera = new THREE.PerspectiveCamera(data.fov ?? 60, 1, data.near ?? 0.1, data.far ?? 1000);
       camera.name = entity.name;
       replaceObject(bridge, entity.id, camera, existing);
     }

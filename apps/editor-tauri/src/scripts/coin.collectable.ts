@@ -10,11 +10,7 @@ export default class CoinCollectable extends Behaviour {
     if (this.collected) return;
 
     const [x, y, z] = ctx.entity.transform.rotation;
-    ctx.entity.transform.rotation = [
-      x,
-      y + this.spinSpeed * ctx.time.delta,
-      z,
-    ];
+    ctx.entity.transform.rotation = [x, y + this.spinSpeed * ctx.time.delta, z];
 
     const coinPos = ctx.entity.transform.position;
     const playerPos = ctx.world.getComponent<{

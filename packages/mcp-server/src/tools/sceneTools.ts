@@ -3,10 +3,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { errorResult, jsonResult } from "../toolResult.js";
 
-export function registerSceneTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerSceneTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "scene.list",
     {
@@ -28,12 +25,9 @@ export function registerSceneTools(
     "scene.open",
     {
       title: "Open scene summary",
-      description:
-        "Returns a scene summary (entities + component ids) without mutating files.",
+      description: "Returns a scene summary (entities + component ids) without mutating files.",
       inputSchema: {
-        scene: z
-          .string()
-          .describe('Scene path, e.g. "scenes/Main.scene.json"'),
+        scene: z.string().describe('Scene path, e.g. "scenes/Main.scene.json"'),
       },
       annotations: { readOnlyHint: true },
     },

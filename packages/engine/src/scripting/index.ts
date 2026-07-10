@@ -1,9 +1,5 @@
 export { InputAPI, type Vec2 } from "../input/InputAPI.js";
-export {
-  Behaviour,
-  type GameContext,
-  type BehaviourConstructor,
-} from "./Behaviour.js";
+export { Behaviour, type GameContext, type BehaviourConstructor } from "./Behaviour.js";
 export { EntityHandle, TransformHandle } from "./EntityHandle.js";
 export { EventBus } from "./EventBus.js";
 export {

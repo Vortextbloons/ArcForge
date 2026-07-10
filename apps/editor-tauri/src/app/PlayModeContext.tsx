@@ -34,9 +34,7 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
   const { scene } = useEditorStore();
   const [playing, setPlaying] = useState(false);
   const [logs, setLogs] = useState<RuntimeLogEntry[]>([]);
-  const [typecheck, setTypecheck] = useState<ScriptTypecheckResult | null>(
-    null
-  );
+  const [typecheck, setTypecheck] = useState<ScriptTypecheckResult | null>(null);
   const runtimeRef = useRef<Runtime | null>(null);
   const unsubRef = useRef<(() => void) | null>(null);
   const snapshotRef = useRef<Scene | null>(null);
@@ -109,21 +107,10 @@ export function PlayModeProvider({ children }: { children: ReactNode }) {
       clearLogs,
       runTypecheck,
     }),
-    [
-      playing,
-      logs,
-      typecheck,
-      setRuntime,
-      play,
-      stop,
-      clearLogs,
-      runTypecheck,
-    ]
+    [playing, logs, typecheck, setRuntime, play, stop, clearLogs, runTypecheck]
   );
 
-  return (
-    <PlayModeContext.Provider value={value}>{children}</PlayModeContext.Provider>
-  );
+  return <PlayModeContext.Provider value={value}>{children}</PlayModeContext.Provider>;
 }
 
 export function usePlayMode(): PlayModeValue {

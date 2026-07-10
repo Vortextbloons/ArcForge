@@ -18,9 +18,7 @@ import type { ExportOptions, ExportResult, ProjectBundle } from "./types.js";
 /**
  * Export an editable Three.js / Vite project that runs without the editor.
  */
-export async function exportThreeProject(
-  options: ExportOptions
-): Promise<ExportResult> {
+export async function exportThreeProject(options: ExportOptions): Promise<ExportResult> {
   const prepared = await prepareExport(options, "three-project");
   if (!prepared.ok) return { report: prepared.report };
 
@@ -108,10 +106,7 @@ export async function exportThreeProject(
   return { report };
 }
 
-async function writeGameBootstrap(
-  bundle: ProjectBundle,
-  output: string
-): Promise<void> {
+async function writeGameBootstrap(bundle: ProjectBundle, output: string): Promise<void> {
   const scriptEntries = bundle.scripts.map((s) => ({
     modulePath: s.path,
     importPath: `./${toPosix(s.path).replace(/\.ts$/, "")}`,
@@ -121,10 +116,7 @@ async function writeGameBootstrap(
     .map((s, i) => `import script_${i} from ${JSON.stringify(s.importPath)};`)
     .join("\n");
   const registerLines = scriptEntries
-    .map(
-      (s, i) =>
-        `  runtime.registerScript(${JSON.stringify(s.modulePath)}, script_${i});`
-    )
+    .map((s, i) => `  runtime.registerScript(${JSON.stringify(s.modulePath)}, script_${i});`)
     .join("\n");
 
   const sceneImport = `./${toPosix(bundle.manifest.defaultScene)}`;
@@ -190,9 +182,7 @@ async function vendorPackages(output: string): Promise<void> {
     ["schemas", schemasRoot],
   ] as const) {
     if (!(await pathExists(path.join(root, "dist", "index.js")))) {
-      throw new Error(
-        `Package not built: ${root}. Run pnpm build for engine/schemas first.`
-      );
+      throw new Error(`Package not built: ${root}. Run pnpm build for engine/schemas first.`);
     }
     const dest = path.join(output, "vendor", "@arcforge", name);
     await ensureDir(dest);
@@ -200,9 +190,7 @@ async function vendorPackages(output: string): Promise<void> {
       ignore: (rel) => rel.endsWith(".map"),
     });
 
-    const srcPkg = JSON.parse(
-      await fs.readFile(path.join(root, "package.json"), "utf8")
-    ) as {
+    const srcPkg = JSON.parse(await fs.readFile(path.join(root, "package.json"), "utf8")) as {
       name: string;
       version: string;
       type?: string;

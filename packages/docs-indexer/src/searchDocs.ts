@@ -9,7 +9,8 @@ function tokenize(text: string): string[] {
 
 function scoreSource(source: DocSource, terms: string[]): number {
   if (terms.length === 0) return 0;
-  const hay = `${source.title}\n${source.uri}\n${source.tags.join(" ")}\n${source.body}`.toLowerCase();
+  const hay =
+    `${source.title}\n${source.uri}\n${source.tags.join(" ")}\n${source.body}`.toLowerCase();
   let score = 0;
   for (const term of terms) {
     if (source.title.toLowerCase().includes(term)) score += 8;
@@ -78,10 +79,7 @@ export function searchDocs(
   return hits.slice(0, limit);
 }
 
-export function findDocByUri(
-  index: DocIndex | DocSource[],
-  uri: string
-): DocSource | undefined {
+export function findDocByUri(index: DocIndex | DocSource[], uri: string): DocSource | undefined {
   const sources = Array.isArray(index) ? index : index.sources;
   return sources.find((s) => s.uri === uri);
 }

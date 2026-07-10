@@ -1,16 +1,9 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
-import {
-  jsonResult,
-  recordWriteSuccess,
-  withPermission,
-} from "../toolGate.js";
+import { jsonResult, recordWriteSuccess, withPermission } from "../toolGate.js";
 
-export function registerSceneWriteTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerSceneWriteTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "scene.create_entity",
     {
@@ -83,8 +76,7 @@ export function registerSceneWriteTools(
     "scene.delete_entity",
     {
       title: "Delete entity",
-      description:
-        "Deletes an entity (and descendants) through DeleteEntityCommand.",
+      description: "Deletes an entity (and descendants) through DeleteEntityCommand.",
       inputSchema: {
         scene: z.string(),
         entityId: z.string(),

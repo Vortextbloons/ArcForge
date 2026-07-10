@@ -1,22 +1,14 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
-import {
-  jsonResult,
-  recordWriteSuccess,
-  withPermission,
-} from "../toolGate.js";
+import { jsonResult, recordWriteSuccess, withPermission } from "../toolGate.js";
 
-export function registerDiffTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerDiffTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "diff.list",
     {
       title: "List AI diffs",
-      description:
-        "Lists recent MCP write operations recorded for review (AI diff review).",
+      description: "Lists recent MCP write operations recorded for review (AI diff review).",
       inputSchema: {
         limit: z.number().int().min(1).max(100).default(20),
       },
@@ -45,10 +37,7 @@ export function registerDiffTools(
   );
 }
 
-export function registerPreviewTool(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerPreviewTool(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "build.preview",
     {
@@ -56,10 +45,7 @@ export function registerPreviewTool(
       description:
         "Starts or refreshes preview. Headless mode writes a preview marker; attached Tauri will drive the live viewport later.",
       inputSchema: {
-        scene: z
-          .string()
-          .optional()
-          .describe("Scene to preview; defaults to project defaultScene"),
+        scene: z.string().optional().describe("Scene to preview; defaults to project defaultScene"),
       },
       annotations: { readOnlyHint: false },
     },

@@ -15,11 +15,7 @@ export class World {
     return this.entities.get(id);
   }
 
-  create(
-    id: EntityId,
-    name: string,
-    parent: EntityId | null = null
-  ): EntityRecord {
+  create(id: EntityId, name: string, parent: EntityId | null = null): EntityRecord {
     if (this.entities.has(id)) {
       throw new Error(`Entity already exists: ${id}`);
     }

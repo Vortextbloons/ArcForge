@@ -31,42 +31,42 @@ Editor MCP config example:
 
 ### Documentation (Phase 7)
 
-| Tool | Purpose |
-| --- | --- |
-| `docs.get_relevant` | Task-scoped docs, components, scripts, conventions, warnings |
-| `docs.search` | Search indexed docs |
-| `docs.read` | Read a `arcforge://` doc URI |
-| `docs.list_sources` | List doc sources |
+| Tool                 | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `docs.get_relevant`  | Task-scoped docs, components, scripts, conventions, warnings    |
+| `docs.search`        | Search indexed docs                                             |
+| `docs.read`          | Read a `arcforge://` doc URI                                    |
+| `docs.list_sources`  | List doc sources                                                |
 | `docs.refresh_index` | Rebuild index → `.arcforge/docs.index.json` + `.generated/docs` |
 
 Before non-trivial edits, AI clients should call `docs.get_relevant`.
 
 ### Read (Phase 5)
 
-| Tool | Purpose |
-| --- | --- |
-| `project.get_info` | Project manifest metadata |
-| `project.list_files` | List scenes/scripts/prefabs/docs |
-| `scene.list` | List scenes |
-| `scene.open` | Scene entity summary |
-| `scene.get_entity` | One entity + components |
-| `component.list` | Core component catalog |
-| `component.get_schema` | One component schema/docs |
-| `build.get_errors` | Scene validation + script diagnostics |
+| Tool                   | Purpose                               |
+| ---------------------- | ------------------------------------- |
+| `project.get_info`     | Project manifest metadata             |
+| `project.list_files`   | List scenes/scripts/prefabs/docs      |
+| `scene.list`           | List scenes                           |
+| `scene.open`           | Scene entity summary                  |
+| `scene.get_entity`     | One entity + components               |
+| `component.list`       | Core component catalog                |
+| `component.get_schema` | One component schema/docs             |
+| `build.get_errors`     | Scene validation + script diagnostics |
 
 ### Write (Phase 6)
 
 Enable with `--write`. Mutations go through **editor-core commands**, `.threeforge/mcp.policy.json`, audit log, and diff log.
 
-| Tool | Purpose |
-| --- | --- |
-| `scene.create_entity` | Create entity via `CreateEntityCommand` |
-| `scene.update_component` | Patch/replace component via commands |
-| `scene.delete_entity` | Delete entity via `DeleteEntityCommand` |
-| `prefab.list` / `prefab.read` / `prefab.create` | Prefab inspect + create |
-| `script.read` / `script.create` / `script.edit` | Script inspect + write (typechecked) |
-| `build.preview` | Preview marker (live viewport needs attached Tauri) |
-| `diff.list` / `diff.summarize` | AI diff review |
+| Tool                                            | Purpose                                             |
+| ----------------------------------------------- | --------------------------------------------------- |
+| `scene.create_entity`                           | Create entity via `CreateEntityCommand`             |
+| `scene.update_component`                        | Patch/replace component via commands                |
+| `scene.delete_entity`                           | Delete entity via `DeleteEntityCommand`             |
+| `prefab.list` / `prefab.read` / `prefab.create` | Prefab inspect + create                             |
+| `script.read` / `script.create` / `script.edit` | Script inspect + write (typechecked)                |
+| `build.preview`                                 | Preview marker (live viewport needs attached Tauri) |
+| `diff.list` / `diff.summarize`                  | AI diff review                                      |
 
 ```bash
 pnpm mcp -- --project ./examples/platformer --write

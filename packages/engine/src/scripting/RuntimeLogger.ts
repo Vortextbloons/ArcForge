@@ -48,11 +48,7 @@ export class RuntimeLogger {
     this.push("error", message, meta);
   }
 
-  private push(
-    level: RuntimeLogLevel,
-    message: string,
-    meta?: Partial<RuntimeLogEntry>
-  ): void {
+  private push(level: RuntimeLogLevel, message: string, meta?: Partial<RuntimeLogEntry>): void {
     const entry: RuntimeLogEntry = {
       id: `log_${++this.seq}`,
       level,

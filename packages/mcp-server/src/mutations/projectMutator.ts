@@ -8,12 +8,7 @@ import {
   UpdateComponentCommand,
   createEntityId,
 } from "@arcforge/editor-core";
-import {
-  CORE_COMPONENT_MAP,
-  parseScene,
-  type Prefab,
-  type Scene,
-} from "@arcforge/schemas";
+import { CORE_COMPONENT_MAP, parseScene, type Prefab, type Scene } from "@arcforge/schemas";
 import type { MutationResult } from "./types.js";
 import {
   absUnderRoot,
@@ -50,17 +45,12 @@ export class ProjectMutator {
     if (!(await pathExists(abs))) {
       throw new Error(`Scene not found: ${rel}`);
     }
-    const before = parseScene(
-      JSON.parse(await fs.readFile(abs, "utf8")) as unknown
-    );
+    const before = parseScene(JSON.parse(await fs.readFile(abs, "utf8")) as unknown);
     const session = new EditorSession({ scene: before, scenePath: rel });
     return { session, rel, before };
   }
 
-  private async saveScene(
-    session: EditorSession,
-    rel: string
-  ): Promise<Scene> {
+  private async saveScene(session: EditorSession, rel: string): Promise<Scene> {
     const scene = session.getScene();
     parseScene(scene);
     const abs = absUnderRoot(this.projectRoot, rel);
@@ -131,23 +121,17 @@ export class ProjectMutator {
       validateComponents({
         [input.component]: nextData as Record<string, unknown>,
       });
-      await session.execute(
-        new AddComponentCommand(input.entityId, input.component, nextData)
-      );
+      await session.execute(new AddComponentCommand(input.entityId, input.component, nextData));
     } else {
       const base =
         current && typeof current === "object" && !Array.isArray(current)
           ? (structuredClone(current) as Record<string, unknown>)
           : {};
-      nextData = input.replace
-        ? structuredClone(input.patch)
-        : deepMerge(base, input.patch);
+      nextData = input.replace ? structuredClone(input.patch) : deepMerge(base, input.patch);
       validateComponents({
         [input.component]: nextData as Record<string, unknown>,
       });
-      await session.execute(
-        new UpdateComponentCommand(input.entityId, input.component, nextData)
-      );
+      await session.execute(new UpdateComponentCommand(input.entityId, input.component, nextData));
     }
 
     const after = await this.saveScene(session, rel);
@@ -192,16 +176,11 @@ export class ProjectMutator {
     return createScriptFile(this.projectRoot, input);
   }
 
-  editScript(input: {
-    path: string;
-    content: string;
-  }): Promise<MutationResult<{ path: string }>> {
+  editScript(input: { path: string; content: string }): Promise<MutationResult<{ path: string }>> {
     return editScriptFile(this.projectRoot, input);
   }
 
-  readScript(
-    scriptPath: string
-  ): Promise<{ path: string; content: string }> {
+  readScript(scriptPath: string): Promise<{ path: string; content: string }> {
     return readScriptFile(this.projectRoot, scriptPath);
   }
 
@@ -209,9 +188,7 @@ export class ProjectMutator {
     return listPrefabFiles(this.projectRoot);
   }
 
-  readPrefab(
-    prefabPath: string
-  ): Promise<{ path: string; prefab: Prefab }> {
+  readPrefab(prefabPath: string): Promise<{ path: string; prefab: Prefab }> {
     return readPrefabFile(this.projectRoot, prefabPath);
   }
 }

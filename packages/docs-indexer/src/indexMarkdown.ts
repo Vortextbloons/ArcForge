@@ -77,19 +77,13 @@ export async function indexMarkdown(
     const basename = path.basename(rel, ".md");
     if (options?.projectDocs) {
       const convention =
-        /CONVENTION|AI_NOTES|GAME_DESIGN|AI_RULE/i.test(basename) ||
-        /conventions/i.test(rel);
+        /CONVENTION|AI_NOTES|GAME_DESIGN|AI_RULE/i.test(basename) || /conventions/i.test(rel);
       sources.push({
         uri: uriFromRel(rel, "project"),
         title: titleFromMarkdown(body, basename),
         kind: "markdown",
         path: full,
-        tags: [
-          "project",
-          "markdown",
-          basename,
-          ...(convention ? ["conventions"] : []),
-        ],
+        tags: ["project", "markdown", basename, ...(convention ? ["conventions"] : [])],
         scope: "project",
         body,
       });

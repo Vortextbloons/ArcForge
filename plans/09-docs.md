@@ -243,6 +243,7 @@ Prefer these change types in order:
 6. Engine core modifications only when explicitly requested.
 
 Do not directly modify:
+
 - engine/render/private
 - engine/core/game-loop
 - generated files

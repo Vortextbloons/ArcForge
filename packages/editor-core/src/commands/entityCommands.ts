@@ -87,9 +87,7 @@ export class DeleteEntityCommand implements EditorCommand {
 
     scene.entities = scene.entities.filter((e) => !toRemove.has(e.id));
     ctx.setScene(scene);
-    ctx.setSelection(
-      ctx.getSelection().filter((id) => !toRemove.has(id))
-    );
+    ctx.setSelection(ctx.getSelection().filter((id) => !toRemove.has(id)));
     for (const entity of this.removed) {
       ctx.notify({ type: "entity.deleted", entityId: entity.id });
     }
@@ -289,11 +287,7 @@ function collectDescendants(scene: Scene, rootId: string): Set<string> {
   while (changed) {
     changed = false;
     for (const entity of scene.entities) {
-      if (
-        entity.parent &&
-        ids.has(entity.parent) &&
-        !ids.has(entity.id)
-      ) {
+      if (entity.parent && ids.has(entity.parent) && !ids.has(entity.id)) {
         ids.add(entity.id);
         changed = true;
       }

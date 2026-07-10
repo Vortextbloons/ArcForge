@@ -16,7 +16,7 @@
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts"
+    "lint": "oxlint src"
   },
   "dependencies": {
     "@arcforge/schemas": "workspace:*"

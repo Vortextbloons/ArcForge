@@ -59,10 +59,7 @@ function meshKey(data: MeshData): string {
 }
 
 function isMatchingMesh(object: THREE.Object3D, data: MeshData): boolean {
-  return (
-    (object as THREE.Mesh).isMesh === true &&
-    object.userData.meshKey === meshKey(data)
-  );
+  return (object as THREE.Mesh).isMesh === true && object.userData.meshKey === meshKey(data);
 }
 
 function updateMeshMaterial(mesh: THREE.Mesh, data: MeshData): void {

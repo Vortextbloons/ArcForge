@@ -1,4 +1,4 @@
- ArcForge Engine — Full Architecture Specification
+ArcForge Engine — Full Architecture Specification
 
 ## 1. Product Goal
 
@@ -6,15 +6,15 @@ ArcForge is a desktop game editor and runtime framework for building shippable T
 
 The system must support:
 
-* A Unity-like desktop editor.
-* A clean Three.js runtime.
-* AI editing through MCP.
-* Per-project MCP authorization.
-* Live preview inside the desktop app.
-* Export to playable web builds.
-* Export to editable Three.js/Vite projects.
-* AI-accessible documentation through MCP.
-* Clean, maintainable, schema-driven project structure.
+- A Unity-like desktop editor.
+- A clean Three.js runtime.
+- AI editing through MCP.
+- Per-project MCP authorization.
+- Live preview inside the desktop app.
+- Export to playable web builds.
+- Export to editable Three.js/Vite projects.
+- AI-accessible documentation through MCP.
+- Clean, maintainable, schema-driven project structure.
 
 The central design rule:
 
@@ -108,11 +108,11 @@ The engine, runtime, editor command system, MCP schemas, and exported projects s
 
 Reasons:
 
-* Three.js is naturally JavaScript/TypeScript-based.
-* Exported projects remain understandable.
-* AI coding tools handle TypeScript well.
-* Component schemas can be reused across the editor, runtime, and MCP server.
-* TypeScript makes it easy to export a normal Vite + Three.js project.
+- Three.js is naturally JavaScript/TypeScript-based.
+- Exported projects remain understandable.
+- AI coding tools handle TypeScript well.
+- Component schemas can be reused across the editor, runtime, and MCP server.
+- TypeScript makes it easy to export a normal Vite + Three.js project.
 
 ## 3.3 Why Rust for Tauri
 
@@ -529,22 +529,22 @@ export const HealthComponent = defineComponent({
   schema: z.object({
     max: z.number().min(1).default(100),
     current: z.number().min(0).default(100),
-    invincible: z.boolean().default(false)
+    invincible: z.boolean().default(false),
   }),
   defaults: {
     max: 100,
     current: 100,
-    invincible: false
+    invincible: false,
   },
   inspector: [
     { key: "max", label: "Max Health", type: "number" },
     { key: "current", label: "Current Health", type: "number" },
-    { key: "invincible", label: "Invincible", type: "boolean" }
+    { key: "invincible", label: "Invincible", type: "boolean" },
   ],
   docs: {
     summary: "Adds hit points and damage state to an entity.",
-    aiUsage: "Use this for players, enemies, destructible objects, and bosses."
-  }
+    aiUsage: "Use this for players, enemies, destructible objects, and bosses.",
+  },
 });
 ```
 
@@ -734,10 +734,7 @@ Editor configuration example:
   "mcpServers": {
     "arcforge-my-game": {
       "command": "arcforge-mcp",
-      "args": [
-        "--project",
-        "C:/Users/Isaac/Documents/MyGame"
-      ]
+      "args": ["--project", "C:/Users/Isaac/Documents/MyGame"]
     }
   }
 }
@@ -1272,6 +1269,7 @@ Prefer these change types in order:
 6. Engine core modifications only when explicitly requested.
 
 Do not directly modify:
+
 - engine/render/private
 - engine/core/game-loop
 - generated files
@@ -1772,17 +1770,9 @@ plugins/inventory/
   "id": "game.inventory",
   "name": "Inventory",
   "version": "1.0.0",
-  "components": [
-    "game.inventory",
-    "game.item"
-  ],
-  "systems": [
-    "InventorySystem"
-  ],
-  "docs": [
-    "docs/inventory.md",
-    "docs/ai-usage.md"
-  ]
+  "components": ["game.inventory", "game.item"],
+  "systems": ["InventorySystem"],
+  "docs": ["docs/inventory.md", "docs/ai-usage.md"]
 }
 ```
 

@@ -1,7 +1,4 @@
-import type {
-  ComponentDocs,
-  InspectorField,
-} from "@arcforge/schemas";
+import type { ComponentDocs, InspectorField } from "@arcforge/schemas";
 import { CORE_COMPONENTS } from "@arcforge/schemas";
 
 /** Loose component definition used by the registry. */
@@ -27,9 +24,7 @@ export class ComponentRegistry {
   }
 
   static withCore(): ComponentRegistry {
-    return new ComponentRegistry(
-      CORE_COMPONENTS as unknown as RegisteredComponent[]
-    );
+    return new ComponentRegistry(CORE_COMPONENTS as unknown as RegisteredComponent[]);
   }
 
   register(def: RegisteredComponent): void {

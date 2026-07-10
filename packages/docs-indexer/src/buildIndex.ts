@@ -1,10 +1,7 @@
 import path from "node:path";
 import { indexMarkdown } from "./indexMarkdown.js";
 import { indexComponentSchemas } from "./indexSchemas.js";
-import {
-  writeDocsIndexFile,
-  writeGeneratedDocs,
-} from "./persistIndex.js";
+import { writeDocsIndexFile, writeGeneratedDocs } from "./persistIndex.js";
 import type { BuildDocIndexOptions, DocIndex, DocSource } from "./types.js";
 
 const MCP_TOOLS_BODY = `# MCP Tools (Phase 5–7)
@@ -42,9 +39,7 @@ Prefer docs tools before suggesting edits. Mutations use editor-core commands.
 /**
  * Build a documentation index from engine docs, project docs, and schemas.
  */
-export async function buildDocIndex(
-  options: BuildDocIndexOptions = {}
-): Promise<DocIndex> {
+export async function buildDocIndex(options: BuildDocIndexOptions = {}): Promise<DocIndex> {
   const sources: DocSource[] = [];
   const includeProjectDocs = options.includeProjectDocs !== false;
   const includeSchemas = options.includeComponentSchemas !== false;
@@ -55,9 +50,7 @@ export async function buildDocIndex(
 
   if (options.projectRoot && includeProjectDocs) {
     const projectDocs = path.join(options.projectRoot, "docs");
-    sources.push(
-      ...(await indexMarkdown(projectDocs, { projectDocs: true }))
-    );
+    sources.push(...(await indexMarkdown(projectDocs, { projectDocs: true })));
   }
 
   if (includeSchemas) {

@@ -26,9 +26,7 @@ export function policyPath(projectRoot: string): string {
   return path.join(threeforgeDir(projectRoot), "mcp.policy.json");
 }
 
-export async function loadOrCreatePolicy(
-  projectRoot: string
-): Promise<McpPolicy> {
+export async function loadOrCreatePolicy(projectRoot: string): Promise<McpPolicy> {
   const file = policyPath(projectRoot);
   if (await pathExists(file)) {
     const raw = JSON.parse(await fs.readFile(file, "utf8")) as unknown;
@@ -85,8 +83,7 @@ export function decidePermission(
     };
   }
 
-  const configured =
-    policy.mcp.allowedTools[capability] ?? policy.mcp.defaultMode;
+  const configured = policy.mcp.allowedTools[capability] ?? policy.mcp.defaultMode;
   let mode: PermissionMode = configured;
 
   const isWrite =

@@ -28,15 +28,15 @@ export default class PlayerController extends Behaviour {
 
 ## GameContext
 
-| API | Purpose |
-| --- | --- |
-| `ctx.time` | `delta`, `elapsed`, `fixedDelta` |
-| `ctx.input` | `getVector("move")`, key queries |
-| `ctx.entity` | `transform`, `getComponent`, `id` |
-| `ctx.world` | ECS queries |
-| `ctx.scene` | Current scene snapshot |
-| `ctx.events` | `on` / `emit` |
-| `ctx.debug` | `info` / `warn` / `error` (console panel) |
+| API          | Purpose                                   |
+| ------------ | ----------------------------------------- |
+| `ctx.time`   | `delta`, `elapsed`, `fixedDelta`          |
+| `ctx.input`  | `getVector("move")`, key queries          |
+| `ctx.entity` | `transform`, `getComponent`, `id`         |
+| `ctx.world`  | ECS queries                               |
+| `ctx.scene`  | Current scene snapshot                    |
+| `ctx.events` | `on` / `emit`                             |
+| `ctx.debug`  | `info` / `warn` / `error` (console panel) |
 
 ## Scene binding
 

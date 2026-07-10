@@ -19,7 +19,7 @@
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "eslint src --ext .ts",
+    "lint": "oxlint src",
     "export": "node ./dist/cli.js"
   },
   "dependencies": {

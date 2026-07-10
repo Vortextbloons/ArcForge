@@ -1,12 +1,5 @@
-export type {
-  ProjectContext,
-  ProjectValidationResult,
-  SceneSummary,
-} from "./projectContext.js";
-export {
-  createProjectContext,
-  resolveEngineDocsRoot,
-} from "./projectContext.js";
+export type { ProjectContext, ProjectValidationResult, SceneSummary } from "./projectContext.js";
+export { createProjectContext, resolveEngineDocsRoot } from "./projectContext.js";
 export { createMcpServer } from "./createServer.js";
 export {
   startMcpServer,

@@ -3,12 +3,7 @@ import path from "node:path";
 import { typecheckScripts } from "@arcforge/engine";
 import { parsePrefab, type Prefab } from "@arcforge/schemas";
 import type { MutationResult } from "./types.js";
-import {
-  absUnderRoot,
-  normalizeProjectRel,
-  pathExists,
-  validateComponents,
-} from "./pathSafety.js";
+import { absUnderRoot, normalizeProjectRel, pathExists, validateComponents } from "./pathSafety.js";
 
 export async function createPrefabFile(
   projectRoot: string,
@@ -23,10 +18,7 @@ export async function createPrefabFile(
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/^-|-$/g, "") || "prefab";
-  const rel = normalizeProjectRel(
-    input.path ?? `prefabs/${slug}.prefab.json`,
-    "prefabs/"
-  );
+  const rel = normalizeProjectRel(input.path ?? `prefabs/${slug}.prefab.json`, "prefabs/");
   if (!rel.endsWith(".prefab.json")) {
     throw new Error("Prefab path must end with .prefab.json");
   }
@@ -89,9 +81,7 @@ export async function readPrefabFile(
   if (!(await pathExists(abs))) {
     throw new Error(`Prefab not found: ${rel}`);
   }
-  const prefab = parsePrefab(
-    JSON.parse(await fs.readFile(abs, "utf8")) as unknown
-  );
+  const prefab = parsePrefab(JSON.parse(await fs.readFile(abs, "utf8")) as unknown);
   return { path: rel, prefab };
 }
 
@@ -109,15 +99,12 @@ export async function createScriptFile(
   }
 
   const className = classNameFromPath(rel);
-  const content =
-    input.content ?? defaultScriptSource(className, input.purpose ?? className);
+  const content = input.content ?? defaultScriptSource(className, input.purpose ?? className);
 
   const typecheck = typecheckScripts([{ path: rel, source: content }]);
   if (!typecheck.ok) {
     throw new Error(
-      `Script failed typecheck: ${typecheck.diagnostics
-        .map((d) => d.message)
-        .join("; ")}`
+      `Script failed typecheck: ${typecheck.diagnostics.map((d) => d.message).join("; ")}`
     );
   }
 
@@ -141,16 +128,12 @@ export async function editScriptFile(
     throw new Error("Script path must end with .ts");
   }
   const abs = absUnderRoot(projectRoot, rel);
-  const before = (await pathExists(abs))
-    ? await fs.readFile(abs, "utf8")
-    : undefined;
+  const before = (await pathExists(abs)) ? await fs.readFile(abs, "utf8") : undefined;
 
   const typecheck = typecheckScripts([{ path: rel, source: input.content }]);
   if (!typecheck.ok) {
     throw new Error(
-      `Script failed typecheck: ${typecheck.diagnostics
-        .map((d) => d.message)
-        .join("; ")}`
+      `Script failed typecheck: ${typecheck.diagnostics.map((d) => d.message).join("; ")}`
     );
   }
 
@@ -181,10 +164,7 @@ export async function readScriptFile(
 function classNameFromPath(rel: string): string {
   const base = path.basename(rel, ".ts");
   const parts = base.split(/[._-]+/).filter(Boolean);
-  return (
-    parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("") ||
-    "NewBehaviour"
-  );
+  return parts.map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("") || "NewBehaviour";
 }
 
 function defaultScriptSource(className: string, purpose: string): string {

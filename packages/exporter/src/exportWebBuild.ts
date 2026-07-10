@@ -5,13 +5,7 @@ import { build as viteBuild } from "vite";
 import { prepareExport } from "./prepareExport.js";
 import { optimizeAssets } from "./optimizeAssets.js";
 import { createBuildReport, writeBuildReport } from "./buildReport.js";
-import {
-  ensureDir,
-  pathExists,
-  writeJsonFile,
-  writeTextFile,
-  toPosix,
-} from "./fsUtils.js";
+import { ensureDir, pathExists, writeJsonFile, writeTextFile, toPosix } from "./fsUtils.js";
 import { resolveWorkspacePackage } from "./paths.js";
 import type { ExportOptions, ExportResult, ProjectBundle } from "./types.js";
 
@@ -20,9 +14,7 @@ const require = createRequire(import.meta.url);
 /**
  * Export a playable static web build (Vite-bundled Runtime + scene + scripts).
  */
-export async function exportWebBuild(
-  options: ExportOptions
-): Promise<ExportResult> {
+export async function exportWebBuild(options: ExportOptions): Promise<ExportResult> {
   const prepared = await prepareExport(options, "web");
   if (!prepared.ok) return { report: prepared.report };
 
@@ -44,10 +36,7 @@ export async function exportWebBuild(
       options.optimize !== false
     );
 
-    await writeProjectData(
-      bundle,
-      path.join(staging, "public", "project.data.json")
-    );
+    await writeProjectData(bundle, path.join(staging, "public", "project.data.json"));
     await assertPackagesBuilt();
     await writeStagingSources(bundle, staging);
 
@@ -117,17 +106,12 @@ async function assertPackagesBuilt(): Promise<void> {
   for (const name of ["engine", "schemas"] as const) {
     const root = await resolveWorkspacePackage(name);
     if (!(await pathExists(path.join(root, "dist", "index.js")))) {
-      throw new Error(
-        `Package not built: ${root}. Run pnpm build for engine/schemas first.`
-      );
+      throw new Error(`Package not built: ${root}. Run pnpm build for engine/schemas first.`);
     }
   }
 }
 
-async function writeProjectData(
-  bundle: ProjectBundle,
-  dest: string
-): Promise<void> {
+async function writeProjectData(bundle: ProjectBundle, dest: string): Promise<void> {
   await writeJsonFile(dest, {
     name: bundle.manifest.name,
     engineVersion: bundle.manifest.engineVersion,
@@ -138,10 +122,7 @@ async function writeProjectData(
   });
 }
 
-async function writeStagingSources(
-  bundle: ProjectBundle,
-  staging: string
-): Promise<void> {
+async function writeStagingSources(bundle: ProjectBundle, staging: string): Promise<void> {
   const scriptImports = bundle.scripts.map((s, i) => {
     const safeName = toPosix(s.path)
       .replace(/^scripts\//, "")
@@ -157,17 +138,11 @@ async function writeStagingSources(
   });
 
   for (const script of scriptImports) {
-    await writeTextFile(
-      path.join(staging, "scripts", `${script.safeName}.ts`),
-      script.source
-    );
+    await writeTextFile(path.join(staging, "scripts", `${script.safeName}.ts`), script.source);
   }
 
   const registerLines = scriptImports
-    .map(
-      (s) =>
-        `  runtime.registerScript(${JSON.stringify(s.modulePath)}, ${s.varName});`
-    )
+    .map((s) => `  runtime.registerScript(${JSON.stringify(s.modulePath)}, ${s.varName});`)
     .join("\n");
   const importLines = scriptImports
     .map((s) => `import ${s.varName} from ${JSON.stringify(s.rel)};`)

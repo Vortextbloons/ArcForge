@@ -56,10 +56,7 @@ export class ScriptSystem {
     const alive = new Set<string>();
 
     for (const entity of this.world.query(SCRIPT_ID)) {
-      const data = this.world.getComponent<ScriptBehaviour>(
-        entity.id,
-        SCRIPT_ID
-      );
+      const data = this.world.getComponent<ScriptBehaviour>(entity.id, SCRIPT_ID);
       if (!data || data.enabled === false) continue;
 
       const key = instanceKey(entity.id, data.module);
@@ -165,10 +162,7 @@ export class ScriptSystem {
     this.instances.delete(key);
   }
 
-  private createContext(
-    entityId: string,
-    time: TimeState
-  ): GameContext | null {
+  private createContext(entityId: string, time: TimeState): GameContext | null {
     if (!this.world.has(entityId)) return null;
     return {
       time,

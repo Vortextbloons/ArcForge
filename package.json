@@ -2,6 +2,7 @@
   "name": "arcforge",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Desktop game editor and runtime framework for building shippable Three.js games",
   "scripts": {
     "dev": "turbo dev",
@@ -18,11 +19,11 @@
     "mcp": "node ./packages/mcp-server/dist/cli.js"
   },
   "devDependencies": {
-    "turbo": "latest",
-    "typescript": "latest",
+    "@types/node": "latest",
+    "oxlint": "^1.73.0",
     "prettier": "latest",
-    "eslint": "latest",
-    "@types/node": "latest"
+    "turbo": "latest",
+    "typescript": "^7.0.2"
   },
   "packageManager": "pnpm@11.5.3",
   "engines": {

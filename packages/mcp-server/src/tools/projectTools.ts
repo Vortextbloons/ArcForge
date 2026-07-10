@@ -3,16 +3,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { errorResult, jsonResult } from "../toolResult.js";
 
-export function registerProjectTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerProjectTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "project.get_info",
     {
       title: "Get project info",
-      description:
-        "Returns ArcForge project metadata from project.arcforge.json.",
+      description: "Returns ArcForge project metadata from project.arcforge.json.",
       inputSchema: {},
       annotations: { readOnlyHint: true },
     },
@@ -35,8 +31,7 @@ export function registerProjectTools(
     "project.list_files",
     {
       title: "List project files",
-      description:
-        "Lists project files under allowed folders (scene/prefab/script/docs).",
+      description: "Lists project files under allowed folders (scene/prefab/script/docs).",
       inputSchema: {
         kind: z
           .enum(["scene", "prefab", "script", "asset", "docs", "all"])

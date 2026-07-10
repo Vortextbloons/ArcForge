@@ -14,9 +14,7 @@ export async function copyReferencedAssets(
   for (const rel of bundle.referencedAssets) {
     const from = path.join(bundle.root, ...rel.split("/"));
     // Strip leading "assets/" so dest is destAssetsRoot/<rest>
-    const withoutPrefix = rel.startsWith("assets/")
-      ? rel.slice("assets/".length)
-      : rel;
+    const withoutPrefix = rel.startsWith("assets/") ? rel.slice("assets/".length) : rel;
     const to = path.join(destAssetsRoot, ...withoutPrefix.split("/"));
     await copyFile(from, to);
     copied.push(toPosix(rel));

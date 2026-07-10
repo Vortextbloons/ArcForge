@@ -21,9 +21,7 @@ export interface ScriptSource {
  * Checks export shape heuristics and basic TypeScript syntax pitfalls.
  * Full project typecheck can replace this later with a worker + typescript API.
  */
-export function typecheckScripts(
-  scripts: ScriptSource[]
-): ScriptTypecheckResult {
+export function typecheckScripts(scripts: ScriptSource[]): ScriptTypecheckResult {
   const diagnostics: ScriptDiagnostic[] = [];
 
   for (const script of scripts) {
@@ -39,8 +37,7 @@ export function typecheckScripts(
       diagnostics.push({
         file: script.path,
         severity: "error",
-        message:
-          "Script must `export default class` extending Behaviour",
+        message: "Script must `export default class` extending Behaviour",
       });
     }
 
@@ -61,8 +58,7 @@ export function typecheckScripts(
       diagnostics.push({
         file: script.path,
         severity: "error",
-        message:
-          "Scripts may not import editor, Tauri, or Node APIs",
+        message: "Scripts may not import editor, Tauri, or Node APIs",
       });
     }
 

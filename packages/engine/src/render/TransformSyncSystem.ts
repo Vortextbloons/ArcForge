@@ -22,27 +22,13 @@ export function syncTransforms(world: World, bridge: RenderBridge): void {
     if (!transform) continue;
 
     const object = bridge.ensureObject(entity.id, entity.name);
-    object.position.set(
-      transform.position[0],
-      transform.position[1],
-      transform.position[2]
-    );
-    object.rotation.set(
-      transform.rotation[0],
-      transform.rotation[1],
-      transform.rotation[2]
-    );
-    object.scale.set(
-      transform.scale[0],
-      transform.scale[1],
-      transform.scale[2]
-    );
+    object.position.set(transform.position[0], transform.position[1], transform.position[2]);
+    object.rotation.set(transform.rotation[0], transform.rotation[1], transform.rotation[2]);
+    object.scale.set(transform.scale[0], transform.scale[1], transform.scale[2]);
 
     // Re-parent if needed.
     const desiredParent =
-      entity.parent !== null
-        ? bridge.getObject(entity.parent) ?? bridge.scene
-        : bridge.scene;
+      entity.parent !== null ? (bridge.getObject(entity.parent) ?? bridge.scene) : bridge.scene;
 
     if (object.parent !== desiredParent) {
       desiredParent.add(object);

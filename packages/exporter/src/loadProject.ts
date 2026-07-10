@@ -92,12 +92,7 @@ export async function loadProjectBundle(
 
   if (!(await pathExists(manifestPath))) {
     issues.push(
-      issue(
-        "error",
-        "missing-manifest",
-        "project.arcforge.json not found",
-        "project.arcforge.json"
-      )
+      issue("error", "missing-manifest", "project.arcforge.json not found", "project.arcforge.json")
     );
     throw new ExportLoadError(issues);
   }
@@ -117,11 +112,13 @@ export async function loadProjectBundle(
     throw new ExportLoadError(issues);
   }
 
-  const sceneFiles = await listFiles(root, (rel) =>
-    rel.startsWith("scenes/") && rel.endsWith(".scene.json")
+  const sceneFiles = await listFiles(
+    root,
+    (rel) => rel.startsWith("scenes/") && rel.endsWith(".scene.json")
   );
-  const prefabFiles = await listFiles(root, (rel) =>
-    rel.startsWith("prefabs/") && rel.endsWith(".prefab.json")
+  const prefabFiles = await listFiles(
+    root,
+    (rel) => rel.startsWith("prefabs/") && rel.endsWith(".prefab.json")
   );
 
   const scenes: CollectedScene[] = [];
@@ -138,12 +135,7 @@ export async function loadProjectBundle(
       collectAssetRefs(scene, assetPaths);
     } catch (err) {
       issues.push(
-        issue(
-          "error",
-          "invalid-scene",
-          err instanceof Error ? err.message : "Invalid scene",
-          rel
-        )
+        issue("error", "invalid-scene", err instanceof Error ? err.message : "Invalid scene", rel)
       );
     }
   }
@@ -157,20 +149,13 @@ export async function loadProjectBundle(
       collectAssetRefs(prefab, assetPaths);
     } catch (err) {
       issues.push(
-        issue(
-          "error",
-          "invalid-prefab",
-          err instanceof Error ? err.message : "Invalid prefab",
-          rel
-        )
+        issue("error", "invalid-prefab", err instanceof Error ? err.message : "Invalid prefab", rel)
       );
     }
   }
 
   if (scenes.length === 0) {
-    issues.push(
-      issue("error", "no-scenes", "No scenes found under scenes/")
-    );
+    issues.push(issue("error", "no-scenes", "No scenes found under scenes/"));
   }
 
   const defaultScene = toPosix(manifest.defaultScene);
@@ -189,15 +174,11 @@ export async function loadProjectBundle(
   for (const rel of [...scriptPaths].sort()) {
     const abs = resolveUnderRoot(root, rel);
     if (!abs) {
-      issues.push(
-        issue("error", "unsafe-script-path", `Unsafe script path: ${rel}`, rel)
-      );
+      issues.push(issue("error", "unsafe-script-path", `Unsafe script path: ${rel}`, rel));
       continue;
     }
     if (!(await pathExists(abs))) {
-      issues.push(
-        issue("error", "missing-script", `Script not found: ${rel}`, rel)
-      );
+      issues.push(issue("error", "missing-script", `Script not found: ${rel}`, rel));
       continue;
     }
     const source = await fs.readFile(abs, "utf8");
@@ -225,15 +206,11 @@ export async function loadProjectBundle(
   for (const rel of [...assetPaths].sort()) {
     const abs = resolveUnderRoot(root, rel);
     if (!abs) {
-      issues.push(
-        issue("error", "unsafe-asset-path", `Unsafe asset path: ${rel}`, rel)
-      );
+      issues.push(issue("error", "unsafe-asset-path", `Unsafe asset path: ${rel}`, rel));
       continue;
     }
     if (!(await pathExists(abs))) {
-      issues.push(
-        issue("error", "missing-asset", `Referenced asset not found: ${rel}`, rel)
-      );
+      issues.push(issue("error", "missing-asset", `Referenced asset not found: ${rel}`, rel));
       continue;
     }
     referencedAssets.push(rel);

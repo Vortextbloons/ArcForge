@@ -12,11 +12,7 @@ export function ConsolePanel() {
           {errors > 0 ? <span className="console__badge">{errors}</span> : null}
         </h2>
         <div className="toolbar__actions">
-          <button
-            type="button"
-            className="btn btn--small"
-            onClick={() => runTypecheck()}
-          >
+          <button type="button" className="btn btn--small" onClick={() => runTypecheck()}>
             Typecheck
           </button>
           <button type="button" className="btn btn--small" onClick={clearLogs}>
@@ -38,15 +34,10 @@ export function ConsolePanel() {
           <li className="muted">No messages</li>
         ) : (
           logs.map((entry) => (
-            <li
-              key={entry.id}
-              className={`console__entry console__entry--${entry.level}`}
-            >
+            <li key={entry.id} className={`console__entry console__entry--${entry.level}`}>
               <span className="console__level">{entry.level}</span>
               <span className="console__msg">{entry.message}</span>
-              {entry.module ? (
-                <span className="console__meta">{entry.module}</span>
-              ) : null}
+              {entry.module ? <span className="console__meta">{entry.module}</span> : null}
             </li>
           ))
         )}

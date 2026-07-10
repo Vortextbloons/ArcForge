@@ -1,16 +1,9 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
-import {
-  jsonResult,
-  recordWriteSuccess,
-  withPermission,
-} from "../toolGate.js";
+import { jsonResult, recordWriteSuccess, withPermission } from "../toolGate.js";
 
-export function registerPrefabWriteTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerPrefabWriteTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "prefab.list",
     {

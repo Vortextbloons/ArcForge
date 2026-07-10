@@ -7,18 +7,9 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@arcforge/editor-core": path.resolve(
-        __dirname,
-        "../../packages/editor-core/src/index.ts"
-      ),
-      "@arcforge/engine": path.resolve(
-        __dirname,
-        "../../packages/engine/src/index.ts"
-      ),
-      "@arcforge/schemas": path.resolve(
-        __dirname,
-        "../../packages/schemas/src/index.ts"
-      ),
+      "@arcforge/editor-core": path.resolve(__dirname, "../../packages/editor-core/src/index.ts"),
+      "@arcforge/engine": path.resolve(__dirname, "../../packages/engine/src/index.ts"),
+      "@arcforge/schemas": path.resolve(__dirname, "../../packages/schemas/src/index.ts"),
     },
   },
   clearScreen: false,

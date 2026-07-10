@@ -20,20 +20,13 @@ export async function readJsonFile(filePath: string): Promise<unknown> {
   return JSON.parse(raw) as unknown;
 }
 
-export async function writeJsonFile(
-  filePath: string,
-  data: unknown,
-  pretty = true
-): Promise<void> {
+export async function writeJsonFile(filePath: string, data: unknown, pretty = true): Promise<void> {
   await ensureDir(path.dirname(filePath));
   const body = pretty ? `${JSON.stringify(data, null, 2)}\n` : `${JSON.stringify(data)}\n`;
   await fs.writeFile(filePath, body, "utf8");
 }
 
-export async function writeTextFile(
-  filePath: string,
-  contents: string
-): Promise<void> {
+export async function writeTextFile(filePath: string, contents: string): Promise<void> {
   await ensureDir(path.dirname(filePath));
   await fs.writeFile(filePath, contents, "utf8");
 }
@@ -101,10 +94,7 @@ export function toPosix(p: string): string {
   return p.replace(/\\/g, "/");
 }
 
-export function resolveUnderRoot(
-  root: string,
-  relativePath: string
-): string | null {
+export function resolveUnderRoot(root: string, relativePath: string): string | null {
   const normalized = toPosix(relativePath).replace(/^\/+/, "");
   if (
     normalized.includes("..") ||

@@ -5,10 +5,7 @@ import { searchDocs, getRelevantDocs } from "@arcforge/docs-indexer";
 import { createProjectContext } from "./projectContext.js";
 import { createMcpServer } from "./createServer.js";
 
-const ROOT = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../.."
-);
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PLATFORMER = path.join(ROOT, "examples", "platformer");
 const ENGINE_DOCS = path.join(ROOT, "docs");
 
@@ -51,18 +48,13 @@ describe("mcp-server phase 5", () => {
       projectRoot: PLATFORMER,
       engineDocsRoot: ENGINE_DOCS,
     });
-    const relevant = getRelevantDocs(
-      ctx.docs,
-      "Implement coin collectable pickup for the player",
-      {
-        scriptPaths: await ctx.listScriptPaths(),
-        componentIds: ctx.listComponents().map((c) => c.id),
-      }
-    );
+    const relevant = getRelevantDocs(ctx.docs, "Implement coin collectable pickup for the player", {
+      scriptPaths: await ctx.listScriptPaths(),
+      componentIds: ctx.listComponents().map((c) => c.id),
+    });
     expect(relevant.scripts.length).toBeGreaterThan(0);
     expect(
-      relevant.conventions.some((c) => c.uri.includes("project")) ||
-        relevant.docs.length > 0
+      relevant.conventions.some((c) => c.uri.includes("project")) || relevant.docs.length > 0
     ).toBe(true);
   });
 

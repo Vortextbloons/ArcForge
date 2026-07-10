@@ -2,10 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { errorResult, jsonResult } from "../toolResult.js";
 
-export function registerBuildTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerBuildTools(server: McpServer, ctx: ProjectContext): void {
   server.registerTool(
     "build.get_errors",
     {

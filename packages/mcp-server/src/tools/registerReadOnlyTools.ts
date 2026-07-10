@@ -11,10 +11,7 @@ import { registerScriptWriteTools } from "./scriptWriteTools.js";
 import { registerDiffTools, registerPreviewTool } from "./writeExtras.js";
 
 /** Phase 5 read-only tools. */
-export function registerReadOnlyTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerReadOnlyTools(server: McpServer, ctx: ProjectContext): void {
   registerProjectTools(server, ctx);
   registerSceneTools(server, ctx);
   registerComponentTools(server, ctx);
@@ -23,10 +20,7 @@ export function registerReadOnlyTools(
 }
 
 /** Phase 6 write tools + preview/diff review. */
-export function registerWriteTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerWriteTools(server: McpServer, ctx: ProjectContext): void {
   registerSceneWriteTools(server, ctx);
   registerPrefabWriteTools(server, ctx);
   registerScriptWriteTools(server, ctx);
@@ -35,10 +29,7 @@ export function registerWriteTools(
 }
 
 /** Full tool surface for current MCP server. */
-export function registerAllTools(
-  server: McpServer,
-  ctx: ProjectContext
-): void {
+export function registerAllTools(server: McpServer, ctx: ProjectContext): void {
   registerReadOnlyTools(server, ctx);
   if (!ctx.readonly) {
     registerWriteTools(server, ctx);
