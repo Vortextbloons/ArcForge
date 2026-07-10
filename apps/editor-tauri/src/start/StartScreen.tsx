@@ -93,8 +93,14 @@ export function StartScreen() {
       <div className="start__glow" aria-hidden />
       <div className="start__shell">
         <header className="start__brand">
+          <img className="start__logo" src="/appicon.png" alt="" width={72} height={72} />
           <p className="start__eyebrow">Desktop game editor</p>
-          <h1>ArcForge</h1>
+          <h1>
+            <span className="brand-mark">
+              <span className="brand-mark__arc">Arc</span>
+              <span className="brand-mark__forge">Forge</span>
+            </span>
+          </h1>
           <p className="start__tagline">
             Create shippable Three.js games with a modular editor, runtime, and MCP.
           </p>

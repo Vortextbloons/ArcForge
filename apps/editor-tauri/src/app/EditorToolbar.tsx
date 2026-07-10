@@ -83,7 +83,11 @@ export function EditorToolbar() {
   return (
     <header className="editor__toolbar">
       <button type="button" className="editor__brand btn-link" onClick={handleHome} title="Back to start">
-        ArcForge
+        <img className="editor__brand-icon" src="/appicon.png" alt="" width={22} height={22} />
+        <span className="brand-mark">
+          <span className="brand-mark__arc">Arc</span>
+          <span className="brand-mark__forge">Forge</span>
+        </span>
       </button>
       <span className="editor__scene">
         {project?.manifest.name ? `${project.manifest.name} / ` : ""}
