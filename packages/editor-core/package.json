@@ -9,6 +9,10 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./node": {
+      "import": "./dist/node.js",
+      "types": "./dist/node.d.ts"
     }
   },
   "scripts": {
@@ -22,6 +26,7 @@
     "@arcforge/schemas": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "^26.1.1",
     "typescript": "^5.5.4",
     "vitest": "^2.0.5"
   }

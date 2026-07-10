@@ -13,14 +13,12 @@ export {
 } from "./commands/entityCommands.js";
 export {
   assetImportSettingsPath,
+  buildDefaultAssetImportSettings,
   guessAssetKind,
-  importAssetFile,
-  readAssetImportSettings,
-  updateAssetImportSettings,
-} from "./commands/assetImport.js";
+} from "./commands/assetImportMeta.js";
 export {
   analyzeScenePerformance,
-  analyzeProjectPerformance,
+  PERFORMANCE_DEFAULTS,
   type PerformanceWarning,
   type PerformanceScanOptions,
 } from "./validation/performanceWarnings.js";

@@ -10,7 +10,7 @@ import {
 } from "@arcforge/schemas";
 import { typecheckScripts } from "@arcforge/engine";
 import { buildDocIndex, type DocIndex } from "@arcforge/docs-indexer";
-import { analyzeProjectPerformance } from "@arcforge/editor-core";
+import { analyzeProjectPerformance } from "@arcforge/editor-core/node";
 import type { McpPolicy } from "./auth/policyTypes.js";
 import { loadOrCreatePolicy } from "./auth/permissions.js";
 import { AuditLog } from "./auth/audit.js";

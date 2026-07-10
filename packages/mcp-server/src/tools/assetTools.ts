@@ -5,7 +5,7 @@ import {
   importAssetFile,
   readAssetImportSettings,
   updateAssetImportSettings,
-} from "@arcforge/editor-core";
+} from "@arcforge/editor-core/node";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { withPermission, recordWriteSuccess } from "../toolGate.js";

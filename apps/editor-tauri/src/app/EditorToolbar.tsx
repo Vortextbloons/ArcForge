@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { CreateEntityCommand } from "@arcforge/editor-core";
 import { useEditorStore } from "../app/EditorStore";
 import { usePlayMode } from "../app/PlayModeContext";
+import { ConnectMcpDialog } from "../mcp/ConnectMcpDialog";
 import {
   downloadSceneJson,
   openSceneFile,
@@ -27,6 +28,7 @@ export function EditorToolbar() {
     getScenePath,
   } = useEditorStore();
   const { playing, play, stop, runTypecheck } = usePlayMode();
+  const [mcpOpen, setMcpOpen] = useState(false);
 
   const handleOpen = useCallback(async () => {
     if (playing) return;
@@ -122,6 +124,14 @@ export function EditorToolbar() {
         <button type="button" className="btn btn--small" onClick={() => runTypecheck()}>
           Typecheck
         </button>
+        <button
+          type="button"
+          className="btn btn--small"
+          title="Copy MCP config for your AI IDE"
+          onClick={() => setMcpOpen(true)}
+        >
+          Connect MCP
+        </button>
         {playing ? (
           <button type="button" className="btn btn--small btn--danger" onClick={stop}>
             Stop
@@ -132,6 +142,13 @@ export function EditorToolbar() {
           </button>
         )}
       </div>
+
+      <ConnectMcpDialog
+        open={mcpOpen}
+        onClose={() => setMcpOpen(false)}
+        scenePath={getScenePath()}
+        sceneName={scene.name}
+      />
     </header>
   );
 }

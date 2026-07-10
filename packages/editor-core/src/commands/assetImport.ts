@@ -1,22 +1,19 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import {
-  defaultImportSettings,
   parseAssetImportSettings,
   type AssetImportSettings,
 } from "@arcforge/schemas";
+import {
+  assetImportSettingsPath,
+  buildDefaultAssetImportSettings,
+} from "./assetImportMeta.js";
 
-export function assetImportSettingsPath(assetRel: string): string {
-  return `${assetRel}.import.json`;
-}
-
-export function guessAssetKind(rel: string): AssetImportSettings["kind"] {
-  const lower = rel.toLowerCase();
-  if (/\.(glb|gltf|fbx|obj)$/.test(lower)) return "model";
-  if (/\.(png|jpe?g|webp|ktx2)$/.test(lower)) return "texture";
-  if (/\.(mp3|ogg|wav)$/.test(lower)) return "audio";
-  return "other";
-}
+export {
+  assetImportSettingsPath,
+  buildDefaultAssetImportSettings,
+  guessAssetKind,
+} from "./assetImportMeta.js";
 
 /** Copy a file into assets/ and write sidecar import settings. */
 export async function importAssetFile(
@@ -34,13 +31,7 @@ export async function importAssetFile(
   await fs.mkdir(path.dirname(destAbs), { recursive: true });
   await fs.copyFile(sourceAbs, destAbs);
 
-  const kind = guessAssetKind(posix);
-  const settings = parseAssetImportSettings({
-    ...defaultImportSettings(posix, kind),
-    ...settingsPatch,
-    source: posix,
-    kind,
-  });
+  const settings = buildDefaultAssetImportSettings(posix, settingsPatch);
   const metaAbs = path.join(
     projectRoot,
     ...assetImportSettingsPath(posix).split("/")
@@ -63,7 +54,7 @@ export async function readAssetImportSettings(
       JSON.parse(await fs.readFile(metaAbs, "utf8")) as unknown
     );
   } catch {
-    return defaultImportSettings(posix, guessAssetKind(posix));
+    return buildDefaultAssetImportSettings(posix);
   }
 }
 
