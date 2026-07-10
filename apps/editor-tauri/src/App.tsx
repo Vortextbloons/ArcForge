@@ -1,35 +1,81 @@
-import { useMemo } from "react";
+import { useEffect } from "react";
+import { DeleteEntityCommand } from "@threeforge/editor-core";
+import { EditorStoreProvider, useEditorStore } from "./app/EditorStore";
+import { EditorToolbar } from "./app/EditorToolbar";
+import { HierarchyPanel } from "./hierarchy/HierarchyPanel";
+import { InspectorPanel } from "./inspector/InspectorPanel";
+import { AssetBrowserPanel } from "./asset-browser/AssetBrowserPanel";
 import { ViewportCanvas } from "./viewport/ViewportCanvas";
 import sampleScene from "./fixtures/Main.scene.json";
 
-function App() {
-  const entities = useMemo(() => sampleScene.entities, []);
+function useEditorHotkeys() {
+  const { canUndo, canRedo, undo, redo, selection, execute } = useEditorStore();
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typing =
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable);
+
+      const mod = event.ctrlKey || event.metaKey;
+
+      if (mod && event.key.toLowerCase() === "z" && !event.shiftKey) {
+        if (typing) return;
+        event.preventDefault();
+        if (canUndo) void undo();
+        return;
+      }
+
+      if (
+        (mod && event.key.toLowerCase() === "y") ||
+        (mod && event.shiftKey && event.key.toLowerCase() === "z")
+      ) {
+        if (typing) return;
+        event.preventDefault();
+        if (canRedo) void redo();
+        return;
+      }
+
+      if (!typing && (event.key === "Delete" || event.key === "Backspace")) {
+        const id = selection[0];
+        if (!id) return;
+        event.preventDefault();
+        void execute(new DeleteEntityCommand(id));
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [canUndo, canRedo, undo, redo, selection, execute]);
+}
+
+function EditorLayout() {
+  useEditorHotkeys();
 
   return (
     <div className="editor">
-      <header className="editor__toolbar">
-        <span className="editor__brand">ThreeForge</span>
-        <span className="editor__scene">{sampleScene.name}</span>
-      </header>
-
-      <aside className="editor__hierarchy">
-        <h2>Hierarchy</h2>
-        <ul>
-          {entities.map((entity) => (
-            <li key={entity.id}>{entity.name}</li>
-          ))}
-        </ul>
-      </aside>
-
-      <main className="editor__viewport">
-        <ViewportCanvas />
-      </main>
-
-      <aside className="editor__inspector">
-        <h2>Inspector</h2>
-        <p className="muted">Select an entity to edit components.</p>
-      </aside>
+      <EditorToolbar />
+      <HierarchyPanel />
+      <div className="editor__center">
+        <main className="editor__viewport">
+          <ViewportCanvas />
+        </main>
+        <AssetBrowserPanel />
+      </div>
+      <InspectorPanel />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <EditorStoreProvider initialScene={sampleScene}>
+      <EditorLayout />
+    </EditorStoreProvider>
   );
 }
 

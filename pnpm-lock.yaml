@@ -32,6 +32,9 @@ importers:
       '@tauri-apps/plugin-shell':
         specifier: ^2
         version: 2.3.5
+      '@threeforge/editor-core':
+        specifier: workspace:*
+        version: link:../../packages/editor-core
       '@threeforge/engine':
         specifier: workspace:*
         version: link:../../packages/engine
@@ -79,6 +82,9 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.9.3
+      vitest:
+        specifier: ^2.0.5
+        version: 2.1.9(@types/node@26.1.1)
 
   packages/engine:
     dependencies:

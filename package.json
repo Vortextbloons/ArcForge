@@ -5,6 +5,7 @@
   "description": "Desktop game editor and runtime framework for building shippable Three.js games",
   "scripts": {
     "dev": "turbo dev",
+    "dev:tauri": "pnpm --filter @threeforge/editor-tauri tauri dev",
     "build": "turbo build",
     "test": "turbo test",
     "test:e2e": "turbo test:e2e",

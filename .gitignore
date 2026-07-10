@@ -18,7 +18,9 @@ build/
 Thumbs.db
 
 # Rust
-src-tauri/target/
+**/src-tauri/target/
+**/src-tauri/gen/
+**/src-tauri/Cargo.lock
 
 # Environment
 .env

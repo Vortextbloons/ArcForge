@@ -7,6 +7,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      "@threeforge/editor-core": path.resolve(
+        __dirname,
+        "../../packages/editor-core/src/index.ts"
+      ),
       "@threeforge/engine": path.resolve(
         __dirname,
         "../../packages/engine/src/index.ts"

@@ -1,14 +1,18 @@
 import { useEffect, useRef } from "react";
 import { Runtime } from "@threeforge/engine";
-import sampleScene from "../fixtures/Main.scene.json";
+import { useEditorStore } from "../app/EditorStore";
 
 /**
  * Three.js viewport backed by the engine Runtime.
- * Phase 1: loads the sample scene and runs the render loop.
+ * Reloads when the editor scene revision changes.
  */
 export function ViewportCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
+  const runtimeRef = useRef<Runtime | null>(null);
+  const { scene, revision } = useEditorStore();
+  const sceneRef = useRef(scene);
+  sceneRef.current = scene;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -20,8 +24,8 @@ export function ViewportCanvas() {
       antialias: true,
       shadows: true,
     });
-
-    runtime.load(sampleScene);
+    runtimeRef.current = runtime;
+    runtime.load(sceneRef.current);
 
     const resize = () => {
       const { clientWidth, clientHeight } = host;
@@ -32,15 +36,21 @@ export function ViewportCanvas() {
 
     resize();
     runtime.start();
-
     const observer = new ResizeObserver(resize);
     observer.observe(host);
 
     return () => {
       observer.disconnect();
       runtime.dispose();
+      runtimeRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    const runtime = runtimeRef.current;
+    if (!runtime) return;
+    runtime.load(scene);
+  }, [revision, scene]);
 
   return (
     <div className="viewport" ref={hostRef}>
