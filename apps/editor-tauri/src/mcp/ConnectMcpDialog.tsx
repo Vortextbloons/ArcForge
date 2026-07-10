@@ -17,7 +17,7 @@ interface ConnectMcpDialogProps {
   sceneName: string;
   projectRoot?: string | null;
   mcpStatus?: McpRuntimeStatus;
-  onRestartMcp?: () => void;
+  onRestartMcp?: (write?: boolean) => void;
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -50,7 +50,7 @@ export function ConnectMcpDialog({
   mcpStatus,
   onRestartMcp,
 }: ConnectMcpDialogProps) {
-  const [mode, setMode] = useState<McpAccessMode>("readonly");
+  const [mode, setMode] = useState<McpAccessMode>("write");
   const [editor, setEditor] = useState<McpEditor>("opencode");
   const [transport, setTransport] = useState<McpTransport>("http");
   const [copied, setCopied] = useState<"json" | "cli" | "logs" | null>(null);
@@ -89,6 +89,14 @@ export function ConnectMcpDialog({
   useEffect(() => {
     if (editor === "opencode") setTransport("http");
   }, [editor]);
+
+  // Keep the attached sidecar access mode in sync with the dialog selection.
+  useEffect(() => {
+    if (!open || !onRestartMcp || !projectRoot || !mcpStatus?.running) return;
+    const wantWrite = mode === "write";
+    if (mcpStatus.write === wantWrite) return;
+    onRestartMcp(wantWrite);
+  }, [mode, open, onRestartMcp, projectRoot, mcpStatus?.running, mcpStatus?.write]);
 
   useEffect(() => {
     if (!open) return;
@@ -170,7 +178,11 @@ export function ConnectMcpDialog({
                   {onRestartMcp && projectRoot ? (
                     <>
                       {" "}
-                      <button type="button" className="btn btn--small" onClick={onRestartMcp}>
+                      <button
+                        type="button"
+                        className="btn btn--small"
+                        onClick={() => onRestartMcp(mode === "write")}
+                      >
                         Retry
                       </button>
                     </>

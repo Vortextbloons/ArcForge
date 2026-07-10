@@ -149,6 +149,10 @@ export class RapierPhysicsBackend implements PhysicsBackend {
       .setAngularDamping(rigidbody.angularDamping)
       .setGravityScale(rigidbody.gravityScale);
 
+    if (rigidbody.type === "dynamic" && rigidbody.mass > 0) {
+      desc.setAdditionalMass(rigidbody.mass);
+    }
+
     if (rigidbody.lockRotation) {
       desc.lockRotations();
     }

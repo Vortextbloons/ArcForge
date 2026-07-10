@@ -177,7 +177,7 @@ export function EditorToolbar() {
         sceneName={scene.name}
         projectRoot={project?.root || null}
         mcpStatus={mcpStatus}
-        onRestartMcp={() => void restartMcp(false)}
+        onRestartMcp={() => void restartMcp(true)}
       />
     </header>
   );

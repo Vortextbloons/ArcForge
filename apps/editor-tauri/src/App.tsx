@@ -10,6 +10,7 @@ import { AssetBrowserPanel } from "./asset-browser/AssetBrowserPanel";
 import { ConsolePanel } from "./console/ConsolePanel";
 import { ViewportCanvas } from "./viewport/ViewportCanvas";
 import { StartScreen } from "./start/StartScreen";
+import { useProjectHotReload } from "./project/useProjectHotReload";
 
 function useEditorHotkeys() {
   const { canUndo, canRedo, undo, redo, selection, execute } = useEditorStore();
@@ -66,6 +67,7 @@ function useEditorHotkeys() {
 
 function EditorLayout() {
   useEditorHotkeys();
+  useProjectHotReload();
 
   return (
     <div className="editor">

@@ -50,7 +50,8 @@ export function ProjectSessionProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const status = await startAttachedMcpServer(root, { write: false, port: 3847 });
+      // Write mode so AI/MCP mutations can update the open project (hot-reloaded in the editor).
+      const status = await startAttachedMcpServer(root, { write: true, port: 3847 });
       setMcpStatus(status);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -91,7 +92,7 @@ export function ProjectSessionProvider({ children }: { children: ReactNode }) {
   }, [syncMcpForProject]);
 
   const restartMcp = useCallback(
-    async (write = false) => {
+    async (write = true) => {
       if (!project?.root) return;
       try {
         const status = await startAttachedMcpServer(project.root, { write, port: 3847 });

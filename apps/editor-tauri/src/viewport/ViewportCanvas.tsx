@@ -29,11 +29,19 @@ export function ViewportCanvas() {
       antialias: true,
       shadows: true,
       scriptsEnabled: false,
+      physics: "rapier",
     });
     runtime.registerScripts(DEMO_SCRIPTS);
     runtimeRef.current = runtime;
     setRuntime(runtime);
-    runtime.load(sceneRef.current);
+    try {
+      runtime.load(sceneRef.current);
+    } catch (error) {
+      console.error("Failed to load scene into viewport:", error);
+      runtime.logger.error(
+        error instanceof Error ? error.message : `Scene load failed: ${String(error)}`
+      );
+    }
 
     const resize = () => {
       const { clientWidth, clientHeight } = host;
@@ -58,7 +66,14 @@ export function ViewportCanvas() {
   useEffect(() => {
     const runtime = runtimeRef.current;
     if (!runtime || playingRef.current) return;
-    runtime.load(scene);
+    try {
+      runtime.load(scene);
+    } catch (error) {
+      console.error("Failed to reload scene into viewport:", error);
+      runtime.logger.error(
+        error instanceof Error ? error.message : `Scene reload failed: ${String(error)}`
+      );
+    }
   }, [revision, scene]);
 
   return (

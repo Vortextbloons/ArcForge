@@ -6,7 +6,8 @@ export const RigidbodyTypeSchema = z.enum(["dynamic", "kinematic", "static"]);
 
 export const RigidbodySchema = z.object({
   type: RigidbodyTypeSchema.default("dynamic"),
-  mass: z.number().positive().default(1),
+  /** Mass in kg. Use 0 for static bodies; dynamic bodies should be > 0. */
+  mass: z.number().nonnegative().default(1),
   linearDamping: z.number().min(0).default(0),
   angularDamping: z.number().min(0).default(0),
   gravityScale: z.number().default(1),
@@ -42,6 +43,6 @@ export const RigidbodyComponent = defineComponent({
   docs: {
     summary: "Physics body — dynamic, kinematic, or static.",
     aiUsage:
-      "Pair with physics.collider. Use dynamic for falling/moving objects, kinematic for script-driven motion, static for ground.",
+      "Pair with physics.collider. Use dynamic for falling/moving objects, kinematic for script-driven motion, static for ground. Static bodies may use mass 0; dynamic mass must be > 0.",
   },
 });
