@@ -1,21 +1,25 @@
-import type { Scene } from "@threeforge/schemas";
+export type {
+  ExportOptions,
+  ExportResult,
+  BuildReport,
+  ExportIssue,
+  ProjectBundle,
+  CollectedScene,
+  CollectedPrefab,
+  CollectedScript,
+} from "./types.js";
 
-export interface ExportOptions {
-  output: string;
-  optimize?: boolean;
-  includeEngineSource?: boolean;
-}
-
-export async function exportWebBuild(
-  _scene: Scene,
-  _options: ExportOptions
-): Promise<void> {
-  console.log("Exporting web build...");
-}
-
-export async function exportThreeProject(
-  _scene: Scene,
-  _options: ExportOptions
-): Promise<void> {
-  console.log("Exporting Three.js project...");
-}
+export { exportWebBuild } from "./exportWebBuild.js";
+export { exportThreeProject } from "./exportThreeProject.js";
+export { loadProjectBundle, ExportLoadError } from "./loadProject.js";
+export { validateProjectBundle } from "./validateProject.js";
+export { prepareExport } from "./prepareExport.js";
+export { optimizeAssets, copyReferencedAssets } from "./optimizeAssets.js";
+export {
+  createBuildReport,
+  writeBuildReport,
+} from "./buildReport.js";
+export {
+  generatePackageJson,
+  generateReadme,
+} from "./generatePackage.js";

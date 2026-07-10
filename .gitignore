@@ -38,6 +38,8 @@ coverage/
 # Generated
 .generated/
 *.tsbuildinfo
+exports/
+**/*.staging/
 ArcForge-spec.md
 AGENTS.md
 plans/

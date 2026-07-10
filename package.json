@@ -12,7 +12,10 @@
     "lint": "turbo lint",
     "typecheck": "turbo typecheck",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
-    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\""
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\"",
+    "export:web": "node ./packages/exporter/dist/cli.js web",
+    "export:three": "node ./packages/exporter/dist/cli.js three",
+    "mcp": "node ./packages/mcp-server/dist/cli.js"
   },
   "devDependencies": {
     "turbo": "latest",

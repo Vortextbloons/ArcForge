@@ -1,24 +1,12 @@
-export interface DocSource {
-  uri: string;
-  title: string;
-  kind: "markdown" | "json";
-  path: string;
-  tags: string[];
-}
+export type {
+  DocScope,
+  DocSource,
+  DocSearchHit,
+  DocIndex,
+  BuildDocIndexOptions,
+} from "./types.js";
 
-export interface DocIndex {
-  version: number;
-  generatedAt: string;
-  sources: DocSource[];
-}
-
-export async function indexMarkdown(_path: string): Promise<DocSource[]> {
-  return [];
-}
-
-export async function searchDocs(
-  _query: string,
-  _scope?: string
-): Promise<DocSource[]> {
-  return [];
-}
+export { indexMarkdown } from "./indexMarkdown.js";
+export { indexComponentSchemas } from "./indexSchemas.js";
+export { searchDocs, findDocByUri } from "./searchDocs.js";
+export { buildDocIndex } from "./buildIndex.js";

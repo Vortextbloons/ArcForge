@@ -1,0 +1,70 @@
+import type { ProjectManifest, Scene, Prefab } from "@threeforge/schemas";
+import type { ScriptDiagnostic } from "@threeforge/engine";
+
+export interface ExportOptions {
+  /** Absolute path to the game project root (contains project.threeforge.json). */
+  projectRoot: string;
+  /** Absolute path where export output is written. */
+  output: string;
+  /** Skip asset optimization (MVP: always a no-op copy). */
+  optimize?: boolean;
+  /** Include engine source under vendor/ (editable export). Default true. */
+  includeEngineSource?: boolean;
+  /** Dry-run: validate and report without writing output. */
+  dryRun?: boolean;
+}
+
+export interface CollectedScript {
+  path: string;
+  absolutePath: string;
+  source: string;
+}
+
+export interface CollectedPrefab {
+  path: string;
+  prefab: Prefab;
+}
+
+export interface CollectedScene {
+  path: string;
+  scene: Scene;
+}
+
+export interface ProjectBundle {
+  root: string;
+  manifest: ProjectManifest;
+  manifestPath: string;
+  scenes: CollectedScene[];
+  prefabs: CollectedPrefab[];
+  scripts: CollectedScript[];
+  /** Asset paths relative to project root (e.g. assets/textures/foo.png). */
+  referencedAssets: string[];
+}
+
+export interface ExportIssue {
+  severity: "error" | "warning";
+  code: string;
+  message: string;
+  path?: string;
+}
+
+export interface BuildReport {
+  ok: boolean;
+  mode: "web" | "three-project";
+  projectName: string;
+  output: string;
+  startedAt: string;
+  finishedAt: string;
+  durationMs: number;
+  scenes: string[];
+  prefabs: string[];
+  scripts: string[];
+  assetsCopied: string[];
+  issues: ExportIssue[];
+  scriptDiagnostics: ScriptDiagnostic[];
+  dryRun: boolean;
+}
+
+export type ExportResult = {
+  report: BuildReport;
+};
