@@ -34,12 +34,17 @@ const EditorStoreContext = createContext<EditorStoreValue | null>(null);
 
 export function EditorStoreProvider({
   initialScene,
+  initialScenePath = null,
   children,
 }: {
   initialScene: Scene;
+  initialScenePath?: string | null;
   children: ReactNode;
 }) {
-  const session = useMemo(() => new EditorSession({ scene: initialScene }), [initialScene]);
+  const session = useMemo(
+    () => new EditorSession({ scene: initialScene, scenePath: initialScenePath }),
+    [initialScene, initialScenePath]
+  );
 
   const [scene, setScene] = useState(() => session.getScene());
   const [selection, setSelectionState] = useState(() => session.getSelection());

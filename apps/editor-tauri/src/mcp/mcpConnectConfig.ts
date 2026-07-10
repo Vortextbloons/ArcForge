@@ -65,9 +65,11 @@ export function serverNameFromProject(projectRoot: string | null, sceneName: str
 
 export function resolveMcpConnectPaths(
   scenePath: string | null,
-  sceneName: string
+  sceneName: string,
+  projectRootOverride?: string | null
 ): McpConnectPaths {
-  const projectRoot = inferProjectRoot(scenePath);
+  const projectRoot =
+    (projectRootOverride && projectRootOverride.trim()) || inferProjectRoot(scenePath);
   const mcpCliPath = inferMcpCliPath(projectRoot);
   return {
     projectRoot,

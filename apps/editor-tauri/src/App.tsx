@@ -2,13 +2,14 @@ import { useEffect } from "react";
 import { DeleteEntityCommand } from "@arcforge/editor-core";
 import { EditorStoreProvider, useEditorStore } from "./app/EditorStore";
 import { PlayModeProvider, usePlayMode } from "./app/PlayModeContext";
+import { ProjectSessionProvider, useProjectSession } from "./app/ProjectSession";
 import { EditorToolbar } from "./app/EditorToolbar";
 import { HierarchyPanel } from "./hierarchy/HierarchyPanel";
 import { InspectorPanel } from "./inspector/InspectorPanel";
 import { AssetBrowserPanel } from "./asset-browser/AssetBrowserPanel";
 import { ConsolePanel } from "./console/ConsolePanel";
 import { ViewportCanvas } from "./viewport/ViewportCanvas";
-import sampleScene from "./fixtures/Main.scene.json";
+import { StartScreen } from "./start/StartScreen";
 
 function useEditorHotkeys() {
   const { canUndo, canRedo, undo, redo, selection, execute } = useEditorStore();
@@ -84,13 +85,34 @@ function EditorLayout() {
   );
 }
 
-function App() {
+function EditorWorkspace() {
+  const { project } = useProjectSession();
+  if (!project) return null;
+
   return (
-    <EditorStoreProvider initialScene={sampleScene}>
+    <EditorStoreProvider
+      key={project.manifestPath || "untitled"}
+      initialScene={project.initialScene}
+      initialScenePath={project.scenePath}
+    >
       <PlayModeProvider>
         <EditorLayout />
       </PlayModeProvider>
     </EditorStoreProvider>
+  );
+}
+
+function AppShell() {
+  const { project } = useProjectSession();
+  if (!project) return <StartScreen />;
+  return <EditorWorkspace />;
+}
+
+function App() {
+  return (
+    <ProjectSessionProvider>
+      <AppShell />
+    </ProjectSessionProvider>
   );
 }
 

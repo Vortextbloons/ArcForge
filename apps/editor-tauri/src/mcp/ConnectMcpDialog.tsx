@@ -11,6 +11,7 @@ interface ConnectMcpDialogProps {
   onClose: () => void;
   scenePath: string | null;
   sceneName: string;
+  projectRoot?: string | null;
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -34,13 +35,19 @@ async function copyText(text: string): Promise<boolean> {
   }
 }
 
-export function ConnectMcpDialog({ open, onClose, scenePath, sceneName }: ConnectMcpDialogProps) {
+export function ConnectMcpDialog({
+  open,
+  onClose,
+  scenePath,
+  sceneName,
+  projectRoot = null,
+}: ConnectMcpDialogProps) {
   const [mode, setMode] = useState<McpAccessMode>("readonly");
   const [copied, setCopied] = useState<"json" | "cli" | null>(null);
 
   const paths = useMemo(
-    () => resolveMcpConnectPaths(scenePath, sceneName),
-    [scenePath, sceneName]
+    () => resolveMcpConnectPaths(scenePath, sceneName, projectRoot),
+    [scenePath, sceneName, projectRoot]
   );
 
   const { json, complete } = useMemo(() => buildMcpServersJson(paths, mode), [paths, mode]);

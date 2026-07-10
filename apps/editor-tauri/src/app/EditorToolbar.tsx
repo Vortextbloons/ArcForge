@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { CreateEntityCommand } from "@arcforge/editor-core";
 import { useEditorStore } from "../app/EditorStore";
 import { usePlayMode } from "../app/PlayModeContext";
+import { useProjectSession } from "../app/ProjectSession";
 import { ConnectMcpDialog } from "../mcp/ConnectMcpDialog";
 import {
   downloadSceneJson,
@@ -28,7 +29,17 @@ export function EditorToolbar() {
     getScenePath,
   } = useEditorStore();
   const { playing, play, stop, runTypecheck } = usePlayMode();
+  const { project, closeProject } = useProjectSession();
   const [mcpOpen, setMcpOpen] = useState(false);
+
+  const handleHome = useCallback(() => {
+    if (playing) stop();
+    if (dirty) {
+      const ok = window.confirm("Leave project? Unsaved scene changes may be lost.");
+      if (!ok) return;
+    }
+    closeProject();
+  }, [playing, stop, dirty, closeProject]);
 
   const handleOpen = useCallback(async () => {
     if (playing) return;
@@ -71,21 +82,27 @@ export function EditorToolbar() {
 
   return (
     <header className="editor__toolbar">
-      <span className="editor__brand">ArcForge</span>
+      <button type="button" className="editor__brand btn-link" onClick={handleHome} title="Back to start">
+        ArcForge
+      </button>
       <span className="editor__scene">
+        {project?.manifest.name ? `${project.manifest.name} / ` : ""}
         {scene.name}
         {dirty ? " •" : ""}
         {playing ? " — Play" : ""}
       </span>
 
       <div className="toolbar__actions">
+        <button type="button" className="btn btn--small" disabled={playing} onClick={handleHome}>
+          Home
+        </button>
         <button
           type="button"
           className="btn btn--small"
           disabled={playing}
           onClick={() => void handleOpen()}
         >
-          Open
+          Open Scene
         </button>
         <button
           type="button"
@@ -148,6 +165,7 @@ export function EditorToolbar() {
         onClose={() => setMcpOpen(false)}
         scenePath={getScenePath()}
         sceneName={scene.name}
+        projectRoot={project?.root || null}
       />
     </header>
   );
