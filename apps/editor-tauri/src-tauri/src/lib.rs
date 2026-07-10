@@ -35,6 +35,44 @@ fn create_directory(path: String) -> Result<(), String> {
 }
 
 #[tauri::command]
+fn list_project_files(
+    project_root: String,
+    relative_dir: String,
+    extension: Option<String>,
+) -> Result<Vec<String>, String> {
+    let root = PathBuf::from(&project_root);
+    let dir = root.join(&relative_dir);
+    if !dir.is_dir() {
+        return Ok(vec![]);
+    }
+
+    let ext = extension.unwrap_or_default();
+    let mut out = Vec::new();
+    let entries = fs::read_dir(&dir).map_err(|e| e.to_string())?;
+    for entry in entries {
+        let entry = entry.map_err(|e| e.to_string())?;
+        let path = entry.path();
+        if !path.is_file() {
+            continue;
+        }
+        if !ext.is_empty() {
+            let name = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
+            if !name.ends_with(&ext) {
+                continue;
+            }
+        }
+        let rel = path
+            .strip_prefix(&root)
+            .map_err(|e| e.to_string())?
+            .to_string_lossy()
+            .replace('\\', "/");
+        out.push(rel);
+    }
+    out.sort();
+    Ok(out)
+}
+
+#[tauri::command]
 async fn open_scene_dialog(app: AppHandle) -> Result<Option<String>, String> {
     let file = app
         .dialog()
@@ -102,6 +140,7 @@ pub fn run() {
             write_project_file,
             path_exists,
             create_directory,
+            list_project_files,
             open_scene_dialog,
             open_project_dialog,
             pick_folder_dialog,

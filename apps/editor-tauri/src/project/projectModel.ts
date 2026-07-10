@@ -1,4 +1,5 @@
 import type { ProjectManifest, Scene } from "@arcforge/schemas";
+import { createAgentsMarkdown, createClaudeMarkdown } from "./agentGuidance";
 
 export interface RecentProject {
   path: string;
@@ -177,12 +178,18 @@ export function createProjectManifest(name: string): ProjectManifest {
   };
 }
 
-export function projectScaffoldFiles(
-  name: string
-): Array<{ rel: string; contents: string }> {
+export function projectScaffoldFiles(name: string): Array<{ rel: string; contents: string }> {
   const manifest = createProjectManifest(name);
   const scene = createBlankScene("Main");
   return [
+    {
+      rel: "AGENTS.md",
+      contents: createAgentsMarkdown(name),
+    },
+    {
+      rel: "CLAUDE.md",
+      contents: createClaudeMarkdown(name),
+    },
     {
       rel: "project.arcforge.json",
       contents: `${JSON.stringify(manifest, null, 2)}\n`,

@@ -11,6 +11,11 @@ export {
 export { ScriptRegistry } from "./ScriptRegistry.js";
 export { ScriptSystem } from "./ScriptSystem.js";
 export {
+  compileBehaviourModule,
+  transpileBehaviourSource,
+  type CompileBehaviourOutcome,
+} from "./compileBehaviourModule.js";
+export {
   typecheckScripts,
   type ScriptDiagnostic,
   type ScriptSource,

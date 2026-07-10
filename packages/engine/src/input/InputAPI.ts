@@ -83,8 +83,38 @@ export class InputAPI {
   }
 
   getAxis(action: string): number {
-    if (action === "horizontal") return this.getVector("horizontal").x;
-    if (action === "vertical") return this.getVector("move").y;
+    if (action === "horizontal" || action === "steer") {
+      return this.getVector("horizontal").x;
+    }
+    if (action === "vertical" || action === "throttle") {
+      return this.getVector("move").y;
+    }
     return 0;
   }
+
+  /** True while a named key / code is held (e.g. "space", "r", "KeyW"). */
+  getKey(name: string): boolean {
+    const code = resolveKeyCode(name);
+    return code ? this.isKeyDown(code) : false;
+  }
+}
+
+function resolveKeyCode(name: string): string | null {
+  const key = name.trim().toLowerCase();
+  if (!key) return null;
+  if (key === "space" || key === " ") return "Space";
+  if (key === "enter" || key === "return") return "Enter";
+  if (key === "escape" || key === "esc") return "Escape";
+  if (key === "shift") return "ShiftLeft";
+  if (key === "ctrl" || key === "control") return "ControlLeft";
+  if (key === "alt") return "AltLeft";
+  if (key.length === 1 && key >= "a" && key <= "z") {
+    return `Key${key.toUpperCase()}`;
+  }
+  if (key.length === 1 && key >= "0" && key <= "9") {
+    return `Digit${key}`;
+  }
+  // Already a KeyboardEvent.code
+  if (/^(Key|Digit|Arrow|Numpad)/.test(name) || name === "Space") return name;
+  return null;
 }

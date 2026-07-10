@@ -53,33 +53,52 @@ export class TransformHandle {
     return data;
   }
 
-  get position(): [number, number, number] {
-    return [...this.require().position] as [number, number, number];
+  /**
+   * Mutable xyz view over the stored tuple. Assigning `.x/.y/.z` writes back.
+   * Also supports tuple assignment: `transform.position = [x, y, z]`.
+   */
+  get position(): Vec3View {
+    return createVec3View(this.require().position, (next) => {
+      const t = this.require();
+      t.position = next;
+      this.world.setComponent(this.entityId, TRANSFORM_ID, t);
+    });
   }
 
-  set position(value: [number, number, number]) {
+  set position(value: [number, number, number] | Vec3Like) {
+    const next = toTuple(value);
     const t = this.require();
-    t.position = [value[0], value[1], value[2]];
+    t.position = next;
     this.world.setComponent(this.entityId, TRANSFORM_ID, t);
   }
 
-  get rotation(): [number, number, number] {
-    return [...this.require().rotation] as [number, number, number];
+  get rotation(): Vec3View {
+    return createVec3View(this.require().rotation, (next) => {
+      const t = this.require();
+      t.rotation = next;
+      this.world.setComponent(this.entityId, TRANSFORM_ID, t);
+    });
   }
 
-  set rotation(value: [number, number, number]) {
+  set rotation(value: [number, number, number] | Vec3Like) {
+    const next = toTuple(value);
     const t = this.require();
-    t.rotation = [value[0], value[1], value[2]];
+    t.rotation = next;
     this.world.setComponent(this.entityId, TRANSFORM_ID, t);
   }
 
-  get scale(): [number, number, number] {
-    return [...this.require().scale] as [number, number, number];
+  get scale(): Vec3View {
+    return createVec3View(this.require().scale, (next) => {
+      const t = this.require();
+      t.scale = next;
+      this.world.setComponent(this.entityId, TRANSFORM_ID, t);
+    });
   }
 
-  set scale(value: [number, number, number]) {
+  set scale(value: [number, number, number] | Vec3Like) {
+    const next = toTuple(value);
     const t = this.require();
-    t.scale = [value[0], value[1], value[2]];
+    t.scale = next;
     this.world.setComponent(this.entityId, TRANSFORM_ID, t);
   }
 
@@ -92,4 +111,63 @@ export class TransformHandle {
   setPosition(x: number, y: number, z: number): void {
     this.position = [x, y, z];
   }
+
+  setRotation(x: number, y: number, z: number): void {
+    this.rotation = [x, y, z];
+  }
+
+  /** Point this entity's forward (-Z) toward a world-space target (Y-up euler). */
+  lookAt(x: number, y: number, z: number): void {
+    const pos = this.require().position;
+    const dx = x - pos[0];
+    const dy = y - pos[1];
+    const dz = z - pos[2];
+    const yaw = Math.atan2(dx, dz);
+    const pitch = -Math.atan2(dy, Math.hypot(dx, dz));
+    this.rotation = [pitch, yaw, 0];
+  }
+}
+
+export type Vec3Like = { x: number; y: number; z: number };
+export type Vec3View = [number, number, number] & Vec3Like;
+
+function toTuple(value: [number, number, number] | Vec3Like): [number, number, number] {
+  if (Array.isArray(value)) {
+    return [value[0], value[1], value[2]];
+  }
+  return [value.x, value.y, value.z];
+}
+
+function createVec3View(
+  source: [number, number, number],
+  write: (next: [number, number, number]) => void
+): Vec3View {
+  const view = [source[0], source[1], source[2]] as Vec3View;
+  Object.defineProperties(view, {
+    x: {
+      get: () => view[0],
+      set: (v: number) => {
+        view[0] = v;
+        write([view[0], view[1], view[2]]);
+      },
+      enumerable: true,
+    },
+    y: {
+      get: () => view[1],
+      set: (v: number) => {
+        view[1] = v;
+        write([view[0], view[1], view[2]]);
+      },
+      enumerable: true,
+    },
+    z: {
+      get: () => view[2],
+      set: (v: number) => {
+        view[2] = v;
+        write([view[0], view[1], view[2]]);
+      },
+      enumerable: true,
+    },
+  });
+  return view;
 }
