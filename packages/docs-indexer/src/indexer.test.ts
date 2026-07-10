@@ -18,7 +18,7 @@ describe("docs-indexer", () => {
 
     const behaviour = findDocByUri(
       index,
-      "threeforge://docs/scripting/behaviour"
+      "arcforge://docs/scripting/behaviour"
     );
     expect(behaviour?.title).toContain("Behaviour");
 
@@ -27,7 +27,7 @@ describe("docs-indexer", () => {
 
     const transform = findDocByUri(
       index,
-      "threeforge://docs/components/core.transform"
+      "arcforge://docs/components/core.transform"
     );
     expect(transform?.body).toContain("core.transform");
   });

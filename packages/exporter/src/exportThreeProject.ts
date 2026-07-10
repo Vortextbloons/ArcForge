@@ -131,7 +131,7 @@ async function writeGameBootstrap(
 
   await writeTextFile(
     path.join(output, "src", "game.ts"),
-    `import { Runtime } from "@threeforge/engine";
+    `import { Runtime } from "@arcforge/engine";
 import manifest from "./project.manifest.json";
 import defaultScene from ${JSON.stringify(sceneImport)};
 ${importLines}
@@ -194,7 +194,7 @@ async function vendorPackages(output: string): Promise<void> {
         `Package not built: ${root}. Run pnpm build for engine/schemas first.`
       );
     }
-    const dest = path.join(output, "vendor", "@threeforge", name);
+    const dest = path.join(output, "vendor", "@arcforge", name);
     await ensureDir(dest);
     await copyDirectory(path.join(root, "dist"), path.join(dest, "dist"), {
       ignore: (rel) => rel.endsWith(".map"),
@@ -226,7 +226,7 @@ async function vendorPackages(output: string): Promise<void> {
     if (name === "engine") {
       vendorPkg.dependencies = {
         three: "^0.166.1",
-        "@threeforge/schemas": "file:../schemas",
+        "@arcforge/schemas": "file:../schemas",
       };
     } else if (srcPkg.dependencies) {
       vendorPkg.dependencies = srcPkg.dependencies;

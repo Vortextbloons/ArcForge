@@ -6,7 +6,7 @@ import {
   parseScene,
   type Prefab,
   type Scene,
-} from "@threeforge/schemas";
+} from "@arcforge/schemas";
 import {
   listFiles,
   pathExists,
@@ -81,22 +81,22 @@ function collectPrefabScriptModules(prefab: Prefab, out: Set<string>): void {
 }
 
 /**
- * Load a ThreeForge project folder into a validated in-memory bundle.
+ * Load an ArcForge project folder into a validated in-memory bundle.
  */
 export async function loadProjectBundle(
   projectRoot: string
 ): Promise<{ bundle: ProjectBundle; issues: ExportIssue[] }> {
   const issues: ExportIssue[] = [];
   const root = path.resolve(projectRoot);
-  const manifestPath = path.join(root, "project.threeforge.json");
+  const manifestPath = path.join(root, "project.arcforge.json");
 
   if (!(await pathExists(manifestPath))) {
     issues.push(
       issue(
         "error",
         "missing-manifest",
-        "project.threeforge.json not found",
-        "project.threeforge.json"
+        "project.arcforge.json not found",
+        "project.arcforge.json"
       )
     );
     throw new ExportLoadError(issues);
@@ -111,7 +111,7 @@ export async function loadProjectBundle(
         "error",
         "invalid-manifest",
         err instanceof Error ? err.message : "Invalid project manifest",
-        "project.threeforge.json"
+        "project.arcforge.json"
       )
     );
     throw new ExportLoadError(issues);

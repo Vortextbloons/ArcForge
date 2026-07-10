@@ -29,7 +29,7 @@ function scopeFromRel(rel: string): DocScope {
 
 function uriFromRel(rel: string, prefix: "docs" | "project"): string {
   const withoutExt = rel.replace(/\.md$/i, "");
-  return `threeforge://${prefix}/${withoutExt}`;
+  return `arcforge://${prefix}/${withoutExt}`;
 }
 
 async function walkMarkdown(root: string): Promise<string[]> {

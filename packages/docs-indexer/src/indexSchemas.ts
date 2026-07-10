@@ -1,4 +1,4 @@
-import { CORE_COMPONENTS } from "@threeforge/schemas";
+import { CORE_COMPONENTS } from "@arcforge/schemas";
 import type { DocSource } from "./types.js";
 
 /**
@@ -29,7 +29,7 @@ ${fields || "_No fields_"}
 `;
 
     return {
-      uri: `threeforge://docs/components/${component.id}`,
+      uri: `arcforge://docs/components/${component.id}`,
       title: `${component.displayName} (${component.id})`,
       kind: "schema" as const,
       path: "",

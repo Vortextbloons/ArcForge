@@ -53,7 +53,7 @@ describe("exporter", () => {
     ).toBe(true);
     expect(
       await pathExists(
-        path.join(out, "vendor", "@threeforge", "engine", "dist", "index.js")
+        path.join(out, "vendor", "@arcforge", "engine", "dist", "index.js")
       )
     ).toBe(true);
     expect(await pathExists(path.join(out, "build-report.json"))).toBe(true);

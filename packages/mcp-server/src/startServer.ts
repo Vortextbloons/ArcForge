@@ -6,7 +6,10 @@ import { createMcpServer } from "./createServer.js";
 export interface StartMcpOptions {
   projectRoot: string;
   readonly?: boolean;
+  /** Auto-approve policy "ask" in headless mode. */
+  approveAsks?: boolean;
   attached?: boolean;
+  clientId?: string;
   engineDocsRoot?: string;
 }
 
@@ -16,16 +19,19 @@ export interface RunningMcpServer {
 }
 
 /**
- * Start ThreeForge MCP over stdio (sidecar / CLI).
+ * Start ArcForge MCP over stdio (sidecar / CLI).
  * Logs must go to stderr only — stdout is the JSON-RPC channel.
  */
 export async function startMcpServer(
   options: StartMcpOptions
 ): Promise<RunningMcpServer> {
+  const readonly = options.readonly !== false;
   const ctx = await createProjectContext({
     projectRoot: options.projectRoot,
-    readonly: options.readonly !== false,
+    readonly,
+    approveAsks: options.approveAsks ?? !readonly,
     attached: options.attached,
+    clientId: options.clientId,
     engineDocsRoot: options.engineDocsRoot,
   });
 
@@ -34,7 +40,7 @@ export async function startMcpServer(
   await server.connect(transport);
 
   console.error(
-    `[threeforge-mcp] ready project=${ctx.projectRoot} readonly=${ctx.readonly} docs=${ctx.docs.sources.length}`
+    `[arcforge-mcp] ready project=${ctx.projectRoot} readonly=${ctx.readonly} approveAsks=${ctx.approveAsks} docs=${ctx.docs.sources.length}`
   );
 
   return {

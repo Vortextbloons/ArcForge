@@ -10,8 +10,8 @@ import {
 import {
   EditorSession,
   type EditorCommand,
-} from "@threeforge/editor-core";
-import type { Entity, Scene } from "@threeforge/schemas";
+} from "@arcforge/editor-core";
+import type { Entity, Scene } from "@arcforge/schemas";
 
 export interface EditorStoreValue {
   session: EditorSession;

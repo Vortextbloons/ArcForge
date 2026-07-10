@@ -3,11 +3,14 @@ import { startMcpServer } from "./startServer.js";
 
 function usage(): never {
   console.error(`Usage:
-  threeforge-mcp --project <path> [--readonly] [--attached] [--docs <engineDocsPath>]
+  arcforge-mcp --project <path> [--readonly | --write] [--attached] [--docs <engineDocsPath>] [--client <id>]
 
-Phase 5 exposes read-only tools:
-  project.get_info, scene.list, scene.open, component.list,
-  docs.search, docs.read, build.get_errors
+Phase 5 read tools + Phase 6 write tools (with --write):
+  Read:  project.get_info, scene.list/open, component.list, docs.*, build.get_errors
+  Write: scene.create_entity, scene.update_component, prefab.create, script.create/edit, build.preview
+  Review: diff.list, diff.summarize
+
+Policy lives in <project>/.threeforge/mcp.policy.json
 `);
   process.exit(1);
 }
@@ -23,14 +26,18 @@ async function main(): Promise<void> {
   const projectRoot = getFlag(args, "--project");
   if (!projectRoot) usage();
 
-  const readonly = args.includes("--readonly") || !args.includes("--write");
+  const write = args.includes("--write");
+  const readonly = args.includes("--readonly") || !write;
   const attached = args.includes("--attached");
   const engineDocsRoot = getFlag(args, "--docs");
+  const clientId = getFlag(args, "--client");
 
   const running = await startMcpServer({
     projectRoot: projectRoot!,
     readonly,
+    approveAsks: write,
     attached,
+    clientId,
     engineDocsRoot,
   });
 

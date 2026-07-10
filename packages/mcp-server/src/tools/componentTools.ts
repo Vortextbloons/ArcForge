@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CORE_COMPONENT_MAP, CORE_COMPONENTS } from "@threeforge/schemas";
+import { CORE_COMPONENT_MAP, CORE_COMPONENTS } from "@arcforge/schemas";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { errorResult, jsonResult } from "../toolResult.js";
@@ -23,7 +23,7 @@ export function registerComponentTools(
           id: c.id,
           displayName: c.displayName,
           summary: c.docs.summary,
-          docsUri: `threeforge://docs/components/${c.id}`,
+          docsUri: `arcforge://docs/components/${c.id}`,
         })),
       })
   );
@@ -54,7 +54,7 @@ export function registerComponentTools(
         defaults: component.defaults,
         inspector: component.inspector,
         docs: component.docs,
-        docsUri: `threeforge://docs/components/${component.id}`,
+        docsUri: `arcforge://docs/components/${component.id}`,
       });
     }
   );

@@ -24,7 +24,7 @@ describe("scripting", () => {
     const result = typecheckScripts([
       {
         path: "scripts/ok.ts",
-        source: `import { Behaviour } from "@threeforge/engine";
+        source: `import { Behaviour } from "@arcforge/engine";
 export default class Ok extends Behaviour {
   update() {}
 }
@@ -38,7 +38,7 @@ export default class Ok extends Behaviour {
     const result = typecheckScripts([
       {
         path: "scripts/bad.ts",
-        source: `import { Behaviour } from "@threeforge/engine";
+        source: `import { Behaviour } from "@arcforge/engine";
 import { invoke } from "@tauri-apps/api/core";
 export default class Bad extends Behaviour {}
 `,

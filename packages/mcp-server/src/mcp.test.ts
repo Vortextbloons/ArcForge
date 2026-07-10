@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { createProjectContext } from "./projectContext.js";
 import { createMcpServer } from "./createServer.js";
-import { searchDocs } from "@threeforge/docs-indexer";
+import { searchDocs } from "@arcforge/docs-indexer";
 
 const ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),

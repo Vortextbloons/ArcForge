@@ -5,11 +5,11 @@ import { exportThreeProject } from "./exportThreeProject.js";
 
 function usage(): never {
   console.log(`Usage:
-  threeforge-export <web|three> <projectRoot> <outputDir> [--dry-run]
+  arcforge-export <web|three> <projectRoot> <outputDir> [--dry-run]
 
 Examples:
-  threeforge-export web ./examples/platformer ./exports/platformer-web
-  threeforge-export three ./examples/platformer ./exports/platformer-three
+  arcforge-export web ./examples/platformer ./exports/platformer-web
+  arcforge-export three ./examples/platformer ./exports/platformer-three
 `);
   process.exit(1);
 }

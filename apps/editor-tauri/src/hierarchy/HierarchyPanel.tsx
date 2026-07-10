@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import {
   CreateEntityCommand,
   DeleteEntityCommand,
-} from "@threeforge/editor-core";
-import type { Entity } from "@threeforge/schemas";
+} from "@arcforge/editor-core";
+import type { Entity } from "@arcforge/schemas";
 import { useEditorStore } from "../app/EditorStore";
 
 function buildTree(entities: Entity[]) {

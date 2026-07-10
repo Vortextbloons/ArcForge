@@ -1,4 +1,4 @@
-import type { BehaviourConstructor } from "@threeforge/engine";
+import type { BehaviourConstructor } from "@arcforge/engine";
 import PlayerController from "./player.controller";
 import CoinCollectable from "./coin.collectable";
 
@@ -11,7 +11,7 @@ export const DEMO_SCRIPTS: Record<string, BehaviourConstructor> = {
 export const DEMO_SCRIPT_SOURCES = [
   {
     path: "scripts/player.controller.ts",
-    source: `import { Behaviour, GameContext } from "@threeforge/engine";
+    source: `import { Behaviour, GameContext } from "@arcforge/engine";
 
 export default class PlayerController extends Behaviour {
   speed = 4;
@@ -29,7 +29,7 @@ export default class PlayerController extends Behaviour {
   },
   {
     path: "scripts/coin.collectable.ts",
-    source: `import { Behaviour, GameContext } from "@threeforge/engine";
+    source: `import { Behaviour, GameContext } from "@arcforge/engine";
 
 export default class CoinCollectable extends Behaviour {
   spinSpeed = 2;

@@ -1,6 +1,6 @@
 # Exporting Games
 
-ThreeForge can export two kinds of builds from a game project:
+ArcForge can export two kinds of builds from a game project:
 
 1. **Playable web build** — static `index.html` + `game.js` + assets
 2. **Editable Three.js / Vite project** — normal npm project you can keep editing
@@ -10,7 +10,7 @@ ThreeForge can export two kinds of builds from a game project:
 From the monorepo root (after building engine/schemas):
 
 ```bash
-pnpm --filter @threeforge/exporter build
+pnpm --filter @arcforge/exporter build
 
 pnpm export:web -- examples/platformer exports/platformer-web
 pnpm export:three -- examples/platformer exports/platformer-three
@@ -25,7 +25,7 @@ pnpm export:web -- examples/platformer exports/platformer-web --dry-run
 ## Programmatic API
 
 ```ts
-import { exportWebBuild, exportThreeProject } from "@threeforge/exporter";
+import { exportWebBuild, exportThreeProject } from "@arcforge/exporter";
 
 await exportWebBuild({
   projectRoot: "/path/to/MyGame",

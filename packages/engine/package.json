@@ -1,5 +1,5 @@
 {
-  "name": "@threeforge/engine",
+  "name": "@arcforge/engine",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "three": "^0.166.1",
-    "@threeforge/schemas": "workspace:*"
+    "@arcforge/schemas": "workspace:*"
   },
   "devDependencies": {
     "@types/three": "^0.166.0",

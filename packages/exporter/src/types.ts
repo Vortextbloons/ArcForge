@@ -1,8 +1,8 @@
-import type { ProjectManifest, Scene, Prefab } from "@threeforge/schemas";
-import type { ScriptDiagnostic } from "@threeforge/engine";
+import type { ProjectManifest, Scene, Prefab } from "@arcforge/schemas";
+import type { ScriptDiagnostic } from "@arcforge/engine";
 
 export interface ExportOptions {
-  /** Absolute path to the game project root (contains project.threeforge.json). */
+  /** Absolute path to the game project root (contains project.arcforge.json). */
   projectRoot: string;
   /** Absolute path where export output is written. */
   output: string;

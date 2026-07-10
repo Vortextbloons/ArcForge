@@ -3,7 +3,7 @@
 Scripts are TypeScript modules that **default-export** a class extending `Behaviour`.
 
 ```ts
-import { Behaviour, type GameContext } from "@threeforge/engine";
+import { Behaviour, type GameContext } from "@arcforge/engine";
 
 export default class PlayerController extends Behaviour {
   speed = 5;

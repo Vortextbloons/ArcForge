@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { findDocByUri, searchDocs } from "@threeforge/docs-indexer";
+import { findDocByUri, searchDocs } from "@arcforge/docs-indexer";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ProjectContext } from "../projectContext.js";
 import { errorResult, jsonResult } from "../toolResult.js";
@@ -44,11 +44,11 @@ export function registerDocsTools(
     {
       title: "Read docs",
       description:
-        "Reads one documentation resource by threeforge:// URI from docs.search.",
+        "Reads one documentation resource by arcforge:// URI from docs.search.",
       inputSchema: {
         uri: z
           .string()
-          .describe('Doc URI, e.g. "threeforge://docs/scripting/behaviour"'),
+          .describe('Doc URI, e.g. "arcforge://docs/scripting/behaviour"'),
       },
       annotations: { readOnlyHint: true },
     },

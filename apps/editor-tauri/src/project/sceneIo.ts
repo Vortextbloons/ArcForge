@@ -1,4 +1,4 @@
-import { parseScene } from "@threeforge/schemas";
+import { parseScene } from "@arcforge/schemas";
 
 export function downloadSceneJson(scene: unknown, filename: string): void {
   const text = JSON.stringify(scene, null, 2);

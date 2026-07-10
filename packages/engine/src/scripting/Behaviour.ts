@@ -1,4 +1,4 @@
-import type { Scene } from "@threeforge/schemas";
+import type { Scene } from "@arcforge/schemas";
 import type { TimeState } from "../runtime/GameLoop.js";
 import type { World } from "../ecs/World.js";
 import type { InputAPI } from "../input/InputAPI.js";

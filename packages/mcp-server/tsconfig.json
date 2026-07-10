@@ -12,6 +12,7 @@
   "references": [
     { "path": "../schemas" },
     { "path": "../engine" },
-    { "path": "../docs-indexer" }
+    { "path": "../docs-indexer" },
+    { "path": "../editor-core" }
   ]
 }

@@ -12,8 +12,8 @@ import {
   type Runtime,
   type RuntimeLogEntry,
   type ScriptTypecheckResult,
-} from "@threeforge/engine";
-import type { Scene } from "@threeforge/schemas";
+} from "@arcforge/engine";
+import type { Scene } from "@arcforge/schemas";
 import { DEMO_SCRIPT_SOURCES } from "../scripts/demoScripts";
 import { useEditorStore } from "./EditorStore";
 

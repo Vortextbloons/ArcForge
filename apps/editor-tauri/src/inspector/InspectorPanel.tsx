@@ -4,12 +4,12 @@ import {
   RemoveComponentCommand,
   RenameEntityCommand,
   UpdateComponentCommand,
-} from "@threeforge/editor-core";
+} from "@arcforge/editor-core";
 import {
   CORE_COMPONENTS,
   CORE_COMPONENT_MAP,
   type InspectorField,
-} from "@threeforge/schemas";
+} from "@arcforge/schemas";
 import { useEditorStore } from "../app/EditorStore";
 
 function NameField({ entityId, name }: { entityId: string; name: string }) {

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { CreateEntityCommand } from "@threeforge/editor-core";
+import { CreateEntityCommand } from "@arcforge/editor-core";
 import { useEditorStore } from "../app/EditorStore";
 import { usePlayMode } from "../app/PlayModeContext";
 import {
@@ -71,7 +71,7 @@ export function EditorToolbar() {
 
   return (
     <header className="editor__toolbar">
-      <span className="editor__brand">ThreeForge</span>
+      <span className="editor__brand">ArcForge</span>
       <span className="editor__scene">
         {scene.name}
         {dirty ? " •" : ""}

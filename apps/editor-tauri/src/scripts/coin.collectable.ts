@@ -1,4 +1,4 @@
-import { Behaviour, type GameContext } from "@threeforge/engine";
+import { Behaviour, type GameContext } from "@arcforge/engine";
 
 /** Spins a collectable coin; hides when the player is nearby. */
 export default class CoinCollectable extends Behaviour {

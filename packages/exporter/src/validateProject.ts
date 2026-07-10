@@ -1,4 +1,4 @@
-import { typecheckScripts } from "@threeforge/engine";
+import { typecheckScripts } from "@arcforge/engine";
 import type { ExportIssue, ProjectBundle } from "./types.js";
 import { issue } from "./fsUtils.js";
 

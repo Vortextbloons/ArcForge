@@ -1,4 +1,4 @@
-import type { Scene } from "@threeforge/schemas";
+import type { Scene } from "@arcforge/schemas";
 import { World } from "../ecs/World.js";
 import { ComponentRegistry } from "../ecs/ComponentRegistry.js";
 import {

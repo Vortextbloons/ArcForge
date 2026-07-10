@@ -1,5 +1,5 @@
 {
-  "name": "@threeforge/editor-tauri",
+  "name": "@arcforge/editor-tauri",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -16,9 +16,9 @@
     "@tauri-apps/plugin-shell": "^2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "@threeforge/editor-core": "workspace:*",
-    "@threeforge/engine": "workspace:*",
-    "@threeforge/schemas": "workspace:*"
+    "@arcforge/editor-core": "workspace:*",
+    "@arcforge/engine": "workspace:*",
+    "@arcforge/schemas": "workspace:*"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",

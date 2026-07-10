@@ -1,5 +1,5 @@
-import type { Scene } from "@threeforge/schemas";
-import { parseScene } from "@threeforge/schemas";
+import type { Scene } from "@arcforge/schemas";
+import { parseScene } from "@arcforge/schemas";
 import { CommandHistory, type EditorCommand } from "../undo/CommandHistory.js";
 import type {
   EditorContext,

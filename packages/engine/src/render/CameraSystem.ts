@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { Camera as CameraData } from "@threeforge/schemas";
+import type { Camera as CameraData } from "@arcforge/schemas";
 import type { World } from "../ecs/World.js";
 import type { RenderBridge } from "./RenderBridge.js";
 import { replaceObject } from "./TransformSyncSystem.js";

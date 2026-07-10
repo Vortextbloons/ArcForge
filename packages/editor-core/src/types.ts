@@ -1,4 +1,4 @@
-import type { Entity, Scene } from "@threeforge/schemas";
+import type { Entity, Scene } from "@arcforge/schemas";
 
 export type EditorEvent =
   | { type: "scene.loaded"; scene: Scene }

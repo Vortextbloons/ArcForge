@@ -63,8 +63,8 @@ export async function exportWebBuild(
       configFile: false,
       resolve: {
         alias: {
-          "@threeforge/engine": path.join(engineRoot, "dist/index.js"),
-          "@threeforge/schemas": path.join(schemasRoot, "dist/index.js"),
+          "@arcforge/engine": path.join(engineRoot, "dist/index.js"),
+          "@arcforge/schemas": path.join(schemasRoot, "dist/index.js"),
           three: threeEntry,
           zod: zodEntry,
         },
@@ -175,7 +175,7 @@ async function writeStagingSources(
 
   await writeTextFile(
     path.join(staging, "main.ts"),
-    `import { Runtime } from "@threeforge/engine";
+    `import { Runtime } from "@arcforge/engine";
 ${importLines}
 
 async function main() {

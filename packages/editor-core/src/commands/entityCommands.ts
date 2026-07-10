@@ -1,4 +1,4 @@
-import type { Entity, Scene } from "@threeforge/schemas";
+import type { Entity, Scene } from "@arcforge/schemas";
 import type { EditorCommand } from "../undo/CommandHistory.js";
 import type { EditorContext } from "../types.js";
 

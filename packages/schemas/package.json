@@ -1,5 +1,5 @@
 {
-  "name": "@threeforge/schemas",
+  "name": "@arcforge/schemas",
   "version": "0.1.0",
   "private": true,
   "type": "module",

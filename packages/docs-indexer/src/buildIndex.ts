@@ -28,15 +28,15 @@ export async function buildDocIndex(
 
   // Built-in MCP tool overview (always available).
   sources.push({
-    uri: "threeforge://docs/mcp/tools",
+    uri: "arcforge://docs/mcp/tools",
     title: "MCP Tools (Phase 5 read-only)",
     kind: "markdown",
     path: "",
     tags: ["mcp", "tools"],
     scope: "mcp",
-    body: `# MCP Tools (Phase 5 read-only)
+    body: `# MCP Tools (Phase 5–6)
 
-Available tools:
+Read tools:
 
 - \`project.get_info\` — project metadata
 - \`scene.list\` / \`scene.open\` — inspect scenes
@@ -44,7 +44,15 @@ Available tools:
 - \`docs.search\` / \`docs.read\` — documentation
 - \`build.get_errors\` — validation / script diagnostics
 
-Write tools arrive in Phase 6. Prefer docs tools before suggesting edits.
+Write tools (require \`--write\` / policy allow):
+
+- \`scene.create_entity\` / \`scene.update_component\` / \`scene.delete_entity\`
+- \`prefab.create\`
+- \`script.create\` / \`script.edit\`
+- \`build.preview\`
+- \`diff.list\` / \`diff.summarize\`
+
+Prefer docs tools before suggesting edits. Mutations use editor-core commands.
 `,
   });
 

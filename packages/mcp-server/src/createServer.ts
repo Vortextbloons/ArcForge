@@ -1,15 +1,17 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { findDocByUri } from "@threeforge/docs-indexer";
+import { findDocByUri } from "@arcforge/docs-indexer";
 import type { ProjectContext } from "./projectContext.js";
-import { registerReadOnlyTools } from "./tools/registerReadOnlyTools.js";
+import { registerAllTools } from "./tools/registerReadOnlyTools.js";
 
 /**
- * Build an MCP server instance bound to a project (Phase 5: read-only tools).
+ * Build an MCP server instance bound to a project.
+ * Phase 5 read-only + Phase 6 write tools (when not --readonly).
  */
 export function createMcpServer(ctx: ProjectContext): McpServer {
+  const mode = ctx.readonly ? "read-only" : "read-write";
   const server = new McpServer(
     {
-      name: "threeforge",
+      name: "arcforge",
       version: "0.1.0",
     },
     {
@@ -18,19 +20,23 @@ export function createMcpServer(ctx: ProjectContext): McpServer {
         resources: {},
       },
       instructions: [
-        "ThreeForge MCP (read-only Phase 5).",
-        "Use docs.search / docs.read and component.list before suggesting edits.",
-        "Write/mutation tools are not available yet (Phase 6).",
+        `ArcForge MCP (${mode}).`,
+        "Use docs.search / docs.read and component.list before proposing edits.",
+        "Write tools go through editor-core commands, project policy, audit, and diff log.",
+        ctx.readonly
+          ? "Server is --readonly; pass --write to enable mutations."
+          : "Write tools require policy allow (or --write to auto-approve ask).",
         `Project: ${ctx.manifest.name} at ${ctx.projectRoot}`,
       ].join(" "),
     }
   );
 
-  registerReadOnlyTools(server, ctx);
+  registerAllTools(server, ctx);
 
-  // Expose indexed docs as MCP resources.
   for (const source of ctx.docs.sources) {
-    const resourceName = source.uri.replace(/^threeforge:\/\//, "").replace(/\//g, ".");
+    const resourceName = source.uri
+      .replace(/^arcforge:\/\//, "")
+      .replace(/\//g, ".");
     server.registerResource(
       resourceName,
       source.uri,

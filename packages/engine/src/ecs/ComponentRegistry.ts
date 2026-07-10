@@ -1,8 +1,8 @@
 import type {
   ComponentDocs,
   InspectorField,
-} from "@threeforge/schemas";
-import { CORE_COMPONENTS } from "@threeforge/schemas";
+} from "@arcforge/schemas";
+import { CORE_COMPONENTS } from "@arcforge/schemas";
 
 /** Loose component definition used by the registry. */
 export type RegisteredComponent = {

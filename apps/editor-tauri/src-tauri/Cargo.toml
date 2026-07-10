@@ -1,12 +1,12 @@
 [package]
-name = "threeforge-editor"
+name = "arcforge-editor"
 version = "0.1.0"
-description = "ThreeForge Desktop Editor"
-authors = ["ThreeForge"]
+description = "ArcForge Desktop Editor"
+authors = ["ArcForge"]
 edition = "2021"
 
 [lib]
-name = "threeforge_editor_lib"
+name = "arcforge_editor_lib"
 crate-type = ["lib", "cdylib", "staticlib"]
 
 [build-dependencies]

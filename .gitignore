@@ -40,6 +40,6 @@ coverage/
 *.tsbuildinfo
 exports/
 **/*.staging/
-ArcForge-spec.md
-AGENTS.md
-plans/
+**/.threeforge/mcp.audit.log
+**/.threeforge/mcp.diff.json
+**/.threeforge/preview/

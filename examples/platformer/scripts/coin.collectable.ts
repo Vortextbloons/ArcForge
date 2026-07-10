@@ -1,4 +1,4 @@
-import { Behaviour, type GameContext } from "@threeforge/engine";
+import { Behaviour, type GameContext } from "@arcforge/engine";
 
 /**
  * Spins a collectable coin and notifies when the player is nearby.

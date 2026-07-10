@@ -2,7 +2,7 @@ import {
   parseScene,
   type Scene,
   type Entity as SceneEntity,
-} from "@threeforge/schemas";
+} from "@arcforge/schemas";
 import { World } from "../ecs/World.js";
 import { ComponentRegistry } from "../ecs/ComponentRegistry.js";
 

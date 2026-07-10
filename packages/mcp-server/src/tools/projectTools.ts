@@ -12,7 +12,7 @@ export function registerProjectTools(
     {
       title: "Get project info",
       description:
-        "Returns ThreeForge project metadata from project.threeforge.json.",
+        "Returns ArcForge project metadata from project.threeforge.json.",
       inputSchema: {},
       annotations: { readOnlyHint: true },
     },

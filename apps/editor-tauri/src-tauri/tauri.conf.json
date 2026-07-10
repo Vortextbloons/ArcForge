@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/crates/tauri-config-schema/schema.json",
-  "productName": "ThreeForge",
+  "productName": "ArcForge",
   "version": "0.1.0",
-  "identifier": "com.threeforge.editor",
+  "identifier": "com.arcforge.editor",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "devUrl": "http://localhost:1420",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "ThreeForge Editor",
+        "title": "ArcForge Editor",
         "width": 1280,
         "height": 720
       }

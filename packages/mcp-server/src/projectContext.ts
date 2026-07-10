@@ -7,12 +7,18 @@ import {
   CORE_COMPONENTS,
   type ProjectManifest,
   type Scene,
-} from "@threeforge/schemas";
-import { typecheckScripts } from "@threeforge/engine";
+} from "@arcforge/schemas";
+import { typecheckScripts } from "@arcforge/engine";
 import {
   buildDocIndex,
   type DocIndex,
-} from "@threeforge/docs-indexer";
+} from "@arcforge/docs-indexer";
+import type { McpPolicy } from "./auth/policyTypes.js";
+import { loadOrCreatePolicy } from "./auth/permissions.js";
+import { AuditLog } from "./auth/audit.js";
+import { DiffLog } from "./diff/diffLog.js";
+import { ProjectMutator } from "./mutations/projectMutator.js";
+import { PreviewSession } from "./preview/previewSession.js";
 
 export interface SceneSummary {
   path: string;
@@ -35,10 +41,18 @@ export interface ProjectValidationResult {
 export interface ProjectContext {
   projectRoot: string;
   readonly: boolean;
+  /** Auto-approve policy "ask" in headless mode (--write). */
+  approveAsks: boolean;
   attached: boolean;
+  clientId: string;
   engineDocsRoot: string | null;
   manifest: ProjectManifest;
   docs: DocIndex;
+  policy: McpPolicy;
+  audit: AuditLog;
+  diffs: DiffLog;
+  mutator: ProjectMutator;
+  preview: PreviewSession;
   listScenes(): Promise<Array<{ path: string; name: string; entityCount: number }>>;
   openScene(scenePath: string): Promise<SceneSummary>;
   readScene(scenePath: string): Promise<Scene>;
@@ -104,12 +118,14 @@ export async function resolveEngineDocsRoot(
 }
 
 /**
- * Create a headless project context for MCP read-only tools.
+ * Create a headless project context for MCP tools.
  */
 export async function createProjectContext(options: {
   projectRoot: string;
   readonly?: boolean;
+  approveAsks?: boolean;
   attached?: boolean;
+  clientId?: string;
   engineDocsRoot?: string;
 }): Promise<ProjectContext> {
   const projectRoot = path.resolve(options.projectRoot);
@@ -121,6 +137,7 @@ export async function createProjectContext(options: {
   const raw = JSON.parse(await fs.readFile(manifestPath, "utf8")) as unknown;
   const manifest = parseProjectManifest(raw);
   const engineDocsRoot = await resolveEngineDocsRoot(options.engineDocsRoot);
+  const policy = await loadOrCreatePolicy(projectRoot);
 
   const loadDocs = async () =>
     buildDocIndex({
@@ -134,9 +151,16 @@ export async function createProjectContext(options: {
   const ctx: ProjectContext = {
     projectRoot,
     readonly: options.readonly !== false,
+    approveAsks: Boolean(options.approveAsks),
     attached: Boolean(options.attached),
+    clientId: options.clientId ?? "local-mcp",
     engineDocsRoot,
     manifest,
+    policy,
+    audit: new AuditLog(projectRoot),
+    diffs: new DiffLog(projectRoot),
+    mutator: new ProjectMutator(projectRoot),
+    preview: new PreviewSession(projectRoot),
     get docs() {
       return docs;
     },

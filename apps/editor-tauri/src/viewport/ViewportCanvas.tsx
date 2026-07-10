@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Runtime } from "@threeforge/engine";
+import { Runtime } from "@arcforge/engine";
 import { useEditorStore } from "../app/EditorStore";
 import { usePlayMode } from "../app/PlayModeContext";
 import { DEMO_SCRIPTS } from "../scripts/demoScripts";

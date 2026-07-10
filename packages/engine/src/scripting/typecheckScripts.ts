@@ -54,7 +54,7 @@ export function typecheckScripts(
 
     // Obvious private API imports — scripts must use public API only.
     if (
-      /from\s+["']@threeforge\/editor-core["']/.test(script.source) ||
+      /from\s+["']@arcforge\/editor-core["']/.test(script.source) ||
       /from\s+["']@tauri-apps\//.test(script.source) ||
       /from\s+["']node:/.test(script.source)
     ) {

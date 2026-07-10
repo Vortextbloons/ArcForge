@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { DeleteEntityCommand } from "@threeforge/editor-core";
+import { DeleteEntityCommand } from "@arcforge/editor-core";
 import { EditorStoreProvider, useEditorStore } from "./app/EditorStore";
 import { PlayModeProvider, usePlayMode } from "./app/PlayModeContext";
 import { EditorToolbar } from "./app/EditorToolbar";

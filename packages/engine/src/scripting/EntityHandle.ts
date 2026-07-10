@@ -1,4 +1,4 @@
-import type { Transform } from "@threeforge/schemas";
+import type { Transform } from "@arcforge/schemas";
 import type { EntityId, EntityRecord } from "../ecs/types.js";
 import type { World } from "../ecs/World.js";
 

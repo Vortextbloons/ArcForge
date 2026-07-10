@@ -1,5 +1,5 @@
 {
-  "name": "@threeforge/docs-indexer",
+  "name": "@arcforge/docs-indexer",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -24,6 +24,6 @@
     "vitest": "^2.1.9"
   },
   "dependencies": {
-    "@threeforge/schemas": "workspace:*"
+    "@arcforge/schemas": "workspace:*"
   }
 }

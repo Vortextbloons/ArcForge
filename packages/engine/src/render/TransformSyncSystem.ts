@@ -1,5 +1,5 @@
 import type * as THREE from "three";
-import type { Transform } from "@threeforge/schemas";
+import type { Transform } from "@arcforge/schemas";
 import type { World } from "../ecs/World.js";
 import type { RenderBridge } from "./RenderBridge.js";
 

@@ -1,4 +1,4 @@
-import { Behaviour, type GameContext } from "@threeforge/engine";
+import { Behaviour, type GameContext } from "@arcforge/engine";
 
 /**
  * Demo player controller: WASD / arrow keys move on XZ.

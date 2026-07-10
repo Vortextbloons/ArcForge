@@ -1,12 +1,12 @@
 {
-  "name": "@threeforge/mcp-server",
+  "name": "@arcforge/mcp-server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
-    "threeforge-mcp": "./dist/cli.js"
+    "arcforge-mcp": "./dist/cli.js"
   },
   "exports": {
     ".": {
@@ -24,9 +24,10 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "@threeforge/docs-indexer": "workspace:*",
-    "@threeforge/engine": "workspace:*",
-    "@threeforge/schemas": "workspace:*",
+    "@arcforge/docs-indexer": "workspace:*",
+    "@arcforge/editor-core": "workspace:*",
+    "@arcforge/engine": "workspace:*",
+    "@arcforge/schemas": "workspace:*",
     "zod": "^3.25.76"
   },
   "devDependencies": {

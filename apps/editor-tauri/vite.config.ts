@@ -7,15 +7,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
-      "@threeforge/editor-core": path.resolve(
+      "@arcforge/editor-core": path.resolve(
         __dirname,
         "../../packages/editor-core/src/index.ts"
       ),
-      "@threeforge/engine": path.resolve(
+      "@arcforge/engine": path.resolve(
         __dirname,
         "../../packages/engine/src/index.ts"
       ),
-      "@threeforge/schemas": path.resolve(
+      "@arcforge/schemas": path.resolve(
         __dirname,
         "../../packages/schemas/src/index.ts"
       ),

@@ -1,0 +1,23 @@
+{
+  "mcp": {
+    "enabled": true,
+    "defaultMode": "ask",
+    "allowedTools": {
+      "project.read": "allow",
+      "docs.read": "allow",
+      "docs.search": "allow",
+      "scene.read": "allow",
+      "scene.write": "ask",
+      "prefab.read": "allow",
+      "prefab.write": "ask",
+      "script.read": "allow",
+      "script.write": "ask",
+      "asset.import": "ask",
+      "build.preview": "allow",
+      "build.export": "ask",
+      "dependency.install": "deny",
+      "shell.run": "deny",
+      "engine.modify": "deny"
+    }
+  }
+}

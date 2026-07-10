@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import type { Light as LightData } from "@threeforge/schemas";
+import type { Light as LightData } from "@arcforge/schemas";
 import type { World } from "../ecs/World.js";
 import type { RenderBridge } from "./RenderBridge.js";
 import { replaceObject } from "./TransformSyncSystem.js";

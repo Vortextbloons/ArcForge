@@ -26,21 +26,21 @@ importers:
 
   apps/editor-tauri:
     dependencies:
+      '@arcforge/editor-core':
+        specifier: workspace:*
+        version: link:../../packages/editor-core
+      '@arcforge/engine':
+        specifier: workspace:*
+        version: link:../../packages/engine
+      '@arcforge/schemas':
+        specifier: workspace:*
+        version: link:../../packages/schemas
       '@tauri-apps/api':
         specifier: ^2
         version: 2.11.1
       '@tauri-apps/plugin-shell':
         specifier: ^2
         version: 2.3.5
-      '@threeforge/editor-core':
-        specifier: workspace:*
-        version: link:../../packages/editor-core
-      '@threeforge/engine':
-        specifier: workspace:*
-        version: link:../../packages/engine
-      '@threeforge/schemas':
-        specifier: workspace:*
-        version: link:../../packages/schemas
       react:
         specifier: ^18.3.1
         version: 18.3.1
@@ -69,7 +69,7 @@ importers:
 
   packages/docs-indexer:
     dependencies:
-      '@threeforge/schemas':
+      '@arcforge/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
@@ -85,7 +85,7 @@ importers:
 
   packages/editor-core:
     dependencies:
-      '@threeforge/schemas':
+      '@arcforge/schemas':
         specifier: workspace:*
         version: link:../schemas
     devDependencies:
@@ -98,7 +98,7 @@ importers:
 
   packages/engine:
     dependencies:
-      '@threeforge/schemas':
+      '@arcforge/schemas':
         specifier: workspace:*
         version: link:../schemas
       three:
@@ -117,10 +117,10 @@ importers:
 
   packages/exporter:
     dependencies:
-      '@threeforge/engine':
+      '@arcforge/engine':
         specifier: workspace:*
         version: link:../engine
-      '@threeforge/schemas':
+      '@arcforge/schemas':
         specifier: workspace:*
         version: link:../schemas
       vite:
@@ -139,18 +139,21 @@ importers:
 
   packages/mcp-server:
     dependencies:
+      '@arcforge/docs-indexer':
+        specifier: workspace:*
+        version: link:../docs-indexer
+      '@arcforge/editor-core':
+        specifier: workspace:*
+        version: link:../editor-core
+      '@arcforge/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@arcforge/schemas':
+        specifier: workspace:*
+        version: link:../schemas
       '@modelcontextprotocol/sdk':
         specifier: ^1.29.0
         version: 1.29.0(zod@3.25.76)
-      '@threeforge/docs-indexer':
-        specifier: workspace:*
-        version: link:../docs-indexer
-      '@threeforge/engine':
-        specifier: workspace:*
-        version: link:../engine
-      '@threeforge/schemas':
-        specifier: workspace:*
-        version: link:../schemas
       zod:
         specifier: ^3.25.76
         version: 3.25.76
