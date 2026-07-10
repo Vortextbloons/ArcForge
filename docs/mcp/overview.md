@@ -9,7 +9,7 @@ pnpm --filter @arcforge/mcp-server build
 node packages/mcp-server/dist/cli.js --project ./examples/platformer --readonly
 ```
 
-Editor MCP config example:
+Editor MCP config example (Cursor / Claude-style):
 
 ```json
 {
@@ -26,6 +26,31 @@ Editor MCP config example:
   }
 }
 ```
+
+OpenCode uses `opencode.json`. On **Windows Desktop**, prefer HTTP while ArcForge is open — the editor auto-starts MCP at `http://127.0.0.1:3847/mcp` and stops it on quit:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "arcforge-platformer": {
+      "type": "remote",
+      "url": "http://127.0.0.1:3847/mcp",
+      "enabled": true,
+      "timeout": 60000,
+      "oauth": false
+    }
+  }
+}
+```
+
+Manual HTTP (if needed):
+
+```bash
+node packages/mcp-server/dist/cli.js --project ./examples/platformer --readonly --http --port 3847
+```
+
+Build first: `pnpm --filter @arcforge/mcp-server build`.
 
 ## Tools
 

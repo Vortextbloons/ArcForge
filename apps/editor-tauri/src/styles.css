@@ -350,6 +350,34 @@ select {
   border-color: #3d5c4a;
 }
 
+.btn--mcp-on {
+  border-color: #3d5c4a;
+}
+
+.mcp-dot {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: var(--muted);
+  vertical-align: middle;
+}
+
+.mcp-dot--on {
+  background: #7dcea0;
+}
+
+.mcp-dot--err {
+  background: var(--danger);
+}
+
+.modal__hint--ok {
+  border-color: #3d5c4a;
+  background: #1a261e;
+  color: #c8f0d8;
+}
+
 .viewport.is-playing {
   outline: 1px solid #3d5c4a;
   outline-offset: -1px;
@@ -581,6 +609,12 @@ select {
   font-size: 0.72rem;
   line-height: 1.45;
   white-space: pre;
+}
+
+.modal__code--logs {
+  max-height: 180px;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .modal__foot {

@@ -1,9 +1,15 @@
 #!/usr/bin/env node
 import { startMcpServer } from "./startServer.js";
+import { startHttpMcpServer } from "./startHttpServer.js";
 
 function usage(): never {
   console.error(`Usage:
   arcforge-mcp --project <path> [--readonly | --write] [--attached] [--docs <engineDocsPath>] [--client <id>]
+  arcforge-mcp --project <path> --http [--port 3847] [--host 127.0.0.1] [--readonly | --write]
+
+Transports:
+  (default) stdio — Cursor / Claude / most IDEs
+  --http          — Streamable HTTP for OpenCode Desktop on Windows (remote MCP URL)
 
 Phase 5–8 tools (write tools require --write):
   Docs:  docs.get_relevant, docs.search, docs.read, docs.list_sources, docs.refresh_index
@@ -30,17 +36,35 @@ async function main(): Promise<void> {
   const write = args.includes("--write");
   const readonly = args.includes("--readonly") || !write;
   const attached = args.includes("--attached");
+  const http = args.includes("--http");
   const engineDocsRoot = getFlag(args, "--docs");
   const clientId = getFlag(args, "--client");
+  const host = getFlag(args, "--host") ?? "127.0.0.1";
+  const portRaw = getFlag(args, "--port");
+  const port = portRaw ? Number(portRaw) : 3847;
+  if (!Number.isFinite(port) || port <= 0) {
+    throw new Error(`Invalid --port: ${portRaw}`);
+  }
 
-  const running = await startMcpServer({
-    projectRoot: projectRoot!,
-    readonly,
-    approveAsks: write,
-    attached,
-    clientId,
-    engineDocsRoot,
-  });
+  const running = http
+    ? await startHttpMcpServer({
+        projectRoot: projectRoot!,
+        readonly,
+        approveAsks: write,
+        attached,
+        clientId,
+        engineDocsRoot,
+        host,
+        port,
+      })
+    : await startMcpServer({
+        projectRoot: projectRoot!,
+        readonly,
+        approveAsks: write,
+        attached,
+        clientId,
+        engineDocsRoot,
+      });
 
   const shutdown = async () => {
     await running.stop();

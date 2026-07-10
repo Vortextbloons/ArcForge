@@ -14,7 +14,7 @@ export interface StartMcpOptions {
 }
 
 export interface RunningMcpServer {
-  server: McpServer;
+  server?: McpServer;
   stop(): Promise<void>;
 }
 

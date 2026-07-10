@@ -29,7 +29,7 @@ export function EditorToolbar() {
     getScenePath,
   } = useEditorStore();
   const { playing, play, stop, runTypecheck } = usePlayMode();
-  const { project, closeProject } = useProjectSession();
+  const { project, closeProject, mcpStatus, restartMcp } = useProjectSession();
   const [mcpOpen, setMcpOpen] = useState(false);
 
   const handleHome = useCallback(() => {
@@ -143,10 +143,20 @@ export function EditorToolbar() {
         </button>
         <button
           type="button"
-          className="btn btn--small"
-          title="Copy MCP config for your AI IDE"
+          className={`btn btn--small ${mcpStatus.running ? "btn--mcp-on" : ""}`}
+          title={
+            mcpStatus.running
+              ? `MCP running at ${mcpStatus.url ?? "http://127.0.0.1:3847/mcp"}`
+              : mcpStatus.error
+                ? `MCP error: ${mcpStatus.error}`
+                : "MCP server (starts with project)"
+          }
           onClick={() => setMcpOpen(true)}
         >
+          <span
+            className={`mcp-dot ${mcpStatus.running ? "mcp-dot--on" : mcpStatus.error ? "mcp-dot--err" : ""}`}
+            aria-hidden
+          />
           Connect MCP
         </button>
         {playing ? (
@@ -166,6 +176,8 @@ export function EditorToolbar() {
         scenePath={getScenePath()}
         sceneName={scene.name}
         projectRoot={project?.root || null}
+        mcpStatus={mcpStatus}
+        onRestartMcp={() => void restartMcp(false)}
       />
     </header>
   );

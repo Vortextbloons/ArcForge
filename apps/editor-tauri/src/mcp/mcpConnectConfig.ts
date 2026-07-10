@@ -2,6 +2,7 @@
 
 export type McpAccessMode = "readonly" | "write";
 export type McpEditor = "opencode" | "cursor" | "claude-desktop" | "windsurf" | "vscode";
+export type McpTransport = "stdio" | "http";
 
 export interface McpEditorOption {
   id: McpEditor;
@@ -10,7 +11,11 @@ export interface McpEditorOption {
 }
 
 export const MCP_EDITOR_OPTIONS: readonly McpEditorOption[] = [
-  { id: "opencode", label: "OpenCode", configLocation: "~/.config/opencode/opencode.json" },
+  {
+    id: "opencode",
+    label: "OpenCode",
+    configLocation: "opencode.json (project root) or ~/.config/opencode/opencode.json",
+  },
   { id: "cursor", label: "Cursor", configLocation: ".cursor/mcp.json" },
   {
     id: "claude-desktop",
@@ -25,6 +30,8 @@ export interface McpConnectPaths {
   projectRoot: string | null;
   mcpCliPath: string | null;
   serverName: string;
+  nodePath: string;
+  arcforgeRoot: string | null;
 }
 
 function normalizePath(p: string): string {
@@ -67,10 +74,25 @@ export function inferMcpCliPath(projectRoot: string | null): string | null {
     return `${normalized.slice(0, examplesIdx)}/packages/mcp-server/dist/cli.js`;
   }
 
-  // Sibling layout: <repo>/packages/mcp-server next to <repo>/<game>
-  const lastSlash = normalized.lastIndexOf("/");
-  if (lastSlash <= 0) return null;
-  return `${normalized.slice(0, lastSlash)}/packages/mcp-server/dist/cli.js`;
+  // Outside the monorepo: do not invent a sibling packages/ path.
+  return null;
+}
+
+export function inferArcforgeRoot(mcpCliPath: string | null): string | null {
+  if (!mcpCliPath) return null;
+  const normalized = normalizePath(mcpCliPath);
+  const marker = "/packages/mcp-server/dist/cli.js";
+  const idx = normalized.toLowerCase().lastIndexOf(marker);
+  if (idx === -1) return null;
+  return normalized.slice(0, idx);
+}
+
+export function defaultNodePath(): string {
+  // Absolute path avoids OpenCode Desktop GUI PATH issues on Windows.
+  if (typeof navigator !== "undefined" && /win/i.test(navigator.platform)) {
+    return "C:/Program Files/nodejs/node.exe";
+  }
+  return "node";
 }
 
 export function serverNameFromProject(projectRoot: string | null, sceneName: string): string {
@@ -94,45 +116,85 @@ export function resolveMcpConnectPaths(
     projectRoot,
     mcpCliPath,
     serverName: serverNameFromProject(projectRoot, sceneName),
+    nodePath: defaultNodePath(),
+    arcforgeRoot: inferArcforgeRoot(mcpCliPath),
   };
 }
 
 export function buildMcpConfigJson(
   paths: McpConnectPaths,
   mode: McpAccessMode,
-  editor: McpEditor
+  editor: McpEditor,
+  transport: McpTransport = editor === "opencode" ? "http" : "stdio"
 ): { json: string; complete: boolean } {
   const cli = paths.mcpCliPath ?? "C:/path/to/ArcForge/packages/mcp-server/dist/cli.js";
   const project = paths.projectRoot ?? "C:/path/to/YourGame";
   const complete = Boolean(paths.mcpCliPath && paths.projectRoot);
+  const accessFlag = mode === "write" ? "--write" : "--readonly";
+  const nodeBin = paths.nodePath || "node";
 
-  const args = [cli, "--project", project, mode === "write" ? "--write" : "--readonly"];
-  const standardServer = { command: "node", args };
-  const config =
-    editor === "opencode"
-      ? {
-          $schema: "https://opencode.ai/config.json",
-          mcp: {
-            [paths.serverName]: {
-              type: "local",
-              command: ["node", ...args],
-              enabled: false,
-            },
+  if (editor === "opencode" && transport === "http") {
+    const config = {
+      $schema: "https://opencode.ai/config.json",
+      mcp: {
+        [paths.serverName]: {
+          type: "remote",
+          url: "http://127.0.0.1:3847/mcp",
+          enabled: true,
+          timeout: 60_000,
+          oauth: false,
+        },
+      },
+    };
+    return { json: JSON.stringify(config, null, 2), complete };
+  }
+
+  const args = [cli, "--project", project, accessFlag];
+  const standardServer = { command: nodeBin, args };
+
+  if (editor === "opencode") {
+    const config = {
+      $schema: "https://opencode.ai/config.json",
+      mcp: {
+        [paths.serverName]: {
+          type: "local",
+          command: [nodeBin, ...args],
+          enabled: true,
+          timeout: 60_000,
+          ...(paths.arcforgeRoot ? { cwd: paths.arcforgeRoot } : {}),
+        },
+      },
+    };
+    return { json: JSON.stringify(config, null, 2), complete };
+  }
+
+  if (editor === "vscode") {
+    return {
+      json: JSON.stringify(
+        {
+          servers: {
+            [paths.serverName]: { type: "stdio", ...standardServer },
           },
-        }
-      : editor === "vscode"
-        ? {
-            servers: {
-              [paths.serverName]: { type: "stdio", ...standardServer },
-            },
-          }
-        : {
-            mcpServers: {
-              [paths.serverName]: standardServer,
-            },
-          };
+        },
+        null,
+        2
+      ),
+      complete,
+    };
+  }
 
-  return { json: JSON.stringify(config, null, 2), complete };
+  return {
+    json: JSON.stringify(
+      {
+        mcpServers: {
+          [paths.serverName]: standardServer,
+        },
+      },
+      null,
+      2
+    ),
+    complete,
+  };
 }
 
 /** Backwards-compatible default for clients using the common mcpServers schema. */
@@ -143,9 +205,17 @@ export function buildMcpServersJson(
   return buildMcpConfigJson(paths, mode, "cursor");
 }
 
-export function buildMcpCliCommand(paths: McpConnectPaths, mode: McpAccessMode): string {
+export function buildMcpCliCommand(
+  paths: McpConnectPaths,
+  mode: McpAccessMode,
+  transport: McpTransport = "stdio"
+): string {
   const cli = paths.mcpCliPath ?? "<ArcForge>/packages/mcp-server/dist/cli.js";
   const project = paths.projectRoot ?? "<YourGame>";
   const flag = mode === "write" ? "--write" : "--readonly";
-  return `node "${cli}" --project "${project}" ${flag}`;
+  const nodeBin = paths.nodePath.includes(" ") ? `"${paths.nodePath}"` : paths.nodePath;
+  if (transport === "http") {
+    return `${nodeBin} "${cli}" --project "${project}" ${flag} --http --port 3847`;
+  }
+  return `${nodeBin} "${cli}" --project "${project}" ${flag}`;
 }

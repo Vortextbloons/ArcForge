@@ -32,11 +32,18 @@ function HierarchyNode({
 
   return (
     <li>
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         className={`hierarchy__item${selected ? " is-selected" : ""}`}
         style={{ paddingLeft: `${0.5 + depth * 0.75}rem` }}
         onClick={() => setSelection([entity.id])}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setSelection([entity.id]);
+          }
+        }}
         onContextMenu={(event) => {
           event.preventDefault();
           setSelection([entity.id]);
@@ -54,7 +61,7 @@ function HierarchyNode({
         >
           ×
         </button>
-      </button>
+      </div>
       {children.length > 0 && (
         <ul>
           {children.map((child) => (

@@ -6,7 +6,9 @@ import {
   resolveMcpConnectPaths,
   type McpAccessMode,
   type McpEditor,
+  type McpTransport,
 } from "./mcpConnectConfig";
+import { getAttachedMcpLogs, type McpRuntimeStatus } from "./mcpRuntime";
 
 interface ConnectMcpDialogProps {
   open: boolean;
@@ -14,6 +16,8 @@ interface ConnectMcpDialogProps {
   scenePath: string | null;
   sceneName: string;
   projectRoot?: string | null;
+  mcpStatus?: McpRuntimeStatus;
+  onRestartMcp?: () => void;
 }
 
 async function copyText(text: string): Promise<boolean> {
@@ -43,22 +47,55 @@ export function ConnectMcpDialog({
   scenePath,
   sceneName,
   projectRoot = null,
+  mcpStatus,
+  onRestartMcp,
 }: ConnectMcpDialogProps) {
   const [mode, setMode] = useState<McpAccessMode>("readonly");
   const [editor, setEditor] = useState<McpEditor>("opencode");
-  const [copied, setCopied] = useState<"json" | "cli" | null>(null);
+  const [transport, setTransport] = useState<McpTransport>("http");
+  const [copied, setCopied] = useState<"json" | "cli" | "logs" | null>(null);
+  const [logs, setLogs] = useState("");
+  const [logsBusy, setLogsBusy] = useState(false);
 
   const paths = useMemo(
     () => resolveMcpConnectPaths(scenePath, sceneName, projectRoot),
     [scenePath, sceneName, projectRoot]
   );
 
+  const effectiveTransport: McpTransport = editor === "opencode" ? transport : "stdio";
+
   const { json, complete } = useMemo(
-    () => buildMcpConfigJson(paths, mode, editor),
-    [paths, mode, editor]
+    () => buildMcpConfigJson(paths, mode, editor, effectiveTransport),
+    [paths, mode, editor, effectiveTransport]
   );
-  const cliCommand = useMemo(() => buildMcpCliCommand(paths, mode), [paths, mode]);
+  const cliCommand = useMemo(
+    () => buildMcpCliCommand(paths, mode, effectiveTransport),
+    [paths, mode, effectiveTransport]
+  );
   const editorOption = MCP_EDITOR_OPTIONS.find((option) => option.id === editor)!;
+  const attached = Boolean(mcpStatus?.running);
+
+  const refreshLogs = useCallback(async () => {
+    setLogsBusy(true);
+    try {
+      setLogs(await getAttachedMcpLogs());
+    } catch (error) {
+      setLogs(error instanceof Error ? error.message : String(error));
+    } finally {
+      setLogsBusy(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (editor === "opencode") setTransport("http");
+  }, [editor]);
+
+  useEffect(() => {
+    if (!open) return;
+    void refreshLogs();
+    const id = window.setInterval(() => void refreshLogs(), 2500);
+    return () => window.clearInterval(id);
+  }, [open, refreshLogs, mcpStatus?.running, mcpStatus?.error]);
 
   useEffect(() => {
     if (!open) return;
@@ -85,6 +122,11 @@ export function ConnectMcpDialog({
     if (ok) setCopied("cli");
   }, [cliCommand]);
 
+  const handleCopyLogs = useCallback(async () => {
+    const ok = await copyText(logs);
+    if (ok) setCopied("logs");
+  }, [logs]);
+
   if (!open) return null;
 
   return (
@@ -105,14 +147,66 @@ export function ConnectMcpDialog({
 
         <div className="modal__body">
           <p className="modal__lead">
-            Copy this config into your AI IDE (Cursor, Claude Desktop, Windsurf, etc.) so it can
-            talk to this ArcForge project through MCP.
+            Copy this config into your AI IDE so it can talk to this ArcForge project through MCP.
           </p>
+
+          {mcpStatus && (
+            <p className={`modal__hint ${attached ? "modal__hint--ok" : ""}`}>
+              {attached ? (
+                <>
+                  MCP is running at <code>{mcpStatus.url}</code>
+                  {mcpStatus.pid ? <> (pid {mcpStatus.pid})</> : null}. Stops when you close ArcForge
+                  or go Home.
+                  {mcpStatus.logPath ? (
+                    <>
+                      {" "}
+                      Log: <code>{mcpStatus.logPath}</code>
+                    </>
+                  ) : null}
+                </>
+              ) : mcpStatus.error ? (
+                <>
+                  MCP failed to start: {mcpStatus.error}
+                  {onRestartMcp && projectRoot ? (
+                    <>
+                      {" "}
+                      <button type="button" className="btn btn--small" onClick={onRestartMcp}>
+                        Retry
+                      </button>
+                    </>
+                  ) : null}
+                </>
+              ) : projectRoot ? (
+                "MCP starts automatically when a project is open."
+              ) : (
+                "Open a disk project to auto-start the attached MCP server."
+              )}
+            </p>
+          )}
+
+          <div className="modal__section">
+            <div className="modal__section-head">
+              <h3>MCP sidecar logs</h3>
+              <div className="toolbar__actions">
+                <button
+                  type="button"
+                  className="btn btn--small"
+                  disabled={logsBusy}
+                  onClick={() => void refreshLogs()}
+                >
+                  {logsBusy ? "Refreshing…" : "Refresh"}
+                </button>
+                <button type="button" className="btn btn--small" onClick={() => void handleCopyLogs()}>
+                  {copied === "logs" ? "Copied" : "Copy logs"}
+                </button>
+              </div>
+            </div>
+            <pre className="modal__code modal__code--logs">{logs || "No logs yet."}</pre>
+          </div>
 
           {!complete && (
             <p className="modal__hint">
-              Open a scene from disk (File → Open) so paths can be filled in, or replace the
-              placeholders below with your ArcForge and project folders.
+              Open a project from disk so paths can be filled in, or replace the placeholders below.
             </p>
           )}
 
@@ -129,29 +223,55 @@ export function ConnectMcpDialog({
             </label>
             <label className="field field--inline">
               <span>Access</span>
-              <select
-                value={mode}
-                onChange={(e) => setMode(e.target.value as McpAccessMode)}
-              >
+              <select value={mode} onChange={(e) => setMode(e.target.value as McpAccessMode)}>
                 <option value="readonly">Read-only</option>
                 <option value="write">Write (mutations)</option>
               </select>
             </label>
+            {editor === "opencode" && (
+              <label className="field field--inline">
+                <span>Transport</span>
+                <select
+                  value={transport}
+                  onChange={(e) => setTransport(e.target.value as McpTransport)}
+                >
+                  <option value="http">HTTP (recommended on Windows)</option>
+                  <option value="stdio">Local stdio</option>
+                </select>
+              </label>
+            )}
           </div>
 
-          <ol className="modal__steps">
-            <li>
-              Build the MCP server once:{" "}
-              <code>pnpm --filter @arcforge/mcp-server build</code>
-            </li>
-            <li>
-              Merge the JSON below into <code>{editorOption.configLocation}</code>.
-            </li>
-            <li>Restart the IDE MCP client / reload MCP servers.</li>
-            <li>
-              Ask the AI to call <code>docs.get_relevant</code> before editing.
-            </li>
-          </ol>
+          {editor === "opencode" && effectiveTransport === "http" ? (
+            <ol className="modal__steps">
+              <li>
+                Build once (if needed): <code>pnpm --filter @arcforge/mcp-server build</code>
+              </li>
+              <li>
+                {attached
+                  ? "ArcForge already started the HTTP MCP server for this project."
+                  : "Open a project in ArcForge so it can start the HTTP MCP server."}
+              </li>
+              <li>
+                Put the JSON below in your game project&apos;s <code>opencode.json</code>.
+              </li>
+              <li>Reload OpenCode — point it at the remote URL while ArcForge is open.</li>
+            </ol>
+          ) : (
+            <ol className="modal__steps">
+              <li>
+                Build the MCP server once:{" "}
+                <code>pnpm --filter @arcforge/mcp-server build</code>
+              </li>
+              <li>
+                Merge the JSON below into <code>{editorOption.configLocation}</code>.
+              </li>
+              <li>Restart the IDE MCP client / reload MCP servers.</li>
+              <li>
+                Ask the AI to call <code>docs.get_relevant</code> before editing.
+              </li>
+            </ol>
+          )}
 
           <div className="modal__section">
             <div className="modal__section-head">
@@ -163,27 +283,35 @@ export function ConnectMcpDialog({
             <pre className="modal__code">{json}</pre>
           </div>
 
-          <div className="modal__section">
-            <div className="modal__section-head">
-              <h3>CLI (optional)</h3>
-              <button type="button" className="btn btn--small" onClick={() => void handleCopyCli()}>
-                {copied === "cli" ? "Copied" : "Copy command"}
-              </button>
+          {!(editor === "opencode" && effectiveTransport === "http" && attached) && (
+            <div className="modal__section">
+              <div className="modal__section-head">
+                <h3>CLI (optional)</h3>
+                <button type="button" className="btn btn--small" onClick={() => void handleCopyCli()}>
+                  {copied === "cli" ? "Copied" : "Copy command"}
+                </button>
+              </div>
+              <pre className="modal__code">{cliCommand}</pre>
             </div>
-            <pre className="modal__code">{cliCommand}</pre>
-          </div>
+          )}
 
-          {editor === "opencode" && (
+          {editor === "opencode" && effectiveTransport === "http" && (
             <p className="muted modal__foot">
-              OpenCode keeps this server disabled until you change <code>enabled</code> to{" "}
-              <code>true</code>.
+              OpenCode Desktop on Windows often fails local stdio MCPs. Use HTTP remote mode and keep
+              ArcForge open so the attached server stays up.
+            </p>
+          )}
+
+          {editor === "opencode" && effectiveTransport === "stdio" && (
+            <p className="muted modal__foot">
+              Stdio may stay red on OpenCode Desktop for Windows. Prefer HTTP transport.
             </p>
           )}
 
           {editor !== "opencode" && (
             <p className="muted modal__foot">
               Save this configuration to <code>{editorOption.configLocation}</code>, then reload the
-              editor's MCP servers.
+              editor&apos;s MCP servers.
             </p>
           )}
         </div>

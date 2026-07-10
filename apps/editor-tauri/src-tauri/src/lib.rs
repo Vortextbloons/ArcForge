@@ -1,8 +1,15 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use tauri::AppHandle;
+use tauri::{AppHandle, RunEvent};
 use tauri_plugin_dialog::{DialogExt, FilePath};
+
+mod mcp_sidecar;
+
+use mcp_sidecar::{
+    get_mcp_server_logs, get_mcp_server_status, on_app_exit, start_mcp_server, stop_mcp_server,
+    McpSidecarState,
+};
 
 #[tauri::command]
 fn read_project_file(path: String) -> Result<String, String> {
@@ -89,6 +96,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
+        .manage(McpSidecarState::default())
         .invoke_handler(tauri::generate_handler![
             read_project_file,
             write_project_file,
@@ -97,8 +105,21 @@ pub fn run() {
             open_scene_dialog,
             open_project_dialog,
             pick_folder_dialog,
-            save_scene_dialog
+            save_scene_dialog,
+            start_mcp_server,
+            stop_mcp_server,
+            get_mcp_server_status,
+            get_mcp_server_logs
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| {
+            if let RunEvent::Exit = event {
+                on_app_exit(app_handle);
+            }
+            // Also stop when the last window is destroyed (before full Exit on some platforms).
+            if let RunEvent::ExitRequested { .. } = event {
+                on_app_exit(app_handle);
+            }
+        });
 }
