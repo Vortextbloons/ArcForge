@@ -4,6 +4,10 @@
   <p>A modular Tauri + Three.js game editor for creating shippable Three.js games.</p>
 
   <p>
+    <strong>ALPHA / WIP:</strong> This project is in early development, very broken, and not production-ready. Use at your own risk.
+  </p>
+
+  <p>
     <a href="https://github.com/Vortextbloons/ArcForge/releases"><img src="https://img.shields.io/github/v/release/Vortextbloons/ArcForge?style=flat-square&label=Latest" alt="Latest Release" /></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-ff8a1a?style=flat-square" alt="MIT License" /></a>
     <img src="https://img.shields.io/badge/Platform-Win%20%7C%20macOS%20%7C%20Linux-1ab8ff?style=flat-square" alt="Platforms" />
